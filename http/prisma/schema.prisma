@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////
+// ENUMS
+//////////////////////
+
+enum Role {
+  TEACHER
+  STUDENT
+  ADMIN
+}
+
+enum LectureStatus {
+  NOT_STARTED
+  STARTED
+  COMPLETED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+}
+
+//////////////////////
+// MODELS
+//////////////////////
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+
+  // Relations
+  courses     Course[]     @relation("TeacherCourses")
+  enrollments Enrollment[]
+  attendance  Attendance[]
+  participants Participant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+
+  teacherId   String
+  teacher     User     @relation("TeacherCourses", fields: [teacherId], references: [id])
+
+  lectures    Lecture[]
+  enrollments Enrollment[]
+
+  createdAt   DateTime @default(now())
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+
+  studentId String
+  courseId  String
+
+  student   User     @relation(fields: [studentId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, courseId])
+}
+
+model Lecture {
+  id        String        @id @default(uuid())
+  title     String
+  startTime DateTime
+  status    LectureStatus @default(NOT_STARTED)
+  meetingId String?       @unique
+
+  courseId  String
+  course    Course        @relation(fields: [courseId], references: [id])
+
+  participants Participant[]
+  attendance   Attendance[]
+
+  createdAt DateTime @default(now())
+}
+
+//
+// Realtime presence (socket-driven)
+// NOT academic truth
+//
+model Participant {
+  id        String   @id @default(uuid())
+
+  userId    String
+  lectureId String
+  role      Role
+
+  joinTime  DateTime @default(now())
+  leaveTime DateTime?
+
+  user      User    @relation(fields: [userId], references: [id])
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+
+  @@index([lectureId])
+}
+
+//
+// Derived academic truth
+// Calculated from join/leave time
+//
+model Attendance {
+  id          String   @id @default(uuid())
+
+  studentId   String
+  lectureId   String
+
+  joinTime    DateTime?
+  leaveTime   DateTime?
+  durationSec Int       @default(0)
+  status      AttendanceStatus
+
+  student     User     @relation(fields: [studentId], references: [id])
+  lecture     Lecture  @relation(fields: [lectureId], references: [id])
+
+  @@unique([studentId, lectureId])
+}
