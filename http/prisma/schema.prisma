@@ -54,6 +54,10 @@ model Course {
   id          String   @id @default(uuid())
   title       String
   description String
+  imageUrl    String
+  isEnrollmentOpen  Boolean  @default(true)
+  isDeleted   Boolean   @default(false)
+  isDisabled  Boolean   @default(false)
 
   teacherId   String
   teacher     User     @relation("TeacherCourses", fields: [teacherId], references: [id])
@@ -62,6 +66,7 @@ model Course {
   enrollments Enrollment[]
 
   createdAt   DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Enrollment {
