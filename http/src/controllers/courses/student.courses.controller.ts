@@ -1,10 +1,12 @@
 import type { Request, Response } from "express";
-import CourseRepositories from "../../repositories/courses/courses.repositories.js";
+import CourseServices from "../../services/course.services.js";
 
 const StudentCoursesController = {
   getEnrolledCourses: async (req: Request, res: Response) => {
     try {
-      const courses = await CourseRepositories.findEnrolledCourses(req.user.id);
+      const courses = await CourseServices.getEnrolledCoursesStudent(
+        req.user.id,
+      );
       if (!courses)
         return res
           .status(400)
@@ -24,7 +26,7 @@ const StudentCoursesController = {
   getEnrolledCourseById: async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const course = await CourseRepositories.findEnrolledCourseById(
+      const course = await CourseServices.getEnrolledCourseByIdStudent(
         req.user.id,
         id as string,
       );

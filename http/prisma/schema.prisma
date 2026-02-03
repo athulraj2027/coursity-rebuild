@@ -89,6 +89,7 @@ model Lecture {
   startTime DateTime
   status    LectureStatus @default(NOT_STARTED)
   meetingId String?       @unique
+  isDeleted Boolean       @default(false)
 
   courseId  String
   course    Course        @relation(fields: [courseId], references: [id])

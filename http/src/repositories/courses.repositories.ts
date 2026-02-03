@@ -1,6 +1,22 @@
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../lib/prisma.js";
 
 const CourseRepositories = {
+  async CreateCourseOwnerInternal(
+    title: string,
+    description: string,
+    imageUrl: string,
+    userId: string,
+  ) {
+    return prisma.course.create({
+      data: {
+        title,
+        description,
+        imageUrl,
+        teacherId: userId,
+      },
+    });
+  },
+
   // Full data (admin / internal use)
   async findAllInternal() {
     return prisma.course.findMany({
@@ -14,6 +30,17 @@ const CourseRepositories = {
     });
   },
 
+  async isCourseOwnedByUser(userId: string, courseId: string) {
+    return prisma.course.findFirst({
+      where: {
+        id: courseId,
+        teacherId: userId,
+        isDeleted: false,
+      },
+      select: { id: true },
+    });
+  },
+  
   // Public-safe course list
   async findAllPublic() {
     return prisma.course.findMany({

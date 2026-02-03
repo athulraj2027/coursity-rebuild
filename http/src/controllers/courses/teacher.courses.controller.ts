@@ -1,13 +1,11 @@
 import type { Request, Response } from "express";
-import CourseRepositories from "../../repositories/courses/courses.repositories.js";
 import { pick } from "../../utils/pick.js";
+import CourseServices from "../../services/course.services.js";
 
 const TeacherCourseController = {
   getMyCourses: async (req: Request, res: Response) => {
     try {
-      const courses = await CourseRepositories.findAllInternalOwnerView(
-        req.user.id,
-      );
+      const courses = await CourseServices.getCourses(req.user.id);
       if (!courses)
         return res
           .status(400)
@@ -24,7 +22,7 @@ const TeacherCourseController = {
   getMyCourseById: async (req: Request, res: Response) => {
     const id = req.params.id;
     try {
-      const course = await CourseRepositories.findByIdInternalOwnerView(
+      const course = await CourseServices.getCourseByIdOwner(
         id as string,
         req.user.id,
       );
@@ -38,6 +36,27 @@ const TeacherCourseController = {
       return res
         .status(500)
         .json({ success: false, message: "Couldnt fetch course" });
+    }
+  },
+
+  createCourse: async (req: Request, res: Response) => {
+    const { title, description, imageUrl } = req.body;
+    try {
+      const course = await CourseServices.createCourse(
+        title,
+        description,
+        imageUrl,
+        req.user,
+      );
+      if (!course)
+        return res
+          .status(400)
+          .json({ success: false, message: "Couldn't create course" });
+    } catch (error) {
+      console.log("Failed to create course : ", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to create course" });
     }
   },
 
@@ -55,9 +74,9 @@ const TeacherCourseController = {
 
     const safeUpdates = pick(updates, allowedFields);
     try {
-      const course = await CourseRepositories.patchCourseByOwner(
+      const course = await CourseServices.patchCourseById(
         id as string,
-        req.user.id,
+        req.user,
         safeUpdates,
       );
       if (!course) {

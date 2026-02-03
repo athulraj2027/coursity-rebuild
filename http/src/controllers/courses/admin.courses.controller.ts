@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import CourseServices from "../../services/course.services.js";
-import CourseRepositories from "../../repositories/courses/courses.repositories.js";
 
 const AdminCoursesController = {
   getCourses: async (req: Request, res: Response) => {
@@ -20,8 +19,9 @@ const AdminCoursesController = {
   },
 
   getCourse: async (req: Request, res: Response) => {
+    const { id } = req.params;
     try {
-      const course = await CourseServices.getCourseById(req.user);
+      const course = await CourseServices.getCourseById(id as string, req.user);
       if (!course)
         return res
           .status(400)
@@ -39,12 +39,18 @@ const AdminCoursesController = {
     try {
       const { id } = req.params;
       const isDisabled = req.body;
-      const course = await CourseRepositories.toggleDisableCourseInternal(
+      const course = await CourseServices.patchCourseById(
         id as string,
+        req.user,
         isDisabled,
       );
       return res.status(200).json(course);
-    } catch (error) {}
+    } catch (error) {
+      console.log("Error in editing course for admin : ", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Couldn't edit course" });
+    }
   },
 };
 
