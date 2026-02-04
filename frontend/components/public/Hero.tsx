@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -17,10 +18,16 @@ const Hero = () => {
         </p>
 
         <div className="mt-10 flex items-center justify-center gap-4">
-          <Button size="lg" className="px-8">
-            Get Started
-          </Button>
-          <Button size="lg" variant="outline" className="px-8">
+          <Link href={`/sign-up`}>
+            <Button size="lg" className="px-8">
+              Get Started
+            </Button>
+          </Link>
+          <Button
+            size="lg"
+            variant="outline"
+            className="px-8 backdrop-blur-2xl bg-white/20 hover:bg-white/50"
+          >
             View Demo
           </Button>
         </div>
@@ -30,4 +37,3 @@ const Hero = () => {
 };
 
 export default Hero;
-

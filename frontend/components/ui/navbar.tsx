@@ -14,6 +14,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 // Simple logo component for the navbar
 // const Logo = (props: React.SVGAttributes<SVGElement>) => {
@@ -158,7 +159,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     return (
       <header
         className={cn(
-          "sticky top-0 z-50 w-full  bg-background/10 backdrop-blur-md supports-[backdrop-filter]:bg-background/20 px-4 md:px-6 [&_*]:no-underline",
+          "sticky top-0 z-50 w-full  bg-background/10 backdrop-blur-md supports-backdrop-filter:bg-background/20 px-4 md:px-6 **:no-underline",
           className,
         )}
         ref={combinedRef}
@@ -205,16 +206,18 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             )}
             {/* Main nav */}
             <div className="flex items-center gap-6">
-              <button
-                type="button"
-                className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
-                onClick={(e) => e.preventDefault()}
-              >
-                <div className="text-2xl">{logo}</div>
-                <span className="hidden font-extrabold text-xl sm:inline-block">
-                  Coursity
-                </span>
-              </button>
+              <Link href={`/`}>
+                <button
+                  type="button"
+                  className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  <div className="text-2xl">{logo}</div>
+                  <span className="hidden font-extrabold text-xl sm:inline-block">
+                    Coursity
+                  </span>
+                </button>
+              </Link>
               {/* Navigation menu */}
               {!isMobile && (
                 <NavigationMenu className="flex">
@@ -276,7 +279,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 
 Navbar.displayName = "Navbar";
 
-export { Logo, HamburgerIcon };
+export { HamburgerIcon };
 
 // Demo
 export function Demo() {

@@ -1,8 +1,7 @@
-import Hero from "@/components/public/Hero";
-// import HowItWorks from "@/components/public/HowItWorks";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import AppNavbar from "@/components/public/Navbar";
 
-export default function Home() {
+export default function PublicLayout({ children }: { children: any }) {
   return (
     <div className="min-h-screen w-full relative">
       {/* Radial Gradient Background from Top */}
@@ -14,8 +13,9 @@ export default function Home() {
       />
       <div className="relative z-10">
         <AppNavbar />
-        <Hero />
-        {/* <HowItWorks /> */}
+        <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+          {children}
+        </div>
         {/* Top courses, top teachers, testimonials */}
       </div>
     </div>
