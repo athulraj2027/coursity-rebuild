@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import LectureServices from "../../services/lecture.services.js";
 import { pick } from "../../utils/pick.js";
+import AttendanceService from "../../services/attendance.services.js";
 
 const TeacherLectureController = {
   createLecture: async (req: Request, res: Response) => {
@@ -62,6 +63,7 @@ const TeacherLectureController = {
     const user = req.user;
     try {
       await LectureServices.endLecture(id as string, user.id);
+      await AttendanceService.finalizeAttendance(user.id, id as string);
       return res.status(200).json({ success: true });
     } catch (error: any) {
       console.log("Failed to end the class : ", error);

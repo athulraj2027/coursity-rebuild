@@ -52,8 +52,6 @@ const LectureServices = {
     return LectureRepositories.updateLectureOwner(lectureId, user.id, updates);
   },
 
-  joinLecture: async (lectureId: string, userId: string) => {},
-  leaveLecture: async (lectureId: string, userId: string) => {},
   startLecture: async (lectureId: string, userId: string) => {
     const lecture = await LectureRepositories.findByIdOwner(userId, lectureId);
     if (!lecture) throw new Error("No lecture found");
@@ -68,6 +66,7 @@ const LectureServices = {
     const lecture = await LectureRepositories.findByIdOwner(userId, lectureId);
     if (!lecture) throw new Error("No lecture found");
     if (lecture.status !== "STARTED") throw new Error("Lecture is not started");
+    // update attendance
     return LectureRepositories.endLectureOwner(lectureId);
   },
 };
