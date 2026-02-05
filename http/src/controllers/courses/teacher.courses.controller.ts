@@ -11,8 +11,13 @@ const TeacherCourseController = {
           .status(400)
           .json({ success: false, message: "Your courses not found" });
       return res.status(200).json(courses);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error in getting teacher's courses : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Couldnt fetch courses" });
@@ -31,8 +36,13 @@ const TeacherCourseController = {
           .status(400)
           .json({ success: false, message: "The course not found" });
       return res.status(200).json(course);
-    } catch (error) {
+    } catch (error: any) {
       console.log(`DError in getting teacher's course with id ${id} : `, error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Couldnt fetch course" });
@@ -52,8 +62,13 @@ const TeacherCourseController = {
         return res
           .status(400)
           .json({ success: false, message: "Couldn't create course" });
-    } catch (error) {
+    } catch (error: any) {
       console.log("Failed to create course : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Failed to create course" });
@@ -86,8 +101,13 @@ const TeacherCourseController = {
         });
       }
       return res.status(200).json(course);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Failed to update course : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Failed to update course" });

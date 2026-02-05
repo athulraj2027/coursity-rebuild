@@ -18,6 +18,11 @@ const TeacherLectureController = {
       return res.json(newLecture);
     } catch (error: any) {
       console.log("Failed to create course");
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -42,6 +47,11 @@ const TeacherLectureController = {
       return res.status(200).json({ success: true, lecture });
     } catch (error: any) {
       console.log("Failed to update course : ", error.message);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -54,6 +64,11 @@ const TeacherLectureController = {
       return res.status(200).json({ success: true });
     } catch (error: any) {
       console.log("Failed to start the class : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },
@@ -67,6 +82,11 @@ const TeacherLectureController = {
       return res.status(200).json({ success: true });
     } catch (error: any) {
       console.log("Failed to end the class : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },

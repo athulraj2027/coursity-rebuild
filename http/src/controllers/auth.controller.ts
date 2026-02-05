@@ -10,6 +10,11 @@ const AuthController = {
       const token = generateToken(user.id, user.role);
       return res.status(201).json(token);
     } catch (error: any) {
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
     }
@@ -21,9 +26,14 @@ const AuthController = {
       const user = await AuthServices.signinUser(email, password, role);
       const token = generateToken(user.id, user.role);
       return res.status(201).json({ user, token });
-    } catch (err: any) {
-      console.error(err);
-      res.status(500).json({ success: false, message: err.message });
+    } catch (error: any) {
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 };

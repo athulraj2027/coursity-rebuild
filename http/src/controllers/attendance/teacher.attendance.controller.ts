@@ -13,6 +13,11 @@ const TeacherAttendanceController = {
       return res.status(200).json({ success: true });
     } catch (error: any) {
       console.log("ERror in finalizing attendance : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({ success: false, message: error.message });
     }
   },

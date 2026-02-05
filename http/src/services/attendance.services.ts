@@ -1,14 +1,15 @@
 import AttendanceRepositories from "../repositories/attendance.repositories.js";
+import { AppError } from "../utils/AppError.js";
 const LATE_THRESHOLD_MIN = 10;
 const PRESENT_THRESHOLD_PERCENT = 70;
 
 const AttendanceService = {
   markAttendanceJoin: async (lectureId: string, studentId: string) => {
     const lecture = await AttendanceRepositories.findLectureById(lectureId);
-    if (!lecture) throw new Error("Lecture not found");
+    if (!lecture) throw new AppError("Lecture not found", 400);
 
     if (lecture.status !== "STARTED") {
-      throw new Error("Lecture is not live");
+      throw new AppError("Lecture is not live", 400);
     }
 
     const enrollment = await AttendanceRepositories.isStudentEnrolled(
@@ -17,7 +18,7 @@ const AttendanceService = {
     );
 
     if (!enrollment) {
-      throw new Error("Student not enrolled in course");
+      throw new AppError("Student not enrolled in course", 300);
     }
 
     return AttendanceRepositories.upsertJoinTime(
@@ -33,8 +34,9 @@ const AttendanceService = {
     leaveTime: Date,
   ) => {
     const lecture = await AttendanceRepositories.findLectureById(lectureId);
-    if (!lecture) throw new Error("Lecture not found");
-    if (lecture.status !== "STARTED") throw new Error("Lecture is not live");
+    if (!lecture) throw new AppError("Lecture not found", 400);
+    if (lecture.status !== "STARTED")
+      throw new AppError("Lecture is not live", 403);
 
     const attendance =
       await AttendanceRepositories.findAttendanceByStudentAndLectureIds(
@@ -43,7 +45,7 @@ const AttendanceService = {
       );
 
     if (!attendance || !attendance.joinTime)
-      throw new Error("Attendance credentials not found");
+      throw new AppError("Attendance credentials not found", 400);
 
     const now = new Date();
     const sessionDuration = Math.floor(
@@ -62,18 +64,18 @@ const AttendanceService = {
     const lecture =
       await AttendanceRepositories.findLectureWithCourse(lectureId);
 
-    if (!lecture) throw new Error("Lecture not found");
+    if (!lecture) throw new AppError("Lecture not found", 400);
 
     if (lecture.course.teacherId !== teacherId) {
-      throw new Error("Unauthorized");
+      throw new AppError("Unauthorized", 403);
     }
 
     if (lecture.status !== "STARTED") {
-      throw new Error("Lecture is not live");
+      throw new AppError("Lecture is not live", 403);
     }
 
     if (!lecture.startTime) {
-      throw new Error("Lecture start time missing");
+      throw new AppError("Lecture start time missing", 400);
     }
 
     const lectureEndTime = new Date();

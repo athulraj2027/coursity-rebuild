@@ -10,8 +10,13 @@ const PublicCoursesController = {
           .status(400)
           .json({ success: false, message: "Courses not found" });
       return res.status(200).json(courses);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error in getting all courses for public : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Couldn't get courses" });
@@ -27,8 +32,13 @@ const PublicCoursesController = {
           .status(400)
           .json({ success: false, message: "Course not found" });
       return res.status(200).json(course);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error in getting course for public : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Couldn't get course" });

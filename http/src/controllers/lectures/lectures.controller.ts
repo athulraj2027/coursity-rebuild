@@ -11,8 +11,13 @@ const LectureController = {
           .json({ success: false, message: "Lectures not found" });
 
       return res.status(200).json({ success: true, lectures });
-    } catch (error) {
+    } catch (error: any) {
       console.log("Failed to fetch lectures for student : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Failed to fetch lectures" });
@@ -31,8 +36,13 @@ const LectureController = {
           .status(400)
           .json({ success: false, message: "Lectures not found" });
       return res.status(200).json({ success: true, lecture });
-    } catch (error) {
+    } catch (error: any) {
       console.log("Failed to fetch lecture for student: ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Failed to fetch lecture" });

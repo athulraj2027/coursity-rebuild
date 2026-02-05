@@ -1,5 +1,6 @@
 import CourseRepositories from "../repositories/courses.repositories.js";
 import LectureRepositories from "../repositories/lectures.repositories.js";
+import { AppError } from "../utils/AppError.js";
 
 const LectureServices = {
   getLectures: async (user: any) => {
@@ -45,27 +46,28 @@ const LectureServices = {
 
   editLecture: async (lectureId: string, user: any, updates: any) => {
     const lecture = await LectureRepositories.findByIdOwner(user.id, lectureId);
-    if (!lecture) throw new Error("Lecture not found");
+    if (!lecture) throw new AppError("Lecture not found", 400);
     if (lecture.status !== "NOT_STARTED")
-      throw new Error("Only lectures not started is allowed to edit");
+      throw new AppError("Only lectures not started is allowed to edit", 403);
 
     return LectureRepositories.updateLectureOwner(lectureId, user.id, updates);
   },
 
   startLecture: async (lectureId: string, userId: string) => {
     const lecture = await LectureRepositories.findByIdOwner(userId, lectureId);
-    if (!lecture) throw new Error("No lecture found");
+    if (!lecture) throw new AppError("No lecture found", 400);
 
     if (lecture.status !== "NOT_STARTED")
-      throw new Error("Lecture can't be started again");
+      throw new AppError("Lecture can't be started again", 403);
 
     return LectureRepositories.startLectureOwner(lecture.id);
   },
 
   endLecture: async (lectureId: string, userId: string) => {
     const lecture = await LectureRepositories.findByIdOwner(userId, lectureId);
-    if (!lecture) throw new Error("No lecture found");
-    if (lecture.status !== "STARTED") throw new Error("Lecture is not started");
+    if (!lecture) throw new AppError("No lecture found", 400);
+    if (lecture.status !== "STARTED")
+      throw new AppError("Lecture is not started", 403);
     // update attendance
     return LectureRepositories.endLectureOwner(lectureId);
   },
