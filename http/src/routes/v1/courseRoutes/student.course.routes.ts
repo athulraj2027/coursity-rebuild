@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.get("/enrolled", StudentCoursesController.getEnrolledCourses);
 router.get("/enrolled/:id", StudentCoursesController.getEnrolledCourseById);
-router.post("/:id/enroll");
+// router.post("/:id/enroll");
 
 export default router;

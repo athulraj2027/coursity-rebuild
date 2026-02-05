@@ -16,66 +16,6 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-// Simple logo component for the navbar
-// const Logo = (props: React.SVGAttributes<SVGElement>) => {
-//   return (
-//     <svg
-//       aria-label="Logo"
-//       role="img"
-//       fill="none"
-//       height="1em"
-//       viewBox="0 0 324 323"
-//       width="1em"
-//       xmlns="http://www.w3.org/2000/svg"
-//       {...(props as any)}
-//     >
-//       <rect fill="currentColor" height="323" rx="161.5" width="323" x="0.5" />
-//       <circle
-//         cx="162"
-//         cy="161.5"
-//         fill="white"
-//         r="60"
-//         className="dark:fill-black"
-//       />
-//     </svg>
-//   );
-// };
-
-// Hamburger icon component
-const HamburgerIcon = ({
-  className,
-  ...props
-}: React.SVGAttributes<SVGElement>) => (
-  <svg
-    aria-label="Menu"
-    className={cn("pointer-events-none", className)}
-    fill="none"
-    height={16}
-    role="img"
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="2"
-    viewBox="0 0 24 24"
-    width={16}
-    xmlns="http://www.w3.org/2000/svg"
-    {...(props as any)}
-  >
-    <path
-      className="origin-center -translate-y-1.75 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-315"
-      d="M4 12L20 12"
-    />
-    <path
-      className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
-      d="M4 12H20"
-    />
-    <path
-      className="origin-center translate-y-1.75 transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-135"
-      d="M4 12H20"
-    />
-  </svg>
-);
-
 // Types
 export interface NavbarNavLink {
   href: string;
@@ -177,7 +117,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                     size="icon"
                     variant="ghost"
                   >
-                    <HamburgerIcon />
+                    {/* icon */}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-48 p-2">
@@ -210,7 +150,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 <button
                   type="button"
                   className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
-                  onClick={(e) => e.preventDefault()}
                 >
                   <div className="text-2xl">{logo}</div>
                   <span className="hidden font-extrabold text-xl sm:inline-block">
@@ -278,8 +217,6 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 );
 
 Navbar.displayName = "Navbar";
-
-export { HamburgerIcon };
 
 // Demo
 export function Demo() {
