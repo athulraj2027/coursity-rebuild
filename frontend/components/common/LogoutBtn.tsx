@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import { SidebarMenuButton } from "../ui/sidebar";
+import { LogOut } from "lucide-react";
 
 const LogoutBtn = () => {
   const router = useRouter();
@@ -17,9 +19,10 @@ const LogoutBtn = () => {
     setLoggingOut(false);
   };
   return (
-    <Button onClick={HandlelogoutUser} disabled={loggingOut}>
+    <SidebarMenuButton onClick={HandlelogoutUser} disabled={loggingOut}>
+      <LogOut />
       {loggingOut ? "Logging you out" : "Logout"}
-    </Button>
+    </SidebarMenuButton>
   );
 };
 

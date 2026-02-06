@@ -61,3 +61,20 @@ export const logoutApi = async () => {
 
   return res.json(); // user / token / message
 };
+
+export const meApi = async () => {
+  const res = await fetch(`${BACKEND_URL}/auth/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  console.log(res);
+  if (!res.ok) {
+    throw new Error("Unauthorized");
+  }
+
+  return res.json();
+};

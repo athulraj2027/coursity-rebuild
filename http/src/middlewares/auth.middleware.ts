@@ -9,6 +9,7 @@ export const authMiddleware = (
 ) => {
   const token = req.cookies?.auth_token;
 
+  console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -18,12 +19,14 @@ export const authMiddleware = (
       process.env.JWT_SECRET || "myjwtsecret",
     ) as AuthPayload;
 
-    // attach user to request
+    // attach user to reques
+    console.log(decoded);
     req.user = {
-      id: decoded.id as string,
+      id: decoded.userId as string,
       role: decoded.role,
     };
 
+    console.log(req.user);
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });
