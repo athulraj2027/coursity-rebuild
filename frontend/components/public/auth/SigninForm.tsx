@@ -15,7 +15,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { areFieldsFilled } from "@/lib/handleFormChange";
 import { SIGNIN_FORM_REQUIRED_FIELDS } from "@/utils/constants/authForm";
 import { useAuth } from "@/hooks/useAuth";
-import { getUserFromToken } from "@/lib/token";
 import { useRouter } from "next/navigation";
 
 const SigninForm = () => {
@@ -28,12 +27,12 @@ const SigninForm = () => {
     setIsSubmitting(true);
     try {
       const data = await signinUser(new FormData(e.currentTarget));
-      console.log(data);
+      //   console.log(data);
 
-      if (data) {
-        const user = getUserFromToken();
-        console.log("redirecting ...",user);
-        router.push(`/${user?.role.toLocaleLowerCase()}`);
+      if (data?.success) {
+        console.log("redirecting ...");
+        router.replace(`/${data.res.role.toLocaleLowerCase()}`);
+        return;
       }
     } catch (error) {
       console.log("error : ", error);
@@ -65,7 +64,7 @@ const SigninForm = () => {
           />
         </div>
 
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <Label htmlFor="role">You are (select your designation):</Label>
 
           <RadioGroup
@@ -112,7 +111,7 @@ const SigninForm = () => {
         </div>
 
         {/* Password */}
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
             {/* <Link

@@ -8,7 +8,18 @@ const AuthController = {
     try {
       const user = await AuthServices.signupUser(name, email, role, password);
       const token = generateToken(user.id, user.role);
-      return res.status(201).json(token);
+      res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      return res.status(201).json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
     } catch (error: any) {
       if (error.statusCode) {
         return res
@@ -25,7 +36,18 @@ const AuthController = {
       const { email, password, role } = req.body;
       const user = await AuthServices.signinUser(email, password, role);
       const token = generateToken(user.id, user.role);
-      return res.status(201).json({ user, token });
+      res.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      return res.status(201).json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
     } catch (error: any) {
       if (error.statusCode) {
         return res
@@ -34,6 +56,50 @@ const AuthController = {
       }
       console.error(error);
       res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  logout: async (req: Request, res: Response) => {
+    try {
+      res.clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Logged out successfully",
+      });
+    } catch (error: any) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to logout",
+      });
+    }
+  },
+
+  me: async (req: Request, res: Response) => {
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      });
+    }
+    try {
+      const user = await AuthServices.getUserById(userId);
+      return res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch user",
+      });
     }
   },
 };

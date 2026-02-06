@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import v1Routes from "./routes/v1/index.routes.js";
 
 const PORT = process.env.PORT;
@@ -12,7 +13,7 @@ app.use(
     credentials: true,
   }),
 );
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

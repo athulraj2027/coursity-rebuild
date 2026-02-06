@@ -25,6 +25,19 @@ const AuthRepositories = {
   async signin(email: string) {
     return prisma.user.findUnique({ where: { email } });
   },
+
+  async findById(userId: string) {
+    return prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+  },
 };
 
 export default AuthRepositories;

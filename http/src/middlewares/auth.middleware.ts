@@ -7,14 +7,11 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.auth_token;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-
-  const token = authHeader.split(" ")[1];
-
   try {
     const decoded = jwt.verify(
       token as string,

@@ -13,7 +13,7 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { getUserFromToken } from "@/lib/token";
+
 import { areFieldsFilled } from "@/lib/handleFormChange";
 import { SIGNUP_FORM_REQUIRED_FIELDS } from "@/utils/constants/authForm";
 
@@ -28,11 +28,12 @@ const SignupForm = () => {
     setIsSubmitting(true);
     try {
       const data = await signupUser(new FormData(e.currentTarget));
-      console.log(data);
+      //   console.log(data);
 
-      if (data) {
-        const user = getUserFromToken();
-        router.push(`/${user?.role.toLocaleLowerCase()}`);
+      if (data?.success) {
+        console.log("redirecting...");
+        router.replace(`/${data.res.role.toLocaleLowerCase()}`);
+        return;
       }
     } catch (error) {
       console.log("error : ", error);
@@ -66,7 +67,7 @@ const SignupForm = () => {
         </div>
 
         {/* Email */}
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
@@ -77,7 +78,7 @@ const SignupForm = () => {
           />
         </div>
 
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <Label htmlFor="role">You are (select your designation):</Label>
 
           <RadioGroup
@@ -124,13 +125,13 @@ const SignupForm = () => {
         </div>
 
         {/* Password */}
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <Label htmlFor="password">Password</Label>
           <Input id="password" type="password" name="password" required />
         </div>
 
         {/* Confirm Password */}
-        <div className="grid gap-2">
+        <div className="grid gap-2 mt-2">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input
             id="confirmPassword"

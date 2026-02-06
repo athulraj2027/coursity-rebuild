@@ -31,5 +31,9 @@ const AuthServices = {
 
     return user;
   },
+
+  getUserById: async (userId: string) => {
+    return AuthRepositories.findById(userId);
+  },
 };
 export default AuthServices;
