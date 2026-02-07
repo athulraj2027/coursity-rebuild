@@ -31,7 +31,7 @@ const SigninForm = () => {
 
       if (data?.success) {
         console.log("redirecting ...");
-        router.replace(`/${data.res.role.toLocaleLowerCase()}`);
+        router.replace(`/${data.res?.role.toLocaleLowerCase()}`);
         return;
       }
     } catch (error) {

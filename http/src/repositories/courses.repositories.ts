@@ -5,6 +5,8 @@ const CourseRepositories = {
     title: string,
     description: string,
     imageUrl: string,
+    priceString: string,
+    startDate: Date,
     userId: string,
   ) {
     return prisma.course.create({
@@ -12,6 +14,8 @@ const CourseRepositories = {
         title,
         description,
         imageUrl,
+        price: Number(priceString),
+        startDate,
         teacherId: userId,
       },
     });
@@ -40,7 +44,7 @@ const CourseRepositories = {
       select: { id: true },
     });
   },
-  
+
   // Public-safe course list
   async findAllPublic() {
     return prisma.course.findMany({

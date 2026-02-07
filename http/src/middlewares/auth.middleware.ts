@@ -9,7 +9,7 @@ export const authMiddleware = (
 ) => {
   const token = req.cookies?.auth_token;
 
-  console.log(token);
+  // console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -20,13 +20,13 @@ export const authMiddleware = (
     ) as AuthPayload;
 
     // attach user to reques
-    console.log(decoded);
+    // console.log(decoded);
     req.user = {
       id: decoded.userId as string,
       role: decoded.role,
     };
 
-    console.log(req.user);
+    // console.log(req.user);
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });

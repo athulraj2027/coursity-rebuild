@@ -55,6 +55,8 @@ model Course {
   title       String
   description String
   imageUrl    String
+  price       Int
+  startDate   DateTime
   isEnrollmentOpen  Boolean  @default(true)
   isDeleted   Boolean   @default(false)
   isDisabled  Boolean   @default(false)

@@ -50,18 +50,21 @@ const TeacherCourseController = {
   },
 
   createCourse: async (req: Request, res: Response) => {
-    const { title, description, imageUrl } = req.body;
+    const { title, description, imageUrl, price, startDate } = req.body;
     try {
       const course = await CourseServices.createCourse(
         title,
         description,
         imageUrl,
+        price,
+        startDate,
         req.user,
       );
       if (!course)
         return res
           .status(400)
           .json({ success: false, message: "Couldn't create course" });
+      return res.status(200).json({ success: true, course });
     } catch (error: any) {
       console.log("Failed to create course : ", error);
       if (error.statusCode) {

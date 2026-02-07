@@ -1,80 +1,41 @@
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { apiRequest } from "@/lib/apiClient";
 
-export const signupApi = async (data: {
+type Role = "STUDENT" | "TEACHER" | "ADMIN";
+
+export const signupApi = (data: {
   name: string;
   email: string;
-  role: "STUDENT" | "TEACHER" | "ADMIN";
+  role: Role;
   password: string;
 }) => {
-  const res = await fetch(`${BACKEND_URL}/auth/signup`, {
+  return apiRequest({
+    path: "/auth/signup",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(data),
+    body: data,
   });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Signup failed");
-  }
-
-  return res.json(); // user / token / message
 };
 
-export const signinApi = async (data: {
+export const signinApi = (data: {
   email: string;
-  role: "STUDENT" | "TEACHER" | "ADMIN";
+  role: Role;
   password: string;
 }) => {
-  const res = await fetch(`${BACKEND_URL}/auth/signin`, {
+  return apiRequest({
+    path: "/auth/signin",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(data),
+    body: data,
   });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Signin failed");
-  }
-
-  return res.json(); // user / token / message
 };
 
-export const logoutApi = async () => {
-  const res = await fetch(`${BACKEND_URL}/auth/logout`, {
+export const logoutApi = () => {
+  return apiRequest({
+    path: "/auth/logout",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
   });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || "Logout failed");
-  }
-
-  return res.json(); // user / token / message
 };
 
-export const meApi = async () => {
-  const res = await fetch(`${BACKEND_URL}/auth/me`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
+export const meApi = () => {
+  return apiRequest({
+    path: "/auth/me",
   });
-
-  console.log(res);
-  if (!res.ok) {
-    throw new Error("Unauthorized");
-  }
-
-  return res.json();
 };

@@ -1,3 +1,4 @@
+"use client";
 import {
   SidebarFooter,
   SidebarMenu,
@@ -7,8 +8,11 @@ import {
 import React from "react";
 import LogoutBtn from "../LogoutBtn";
 import { Moon, Settings, User2 } from "lucide-react";
+import { useMe } from "@/queries/auth.queries";
 
 const Footer = () => {
+  const { isLoading } = useMe();
+  if (isLoading) return null;
   return (
     <SidebarFooter>
       <SidebarMenu>

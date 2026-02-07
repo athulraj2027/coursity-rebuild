@@ -25,12 +25,16 @@ const CourseServices = {
     title: string,
     description: string,
     imageUrl: string,
+    price: string,
+    startDate: Date,
     user: any,
   ) => {
     return CourseRepositories.CreateCourseOwnerInternal(
       title,
       description,
       imageUrl,
+      price,
+      startDate,
       user.id,
     );
   },
