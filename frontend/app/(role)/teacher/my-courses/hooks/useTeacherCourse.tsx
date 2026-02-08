@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback } from "react";
-import { FileWithPreview } from "./use-file-upload";
+
 import { createCourseApi } from "@/services/course.services";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 import { toast } from "sonner";
+import { FileWithPreview } from "@/hooks/use-file-upload";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useCourse = () => {
+  const queryClient = useQueryClient();
   const createCourse = useCallback(
     async (payload: {
       title: string;
@@ -17,7 +20,7 @@ export const useCourse = () => {
       try {
         // uploadd image and get imageurl
         const imageUrl = await uploadToCloudinary(payload.image.file as File);
-        console.log("image url : ", imageUrl);
+        // console.log("image url : ", imageUrl);
         // create course
         const res: any = await createCourseApi({
           title: payload.title,
@@ -32,8 +35,10 @@ export const useCourse = () => {
           toast.error(res.message);
           return { success: false };
         }
+        queryClient.invalidateQueries({ queryKey: ["my-courses"] });
         toast.success("Course created successfully");
-        return { success: true, course: res.course };
+
+        return res;
         // return
       } catch (err: any) {
         toast.error(err.message);
@@ -41,7 +46,7 @@ export const useCourse = () => {
         return { success: false };
       }
     },
-    [],
+    [queryClient],
   );
 
   return { createCourse };

@@ -5,11 +5,13 @@ import CourseServices from "../../services/course.services.js";
 const TeacherCourseController = {
   getMyCourses: async (req: Request, res: Response) => {
     try {
-      const courses = await CourseServices.getCourses(req.user.id);
+      console.log("req user : ", req.user);
+      const courses = await CourseServices.getCourses(req.user);
       if (!courses)
         return res
           .status(400)
           .json({ success: false, message: "Your courses not found" });
+      console.log("courses : ", courses);
       return res.status(200).json(courses);
     } catch (error: any) {
       console.log("Error in getting teacher's courses : ", error);
@@ -27,9 +29,9 @@ const TeacherCourseController = {
   getMyCourseById: async (req: Request, res: Response) => {
     const id = req.params.id;
     try {
-      const course = await CourseServices.getCourseByIdOwner(
+      const course = await CourseServices.getCourseById(
         id as string,
-        req.user.id,
+        req.user,
       );
       if (!course)
         return res

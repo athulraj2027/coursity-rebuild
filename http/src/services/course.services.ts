@@ -8,6 +8,8 @@ const CourseServices = {
         return CourseRepositories.findAllInternal;
       case "STUDENT":
         return CourseRepositories.findAllPublic;
+      case "TEACHER":
+        return CourseRepositories.findAllInternalOwnerView(user.id);
     }
   },
 
@@ -18,6 +20,8 @@ const CourseServices = {
         return CourseRepositories.findByIdInternal(courseId);
       case "STUDENT":
         return CourseRepositories.findByIdPublic(courseId);
+      case "TEACHER":
+        return CourseRepositories.findByIdInternalOwnerView(courseId, user.id);
     }
   },
 
@@ -46,14 +50,6 @@ const CourseServices = {
       case "TEACHER":
         return CourseRepositories.patchCourseByOwner(courseId, user.id, data);
     }
-  },
-
-  getCoursesOwner: async (userId: string) => {
-    return CourseRepositories.findAllInternalOwnerView(userId);
-  },
-
-  getCourseByIdOwner: async (courseId: string, userId: string) => {
-    return CourseRepositories.findByIdInternalOwnerView(courseId, userId);
   },
 
   getEnrolledCoursesStudent: async (userId: string) => {

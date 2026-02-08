@@ -19,3 +19,10 @@ export const createCourseApi = ({
     body: { title, description, imageUrl, price, startDate },
   });
 };
+
+export const fetchAllCoursesForOwner = () => {
+  return apiRequest({ path: "/courses/teacher/my", method: "GET" });
+};
+
+export const fetchCourseByIdForOwner = (courseId: string) =>
+  apiRequest({ path: `/courses/teacher/my/${courseId}`, method: "GET" });

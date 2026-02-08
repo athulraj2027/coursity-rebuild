@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from "../ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { SidebarMenuButton } from "../ui/sidebar";
