@@ -5,6 +5,7 @@ import attendanceRoutes from "./attendanceRoutes/index.attendance.routes.js";
 import uploadsRoutes from "./upload.routes.js";
 import lectureRoutes from "./lectureRoutes/index.lecture.routes.js";
 import enrollmentRoutes from "./enrollmentRoutes/enrollment.routes.js";
+import paymentRoutes from "./paymentRoutes/payments.routes.js";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.use("/lectures", lectureRoutes);
 router.use("/uploads", uploadsRoutes);
 router.use("/enrollment", authMiddleware, enrollmentRoutes);
 router.use("/attendance", authMiddleware, attendanceRoutes);
+router.use("/payment", authMiddleware, paymentRoutes);
 
 export default router;

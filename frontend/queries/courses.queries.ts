@@ -2,6 +2,7 @@ import {
   fetchAllCoursesForOwner,
   fetchAllCoursesForPublic,
   fetchCourseByIdForOwner,
+  fetchCourseByIdForPublic,
 } from "@/services/course.services";
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,3 +17,9 @@ export const useMyCourseQueryById = (courseId: string) =>
 
 export const useAllCoursesQueryPublic = () =>
   useQuery({ queryKey: ["all-courses"], queryFn: fetchAllCoursesForPublic });
+
+export const useCourseByIdQueryPublic = (courseId: string) =>
+  useQuery({
+    queryKey: ["course", courseId],
+    queryFn: () => fetchCourseByIdForPublic(courseId),
+  });

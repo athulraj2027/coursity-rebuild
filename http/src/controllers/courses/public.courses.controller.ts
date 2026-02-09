@@ -27,7 +27,7 @@ const PublicCoursesController = {
   getCourse: async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-      const course = await CourseServices.getCourseById(id as string);
+      const course = await CourseServices.getCourseById(id as string, req.user);
       if (!course)
         return res
           .status(400)

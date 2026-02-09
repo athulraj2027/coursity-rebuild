@@ -96,26 +96,39 @@ const CourseRepositories = {
   // Public single course view
   async findByIdPublic(courseId: string) {
     return prisma.course.findUnique({
-      where: { id: courseId },
+      where: {
+        id: courseId,
+        isDeleted: false,
+        isDisabled: false,
+      },
       select: {
         id: true,
         title: true,
         description: true,
+        imageUrl: true,
+        price: true,
+        startDate: true,
+        isEnrollmentOpen: true,
+
         teacher: {
-          select: { id: true, name: true },
-        },
-        lectures: {
           select: {
             id: true,
-            title: true,
-            startTime: true,
-            status: true,
+            name: true,
+          },
+        },
+
+        _count: {
+          select: {
+            lectures: {
+              where: {
+                status: "COMPLETED",
+              },
+            },
           },
         },
       },
     });
   },
-
   // Fetching teacher's courses
   async findByIdInternalOwnerView(courseId: string, teacherId: string) {
     return prisma.course.findFirst({

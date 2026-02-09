@@ -8,7 +8,7 @@ import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.use("/", publicCourseRoutes);
+router.use("/", authMiddleware, publicCourseRoutes);
 router.use(
   "/admin",
   authMiddleware,

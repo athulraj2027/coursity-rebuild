@@ -13,11 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Badge } from "../ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import {
@@ -30,6 +26,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import Modal from "../common/Modal";
+import CourseDetailCard from "./CourseDetailCard";
 
 type Course = {
   id: string;
@@ -48,10 +46,23 @@ type Course = {
   createdAt: string;
 };
 
-type SortOption = "newest" | "oldest" | "price-low" | "price-high" | "popular" | "name-asc" | "name-desc";
+type SortOption =
+  | "newest"
+  | "oldest"
+  | "price-low"
+  | "price-high"
+  | "popular"
+  | "name-asc"
+  | "name-desc";
 
 type FilterOptions = {
-  priceRange: "all" | "free" | "paid" | "under1000" | "1000to5000" | "above5000";
+  priceRange:
+    | "all"
+    | "free"
+    | "paid"
+    | "under1000"
+    | "1000to5000"
+    | "above5000";
   startDate: "all" | "upcoming" | "this-week" | "this-month";
 };
 
@@ -59,7 +70,8 @@ const ITEMS_PER_PAGE = 9;
 
 const StudentsCoursesPage = () => {
   const { isLoading, error, data } = useAllCoursesQueryPublic();
-  
+
+  const [modal, setModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [filters, setFilters] = useState<FilterOptions>({
@@ -78,8 +90,10 @@ const StudentsCoursesPage = () => {
       filtered = filtered.filter(
         (course) =>
           course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.teacher.name.toLowerCase().includes(searchQuery.toLowerCase())
+          course.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          course.teacher.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -134,9 +148,13 @@ const StudentsCoursesPage = () => {
     sorted.sort((a, b) => {
       switch (sortOption) {
         case "newest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         case "oldest":
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
         case "price-low":
           return a.price - b.price;
         case "price-high":
@@ -166,7 +184,7 @@ const StudentsCoursesPage = () => {
   const totalPages = Math.ceil(processedData.length / ITEMS_PER_PAGE);
   const paginatedData = processedData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   // Reset to page 1 when filters change
@@ -198,7 +216,8 @@ const StudentsCoursesPage = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-extrabold">Explore Courses</h1>
         <div className="text-sm text-muted-foreground">
-          {processedData.length} {processedData.length === 1 ? "course" : "courses"} available
+          {processedData.length}{" "}
+          {processedData.length === 1 ? "course" : "courses"} available
         </div>
       </div>
 
@@ -216,7 +235,10 @@ const StudentsCoursesPage = () => {
         </div>
 
         {/* Sort */}
-        <Select value={sortOption} onValueChange={(value: SortOption) => setSortOption(value)}>
+        <Select
+          value={sortOption}
+          onValueChange={(value: SortOption) => setSortOption(value)}
+        >
           <SelectTrigger className="w-45">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -313,7 +335,12 @@ const StudentsCoursesPage = () => {
 
         {/* Clear filters button */}
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="gap-2"
+          >
             <X className="h-4 w-4" />
             Clear
           </Button>
@@ -334,7 +361,12 @@ const StudentsCoursesPage = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginatedData.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <CourseCard
+                key={course.id}
+                course={course}
+                modal={modal}
+                setModal={setModal}
+              />
             ))}
           </div>
 
@@ -351,34 +383,45 @@ const StudentsCoursesPage = () => {
               </Button>
 
               <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                  // Show first page, last page, current page, and pages around current
-                  if (
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? "default" : "outline"}
-                        size="icon"
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Button>
-                    );
-                  } else if (page === currentPage - 2 || page === currentPage + 2) {
-                    return <span key={page} className="px-2">...</span>;
-                  }
-                  return null;
-                })}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => {
+                    // Show first page, last page, current page, and pages around current
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <Button
+                          key={page}
+                          variant={currentPage === page ? "default" : "outline"}
+                          size="icon"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Button>
+                      );
+                    } else if (
+                      page === currentPage - 2 ||
+                      page === currentPage + 2
+                    ) {
+                      return (
+                        <span key={page} className="px-2">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  },
+                )}
               </div>
 
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
               >
                 <ChevronRight className="h-4 w-4" />
@@ -392,7 +435,16 @@ const StudentsCoursesPage = () => {
 };
 
 // Course Card Component
-const CourseCard = ({ course }: { course: Course }) => {
+const CourseCard = ({
+  course,
+  setModal,
+  modal,
+}: {
+  course: Course;
+  modal: boolean;
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const [courseId, setCourseId] = useState<string | null>(null);
   const startDate = new Date(course.startDate);
   const isUpcoming = startDate > new Date();
 
@@ -418,9 +470,6 @@ const CourseCard = ({ course }: { course: Course }) => {
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-bold text-lg line-clamp-2">{course.title}</h3>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {course.description}
-        </p>
       </CardHeader>
 
       <CardContent className="space-y-3">
@@ -434,10 +483,17 @@ const CourseCard = ({ course }: { course: Course }) => {
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <span className="text-muted-foreground">
-            Starts {startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            Starts{" "}
+            {startDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
           </span>
           {isUpcoming && (
-            <Badge variant="secondary" className="text-xs">Upcoming</Badge>
+            <Badge variant="secondary" className="text-xs">
+              Upcoming
+            </Badge>
           )}
         </div>
 
@@ -445,7 +501,8 @@ const CourseCard = ({ course }: { course: Course }) => {
         <div className="flex items-center gap-2 text-sm">
           <GraduationCap className="h-4 w-4 text-muted-foreground" />
           <span className="text-muted-foreground">
-            {course._count.enrollments} {course._count.enrollments === 1 ? "student" : "students"} enrolled
+            {course._count.enrollments}{" "}
+            {course._count.enrollments === 1 ? "student" : "students"} enrolled
           </span>
         </div>
       </CardContent>
@@ -457,8 +514,21 @@ const CourseCard = ({ course }: { course: Course }) => {
             {course.price === 0 ? "Free" : course.price.toLocaleString()}
           </span>
         </div>
-        <Button>Enroll Now</Button>
+        <Button
+          onClick={() => {
+            setModal(true);
+            setCourseId(course.id);
+          }}
+        >
+          View Details
+        </Button>
       </CardFooter>
+      {modal && courseId && (
+        <Modal
+          Card={<CourseDetailCard courseId={courseId} />}
+          setModal={setModal}
+        />
+      )}
     </Card>
   );
 };

@@ -1,8 +1,7 @@
 import CourseRepositories from "../repositories/courses.repositories.js";
 
 const CourseServices = {
-  getCourses: async (user?: any) => {
-    if (!user.role) return CourseRepositories.findAllPublic();
+  getCourses: async (user: any) => {
     switch (user.role) {
       case "ADMIN":
         return CourseRepositories.findAllInternal();
@@ -13,8 +12,7 @@ const CourseServices = {
     }
   },
 
-  getCourseById: async (courseId: string, user?: any) => {
-    if (!user.role) return CourseRepositories.findByIdPublic(courseId);
+  getCourseById: async (courseId: string, user: any) => {
     switch (user.role) {
       case "ADMIN":
         return CourseRepositories.findByIdInternal(courseId);
@@ -51,8 +49,6 @@ const CourseServices = {
         return CourseRepositories.patchCourseByOwner(courseId, user.id, data);
     }
   },
-
- 
 };
 
 export default CourseServices;

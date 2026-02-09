@@ -28,3 +28,6 @@ export const fetchCourseByIdForOwner = (courseId: string) =>
 
 export const fetchAllCoursesForPublic = () =>
   apiRequest({ path: `/courses`, method: "GET" });
+
+export const fetchCourseByIdForPublic = (courseId: string) =>
+  apiRequest({ path: `/courses/${courseId}`, method: "GET" });
