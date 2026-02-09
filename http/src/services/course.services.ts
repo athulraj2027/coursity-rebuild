@@ -2,12 +2,12 @@ import CourseRepositories from "../repositories/courses.repositories.js";
 
 const CourseServices = {
   getCourses: async (user?: any) => {
-    if (!user.role) return CourseRepositories.findAllPublic;
+    if (!user.role) return CourseRepositories.findAllPublic();
     switch (user.role) {
       case "ADMIN":
-        return CourseRepositories.findAllInternal;
+        return CourseRepositories.findAllInternal();
       case "STUDENT":
-        return CourseRepositories.findAllPublic;
+        return CourseRepositories.findAllPublic();
       case "TEACHER":
         return CourseRepositories.findAllInternalOwnerView(user.id);
     }
@@ -52,13 +52,7 @@ const CourseServices = {
     }
   },
 
-  getEnrolledCoursesStudent: async (userId: string) => {
-    return CourseRepositories.findEnrolledCourses(userId);
-  },
-
-  getEnrolledCourseByIdStudent: async (userId: string, courseId: string) => {
-    return CourseRepositories.findEnrolledCourseById(userId, courseId);
-  },
+ 
 };
 
 export default CourseServices;

@@ -3,6 +3,7 @@ import {
   Group,
   IndianRupee,
   LayoutDashboard,
+  Newspaper,
   Notebook,
   Pen,
   User,
@@ -14,6 +15,7 @@ export const TEACHER_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "My Courses", url: "/my-courses", icon: Notebook },
   { name: "My Lectures", url: "/my-lectures", icon: Group },
+  { name: "Enrollments", url: "/enrollments", icon: Newspaper },
   { name: "Payouts", url: "/payouts", icon: IndianRupee },
   { name: "Attendance", url: "/attendance", icon: User2 },
   { name: "Profile", url: "/profile", icon: User },
@@ -22,15 +24,17 @@ export const TEACHER_LINKS = [
 export const STUDENT_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "Explore Courses", url: "/courses", icon: Notebook },
+  { name: "Enrolled Courses", url: "/enrolled-courses", icon: BookSearch },
   { name: "Lectures", url: "/lectures", icon: Group },
-  { name: "Enrolled Courses", url: "/courses", icon: BookSearch },
   { name: "Homeworks", url: "/homeworks", icon: Pen },
+  { name: "Purchase History", url: "/history", icon: Group },
   { name: "Profile", url: "/profile", icon: User },
 ];
 export const ADMIN_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
-  { name: "Teachers", url: "/homeworks", icon: User },
-  { name: "Students", url: "/homeworks", icon: User2Icon },
+  { name: "Teachers", url: "/teachers", icon: User },
+  { name: "Students", url: "/students", icon: User2Icon },
   { name: "Courses", url: "/courses", icon: Notebook },
   { name: "Lectures", url: "/lectures", icon: Group },
+  { name: "Enrollments", url: "/enrollments", icon: Newspaper },
 ];

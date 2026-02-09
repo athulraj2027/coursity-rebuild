@@ -48,18 +48,39 @@ const CourseRepositories = {
   // Public-safe course list
   async findAllPublic() {
     return prisma.course.findMany({
+      where: {
+        isDeleted: false,
+        isDisabled: false,
+        isEnrollmentOpen: true,
+      },
       select: {
         id: true,
         title: true,
         description: true,
+        imageUrl: true,
+        price: true,
+        startDate: true,
+
         teacher: {
-          select: { id: true, name: true },
+          select: {
+            id: true,
+            name: true,
+          },
         },
+
+        _count: {
+          select: {
+            enrollments: true,
+          },
+        },
+
         createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },
-
   // Full single course view
   async findByIdInternal(courseId: string) {
     return prisma.course.findUnique({
@@ -129,65 +150,6 @@ const CourseRepositories = {
         enrollments: {
           select: {
             id: true,
-          },
-        },
-      },
-    });
-  },
-
-  // fetch all the enrolled courses for student
-  async findEnrolledCourses(studentId: string) {
-    return prisma.enrollment.findMany({
-      where: {
-        studentId,
-      },
-      select: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            teacher: {
-              select: { id: true, name: true },
-            },
-            lectures: {
-              select: {
-                id: true,
-                title: true,
-                startTime: true,
-                status: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  },
-
-  // fetch course which student enrolled with id
-  async findEnrolledCourseById(studentId: string, courseId: string) {
-    return prisma.enrollment.findFirst({
-      where: {
-        studentId,
-        courseId,
-      },
-      select: {
-        course: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            teacher: {
-              select: { id: true, name: true },
-            },
-            lectures: {
-              select: {
-                id: true,
-                title: true,
-                startTime: true,
-                status: true,
-              },
-            },
           },
         },
       },

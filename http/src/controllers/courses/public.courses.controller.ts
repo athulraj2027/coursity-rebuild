@@ -3,8 +3,9 @@ import CourseServices from "../../services/course.services.js";
 
 const PublicCoursesController = {
   getCourses: async (req: Request, res: Response) => {
+    console.log(req.user);
     try {
-      const courses = await CourseServices.getCourses();
+      const courses = await CourseServices.getCourses(req.user);
       if (!courses)
         return res
           .status(400)
