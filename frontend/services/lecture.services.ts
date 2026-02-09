@@ -8,3 +8,6 @@ export const createLectureApi = async (payload: {
 
 export const getMyLecturesForOwnerApi = async () =>
   apiRequest({ path: "/lectures/teacher", method: "GET" });
+
+export const getMyLectureByIdForOwnerApi = async (lectureId: string) =>
+  apiRequest({ path: `/lectures/teacher/${lectureId}`, method: "GET" });
