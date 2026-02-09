@@ -7,8 +7,15 @@ const LectureRepositories = {
     title: string,
     startTime: Date,
     courseId: string,
-    userId: string,
-  ) {},
+  ) {
+    return prisma.lecture.create({
+      data: {
+        title,
+        startTime,
+        courseId,
+      },
+    });
+  },
 
   //  Admin – all lectures
   async findAllInternal() {

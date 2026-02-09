@@ -5,13 +5,13 @@ import CourseServices from "../../services/course.services.js";
 const TeacherCourseController = {
   getMyCourses: async (req: Request, res: Response) => {
     try {
-      console.log("req user : ", req.user);
+      // console.log("req user : ", req.user);
       const courses = await CourseServices.getCourses(req.user);
       if (!courses)
         return res
           .status(400)
           .json({ success: false, message: "Your courses not found" });
-      console.log("courses : ", courses);
+      // console.log("courses : ", courses);
       return res.status(200).json(courses);
     } catch (error: any) {
       console.log("Error in getting teacher's courses : ", error);

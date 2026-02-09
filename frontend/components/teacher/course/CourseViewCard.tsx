@@ -8,7 +8,6 @@ import { Separator } from "../../ui/separator";
 import {
   Calendar,
   IndianRupee,
-  User,
   GraduationCap,
   BookOpen,
   Clock,

@@ -40,7 +40,6 @@ const LectureServices = {
       title,
       startTime,
       courseId,
-      userId,
     );
   },
 

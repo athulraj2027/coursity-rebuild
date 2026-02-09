@@ -9,6 +9,6 @@ export const useMyCoursesQuery = () =>
 
 export const useMyCourseQueryById = (courseId: string) =>
   useQuery({
-    queryKey: ["my-course-by-id"],
+    queryKey: ["my-course", courseId],
     queryFn: () => fetchCourseByIdForOwner(courseId),
   });

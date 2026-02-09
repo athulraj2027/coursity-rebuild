@@ -39,7 +39,7 @@ const CourseActions = ({ courseId }: Props) => {
         return <CourseEditCard courseId={courseId} />;
 
       case "ADD_LECTURE":
-        return <CreateLectureCard courseId={courseId} />;
+        return <CreateLectureCard courseId={courseId} setModal={setModal} />;
 
       default:
         return null;
@@ -71,6 +71,7 @@ const CourseActions = ({ courseId }: Props) => {
                 size="icon"
                 variant="outline"
                 onClick={() => openModal("EDIT")}
+                disabled
               >
                 <Pencil size={16} />
               </Button>

@@ -12,7 +12,11 @@ import { Calendar } from "../../ui/calendar";
 import { toast } from "sonner";
 import { useCourse } from "@/app/(role)/teacher/my-courses/hooks/useTeacherCourse";
 
-const NewCourseCard = () => {
+const NewCourseCard = ({
+  setModal,
+}: {
+  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const { createCourse } = useCourse();
   /* -------------------- form state -------------------- */
   const [formData, setFormData] = useState({
@@ -73,6 +77,7 @@ const NewCourseCard = () => {
       setImages([]);
       setDate(undefined);
       setFileUploadKey((prev) => prev + 1);
+      setModal(false);
     } catch (error) {
       console.error(error);
       toast.error("Failed to create course");
