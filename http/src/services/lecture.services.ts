@@ -48,7 +48,6 @@ const LectureServices = {
     if (!lecture) throw new AppError("Lecture not found", 400);
     if (lecture.status !== "NOT_STARTED")
       throw new AppError("Only lectures not started is allowed to edit", 403);
-
     return LectureRepositories.updateLectureOwner(lectureId, user.id, updates);
   },
 
@@ -58,7 +57,6 @@ const LectureServices = {
 
     if (lecture.status !== "NOT_STARTED")
       throw new AppError("Lecture can't be started again", 403);
-
     return LectureRepositories.startLectureOwner(lecture.id);
   },
 
