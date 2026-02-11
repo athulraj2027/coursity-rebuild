@@ -33,7 +33,9 @@ const AuthServices = {
   },
 
   getUserById: async (userId: string) => {
-    return AuthRepositories.findById(userId);
+    const user = await AuthRepositories.findById(userId);
+    if (!user) throw new AppError("User not found", 400);
+    return user;
   },
 };
 export default AuthServices;

@@ -58,6 +58,20 @@ const EnrollmentRepositories = {
       },
     });
   },
+
+  async enrollToCourse(params: {
+    paymentId: string;
+    courseId: string;
+    user: any;
+  }) {
+    return prisma.enrollment.create({
+      data: {
+        studentId: params.user.id,
+        courseId: params.courseId,
+        paymentId: params.paymentId,
+      },
+    });
+  },
 };
 
 export default EnrollmentRepositories;

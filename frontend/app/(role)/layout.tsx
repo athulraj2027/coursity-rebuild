@@ -8,8 +8,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <main className="w-full">
         <SidebarTrigger />
-        <MeLoader />
-        <div className="">{children}</div>
+
+        <div className="">
+          {" "}
+          <MeLoader />
+          {children}
+        </div>
       </main>
     </SidebarProvider>
   );

@@ -29,6 +29,12 @@ enum AttendanceStatus {
   ABSENT
 }
 
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
 //////////////////////
 // MODELS
 //////////////////////
@@ -41,10 +47,11 @@ model User {
   role      Role
 
   // Relations
-  courses     Course[]     @relation("TeacherCourses")
-  enrollments Enrollment[]
-  attendance  Attendance[]
+  courses      Course[]      @relation("TeacherCourses")
+  enrollments  Enrollment[]
+  attendance   Attendance[]
   participants Participant[]
+  payments     Payment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,20 +62,22 @@ model Course {
   title       String
   description String
   imageUrl    String
-  price       Int
+  price       Int              // stored in paise
   startDate   DateTime
-  isEnrollmentOpen  Boolean  @default(true)
-  isDeleted   Boolean   @default(false)
-  isDisabled  Boolean   @default(false)
+
+  isEnrollmentOpen Boolean @default(true)
+  isDeleted        Boolean @default(false)
+  isDisabled       Boolean @default(false)
 
   teacherId   String
   teacher     User     @relation("TeacherCourses", fields: [teacherId], references: [id])
 
   lectures    Lecture[]
   enrollments Enrollment[]
+  payments    Payment[]
 
-  createdAt   DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Enrollment {
@@ -76,9 +85,11 @@ model Enrollment {
 
   studentId String
   courseId  String
+  paymentId String?  @unique
 
-  student   User     @relation(fields: [studentId], references: [id])
-  course    Course   @relation(fields: [courseId], references: [id])
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+  student   User   @relation(fields: [studentId], references: [id])
+  course    Course @relation(fields: [courseId], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -94,7 +105,7 @@ model Lecture {
   isDeleted Boolean       @default(false)
 
   courseId  String
-  course    Course        @relation(fields: [courseId], references: [id])
+  course    Course @relation(fields: [courseId], references: [id])
 
   participants Participant[]
   attendance   Attendance[]
@@ -137,8 +148,36 @@ model Attendance {
   durationSec Int       @default(0)
   status      AttendanceStatus
 
-  student     User     @relation(fields: [studentId], references: [id])
-  lecture     Lecture  @relation(fields: [lectureId], references: [id])
+  student     User    @relation(fields: [studentId], references: [id])
+  lecture     Lecture @relation(fields: [lectureId], references: [id])
 
   @@unique([studentId, lectureId])
+}
+
+//
+// Payments are financial truth
+// Enrollment is derived from PAID payment
+//
+model Payment {
+  id                  String   @id @default(uuid())
+
+  studentId           String
+  courseId            String
+
+  razorpayOrderId     String   @unique
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  enrollment         Enrollment?
+
+  amount              Int      // must match course.price
+  currency            String   @default("INR")
+  status              PaymentStatus @default(CREATED)
+
+  student             User   @relation(fields: [studentId], references: [id])
+  course              Course @relation(fields: [courseId], references: [id])
+
+  createdAt           DateTime @default(now())
+
+  @@index([studentId])
+  @@index([courseId])
 }

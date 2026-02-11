@@ -13,6 +13,9 @@ const EnrollmentServices = {
     userId: string,
     courseId: string,
   ) => {},
+
+  enrollCourse: async (data: any) =>
+    EnrollmentRepositories.enrollToCourse(data),
 };
 
 export default EnrollmentServices;

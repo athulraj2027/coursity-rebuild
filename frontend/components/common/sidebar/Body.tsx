@@ -17,11 +17,13 @@ import {
 import React from "react";
 
 const Body = () => {
-  const { data,isLoading } = useMe();
-  if(isLoading) return null
+  const { data, isLoading } = useMe();
+  if (isLoading) return null;
 
   const userRole: string = data.user.role;
-  let links: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any 
+  let links: { name: string; url: string; icon: any }[] = [];
+
   if (userRole === "STUDENT") links = STUDENT_LINKS;
   else if (userRole === "TEACHER") links = TEACHER_LINKS;
   else if (userRole === "ADMIN") links = ADMIN_LINKS;

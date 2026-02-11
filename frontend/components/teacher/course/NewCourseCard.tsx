@@ -51,13 +51,29 @@ const NewCourseCard = ({
     if (!isValid) {
       if (!formData.title.trim())
         return toast.error("Please enter a course title");
+
       if (!formData.description.trim())
         return toast.error("Please enter a course description");
+
       if (!formData.price) return toast.error("Please enter a price");
+
       if (images.length === 0)
         return toast.error("Please upload a course image");
+
       if (!date) return toast.error("Please select a starting date");
+
       return;
+    }
+
+    /* ⬇️ NEW: past date validation */
+    const selectedDate = new Date(date);
+    const today = new Date();
+
+    // normalize today to start of day
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return toast.error("Start date cannot be in the past");
     }
 
     setIsSubmitting(true);

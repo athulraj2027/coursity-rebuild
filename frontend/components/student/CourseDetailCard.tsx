@@ -10,6 +10,7 @@ import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 import { Calendar, IndianRupee, GraduationCap, BookOpen } from "lucide-react";
 import { Button } from "../ui/button";
+import EnrollBtn from "./EnrollBtn";
 
 const CourseDetailCard = ({ courseId }: { courseId: string }) => {
   const { isLoading, error, data } = useCourseByIdQueryPublic(courseId);
@@ -113,7 +114,7 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
               </div>
             </div>
           </div>
-          <Button>Enroll now</Button>
+          <EnrollBtn courseId={courseId} />
         </CardContent>
       </Card>
     </div>

@@ -35,7 +35,7 @@ const LectureServices = {
       userId,
       courseId,
     );
-    if (!ownsCourse) throw new Error("You do not own this course");
+    if (!ownsCourse) throw new AppError("You do not own this course", 403);
     return LectureRepositories.createByInternalOwner(
       title,
       startTime,

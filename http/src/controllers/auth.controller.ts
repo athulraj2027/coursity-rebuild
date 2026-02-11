@@ -73,6 +73,11 @@ const AuthController = {
       });
     } catch (error: any) {
       console.error(error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({
         success: false,
         message: "Failed to logout",
@@ -96,6 +101,11 @@ const AuthController = {
       });
     } catch (error: any) {
       console.error(error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
       return res.status(500).json({
         success: false,
         message: "Failed to fetch user",
