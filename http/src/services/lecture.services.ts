@@ -10,7 +10,7 @@ const LectureServices = {
       case "TEACHER":
         return LectureRepositories.findAllOwner(user.id);
       case "STUDENT":
-        return LectureRepositories.findAllStudent(user.id);
+        return LectureRepositories.findAllStudentLectures(user.id);
     }
   },
 

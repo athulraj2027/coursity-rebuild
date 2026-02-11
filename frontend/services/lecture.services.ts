@@ -11,3 +11,6 @@ export const getMyLecturesForOwnerApi = async () =>
 
 export const getMyLectureByIdForOwnerApi = async (lectureId: string) =>
   apiRequest({ path: `/lectures/teacher/${lectureId}`, method: "GET" });
+
+export const getScheduledLectures = async () =>
+  apiRequest({ path: "/lectures/student", method: "GET" });

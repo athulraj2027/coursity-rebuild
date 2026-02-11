@@ -31,3 +31,6 @@ export const fetchAllCoursesForPublic = () =>
 
 export const fetchCourseByIdForPublic = (courseId: string) =>
   apiRequest({ path: `/courses/${courseId}`, method: "GET" });
+
+export const fetchEnrolledCourses = () =>
+  apiRequest({ path: "/enrollment/student/my", method: "GET" });

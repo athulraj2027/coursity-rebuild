@@ -12,15 +12,35 @@ const EnrollmentRepositories = {
             id: true,
             title: true,
             description: true,
+            imageUrl: true,
+            price: true,
+            startDate: true,
+
             teacher: {
-              select: { id: true, name: true },
+              select: {
+                id: true,
+                name: true,
+              },
             },
+
             lectures: {
+              where: {
+                isDeleted: false,
+              },
               select: {
                 id: true,
                 title: true,
                 startTime: true,
                 status: true,
+              },
+              orderBy: {
+                startTime: "asc",
+              },
+            },
+
+            _count: {
+              select: {
+                enrollments: true,
               },
             },
           },
@@ -28,7 +48,7 @@ const EnrollmentRepositories = {
       },
     });
   },
-
+  
   // fetch course which student enrolled with id
   async findEnrolledCourseById(studentId: string, courseId: string) {
     return prisma.enrollment.findFirst({

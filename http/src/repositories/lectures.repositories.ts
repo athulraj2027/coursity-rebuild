@@ -54,28 +54,48 @@ const LectureRepositories = {
   },
 
   //  Student – lectures of enrolled courses
-  async findAllStudent(studentId: string) {
+  async findAllStudentLectures(studentId: string) {
     return prisma.lecture.findMany({
       where: {
+        isDeleted: false,
         course: {
           enrollments: {
             some: {
               studentId,
             },
           },
+          isDeleted: false,
+          isDisabled: false,
         },
       },
-      include: {
+
+      orderBy: {
+        startTime: "asc",
+      },
+
+      select: {
+        id: true,
+        title: true,
+        startTime: true,
+        status: true,
+        meetingId: true,
+
         course: {
           select: {
             id: true,
             title: true,
+            teacher: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
     });
   },
-
+  
   //  Admin – single lecture
   async findByIdInternal(lectureId: string) {
     return prisma.lecture.findUnique({
