@@ -1,11 +1,11 @@
 "use client";
-import Loading from "../common/Loading";
+import Loading from "../../common/Loading";
 import NoAccess from "./NoAccess";
 import StartLectureBtn from "./StartLectureBtn";
 import JoinLectureBtn from "./JoinLectureBtn";
 import Meeting from "./Meeting";
-import { useMediastream } from "./hooks/useMediastream";
-import { useLectureAccess } from "./hooks/useLectureAccess";
+import { useMediastream } from "../hooks/useMediastream";
+import { useLectureAccess } from "../hooks/useLectureAccess";
 
 const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
   const { requestMedia } = useMediastream();

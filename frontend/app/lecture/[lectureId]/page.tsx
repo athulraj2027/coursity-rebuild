@@ -1,4 +1,4 @@
-import LecturePageComponent from "@/components/lecturePage/LecturePage";
+import LecturePageComponent from "@/components/lecturePage/components/LecturePage";
 
 export default async function LecturePage({
   params,
