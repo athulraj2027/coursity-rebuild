@@ -12,6 +12,13 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("auth_token")?.value as string;
 
+  if (pathname.startsWith("/lecture")) {
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    return NextResponse.next();
+  }
+  
   if (!token && !PUBLIC_ROUTES.includes(pathname)) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }

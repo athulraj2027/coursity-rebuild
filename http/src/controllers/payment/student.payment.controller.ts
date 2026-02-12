@@ -57,6 +57,8 @@ const StudentPaymentController = {
 
       console.log(enroll);
 
+      // add wallet money for teacher
+
       return res.status(200).json({ success: true, enroll });
     } catch (error: any) {
       console.log(`Failed to enroll student ${req.user.id} : `, error);

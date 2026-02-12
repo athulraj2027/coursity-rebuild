@@ -84,6 +84,8 @@ const LectureRepositories = {
           select: {
             id: true,
             title: true,
+            isDeleted: true,
+            isDisabled: true,
             teacher: {
               select: {
                 id: true,
@@ -95,7 +97,7 @@ const LectureRepositories = {
       },
     });
   },
-  
+
   //  Admin – single lecture
   async findByIdInternal(lectureId: string) {
     return prisma.lecture.findUnique({
@@ -158,6 +160,9 @@ const LectureRepositories = {
           select: {
             id: true,
             title: true,
+            isEnrollmentOpen: true,
+            isDeleted: true,
+            isDisabled: true,
           },
         },
       },

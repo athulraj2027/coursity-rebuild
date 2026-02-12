@@ -48,6 +48,34 @@ const LectureController = {
         .json({ success: false, message: "Failed to fetch lecture" });
     }
   },
+
+  getLectureAccess: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = req.user;
+    try {
+      // check whether the course status is correct and lecture exists
+      const lecture = await LectureServices.getLectureById(id as string, user);
+      if (!lecture)
+        return res
+          .status(400)
+          .json({ isAllowed: false, message: "Lecture not found" });
+      if (user.role !== "TEACHER" && lecture.status === "NOT_STARTED")
+        return res
+          .status(403)
+          .json({ isAllowed: false, message: "Lecture has not started " });
+      return res.status(200).json({ isAllowed: true, role: user.role });
+    } catch (error: any) {
+      console.log("Failed to fetch lecture for student: ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch lecture" });
+    }
+  },
 };
 
 export default LectureController;

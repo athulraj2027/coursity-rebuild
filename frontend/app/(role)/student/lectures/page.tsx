@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useScheduledLecturesQuery } from "@/queries/lectures.queries";
 import Error from "@/components/common/Error";
 import Loading from "@/components/common/Loading";
-import { useScheduledLecturesQuery } from "@/queries/lectures.queries";
+
 import {
   Card,
   CardContent,
@@ -42,9 +43,6 @@ export default function LecturesPage() {
     "all" | "upcoming" | "completed" | "live"
   >("all");
   const [currentPage, setCurrentPage] = useState(1);
-
-  if (isLoading) return <Loading />;
-  if (error) return <Error />;
 
   const lectures = data?.lectures ?? [];
 
@@ -130,6 +128,8 @@ export default function LecturesPage() {
     setCurrentPage(1);
   }, [searchQuery, sortOption, statusFilter]);
 
+  if (isLoading) return <Loading />;
+  if (error) return <Error />;
   return (
     <div className="px-7 flex flex-col gap-6">
       {/* Header */}

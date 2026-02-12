@@ -55,9 +55,6 @@ const StudentEnrollmentController = {
         .json({ success: false, message: "Failed to fetch enrolled course" });
     }
   },
-
-  //enroll course
-  enrollCourse: async (req: Request, res: Response) => {},
 };
 
 export default StudentEnrollmentController;

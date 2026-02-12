@@ -22,7 +22,7 @@ const LectureActions = ({ lectureId }: { lectureId: string }) => {
 
   const openModal = (type: ModalType) => {
     if (type === "START") {
-      window.open(`/teacher/lectures/${lectureId}/start`, "_blank");
+      window.open(`/lecture/${lectureId}`, "_blank");
       return;
     }
 

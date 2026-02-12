@@ -28,5 +28,6 @@ router.use(
 
 router.get("/", authMiddleware, LectureController.getLectures);
 router.get("/:id", authMiddleware, LectureController.getLectureById);
+router.get("/access/:id", authMiddleware, LectureController.getLectureAccess);
 
 export default router;
