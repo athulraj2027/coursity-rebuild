@@ -1,5 +1,5 @@
 "use client";
-import Loading from "../../common/Loading";
+import Loading from "../../../components/common/Loading";
 import NoAccess from "./NoAccess";
 import StartLectureBtn from "./StartLectureBtn";
 import JoinLectureBtn from "./JoinLectureBtn";
