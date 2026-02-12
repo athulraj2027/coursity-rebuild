@@ -6,17 +6,19 @@ import JoinLectureBtn from "./JoinLectureBtn";
 import Meeting from "./Meeting";
 import { useMediastream } from "../hooks/useMediastream";
 import { useLectureAccess } from "../hooks/useLectureAccess";
+import { useSocketStatus } from "../hooks/useSocketStatus";
 
 const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
   const { requestMedia } = useMediastream();
   const { isLoading, mode, setMode, role, error } = useLectureAccess(lectureId);
+  const { isConnected, transport } = useSocketStatus();
 
   const handleEnter = async () => {
     requestMedia();
     setMode("MEETING");
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading || !role) return <Loading />;
   if (error) return <NoAccess error={error} />;
   if (mode === "MEETING") return <Meeting />;
   return (
@@ -38,6 +40,14 @@ const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
           ) : (
             <JoinLectureBtn onStart={handleEnter} />
           )}
+        </div>
+        <div>
+          <p className="text-white">
+            {isConnected ? "Connected" : "Not connected"}
+          </p>
+          <p className="text-white">
+            {transport ? "Transport created " : "No transport"}
+          </p>
         </div>
       </div>
     </div>
