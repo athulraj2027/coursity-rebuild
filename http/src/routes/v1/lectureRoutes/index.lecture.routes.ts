@@ -29,5 +29,11 @@ router.use(
 router.get("/", authMiddleware, LectureController.getLectures);
 router.get("/:id", authMiddleware, LectureController.getLectureById);
 router.get("/access/:id", authMiddleware, LectureController.getLectureAccess);
+router.post(
+  "/:id/join",
+  authMiddleware,
+  roleMiddleware(["ADMIN", "STUDENT"]),
+  LectureController.joinLecture,
+);
 
 export default router;

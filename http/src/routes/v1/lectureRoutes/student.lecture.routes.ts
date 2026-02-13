@@ -3,6 +3,5 @@ import StudentLectureController from "../../../controllers/lectures/student.lect
 const router = express.Router();
 
 router.get("/", StudentLectureController.getScheduledLectures);
-// router.get('/:id')
 
 export default router;

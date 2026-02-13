@@ -7,35 +7,31 @@ export const signupApi = (data: {
   email: string;
   role: Role;
   password: string;
-}) => {
-  return apiRequest({
+}) =>
+  apiRequest({
     path: "/auth/signup",
     method: "POST",
     body: data,
   });
-};
 
 export const signinApi = (data: {
   email: string;
   role: Role;
   password: string;
-}) => {
-  return apiRequest({
+}) =>
+  apiRequest({
     path: "/auth/signin",
     method: "POST",
     body: data,
   });
-};
 
-export const logoutApi = () => {
-  return apiRequest({
+export const logoutApi = () =>
+  apiRequest({
     path: "/auth/logout",
     method: "POST",
   });
-};
 
-export const meApi = () => {
-  return apiRequest({
+export const meApi = () =>
+  apiRequest({
     path: "/auth/me",
   });
-};

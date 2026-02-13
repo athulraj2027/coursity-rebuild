@@ -16,4 +16,16 @@ export const getScheduledLectures = async () =>
   apiRequest({ path: "/lectures/student", method: "GET" });
 
 export const getLectureAccess = async (lectureId: string) =>
-  apiRequest({ path: `/lectures/access/${lectureId}`, method: "GET", });
+  apiRequest({ path: `/lectures/access/${lectureId}`, method: "GET" });
+
+export const startLecture = async (lectureId: string) =>
+  apiRequest({ path: `/lectures/teacher/${lectureId}/start`, method: "POST" });
+
+export const endLecture = async (lectureId: string) =>
+  apiRequest({ path: `/lectures/teacher/${lectureId}/end`, method: "POST" });
+
+export const joinLecture = async () =>
+  apiRequest({ path: "/lectures/join", method: "POST" });
+
+export const getLectureStatus = async (lectureId: string) =>
+  apiRequest({ path: `/lectures/status/${lectureId}`, method: "GET" });

@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { createWorker } from "./mediasoup/worker.js";
 import { roomSocket } from "./socket/socket.js";
+import { socketAuthMiddleware } from "./middlewares/socketAuthMiddleware.js";
 const PORT = process.env.PORT;
 const app = express();
 
@@ -19,6 +20,8 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
+io.use(socketAuthMiddleware);
 
 (async () => {
   await createWorker();

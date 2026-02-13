@@ -9,10 +9,9 @@ export interface CloudinarySignatureResponse {
 }
 export const GetCloudinarySignatureApi = (
   folder = "courses",
-): Promise<CloudinarySignatureResponse> => {
-  return apiRequest({
+): Promise<CloudinarySignatureResponse> =>
+  apiRequest({
     path: "/uploads/cloudinary-signature",
     method: "POST",
     body: { folder },
   });
-};

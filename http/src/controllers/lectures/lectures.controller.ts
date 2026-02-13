@@ -57,13 +57,15 @@ const LectureController = {
       const lecture = await LectureServices.getLectureById(id as string, user);
       if (!lecture)
         return res
-          .status(400)
+          .status(200)
           .json({ isAllowed: false, message: "Lecture not found" });
       if (user.role !== "TEACHER" && lecture.status === "NOT_STARTED")
         return res
-          .status(403)
+          .status(200)
           .json({ isAllowed: false, message: "Lecture has not started " });
-      return res.status(200).json({ isAllowed: true, role: user.role });
+      return res
+        .status(200)
+        .json({ isAllowed: true, role: user.role, status: lecture.status });
     } catch (error: any) {
       console.log("Failed to fetch lecture for student: ", error);
       if (error.statusCode) {
@@ -76,6 +78,8 @@ const LectureController = {
         .json({ success: false, message: "Failed to fetch lecture" });
     }
   },
+
+  joinLecture: async () => {},
 };
 
 export default LectureController;

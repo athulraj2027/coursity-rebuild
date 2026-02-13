@@ -10,17 +10,18 @@ import { useSocketStatus } from "../hooks/useSocketStatus";
 
 const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
   const { requestMedia } = useMediastream();
-  const { isLoading, mode, setMode, role, error } = useLectureAccess(lectureId);
+  const { isLoading, mode, setMode, role, error, lectureStatus } =
+    useLectureAccess(lectureId);
   const { isConnected, transport } = useSocketStatus();
-
   const handleEnter = async () => {
-    requestMedia();
+    const media = await requestMedia();
+    if (!media) return;
     setMode("MEETING");
   };
 
-  if (isLoading || !role) return <Loading />;
   if (error) return <NoAccess error={error} />;
-  if (mode === "MEETING") return <Meeting />;
+  if (isLoading || !role) return <Loading />;
+  if (mode === "MEETING" || lectureStatus === "STARTED") return <Meeting />;
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 to-gray-800 px-4">
       <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-10 w-full max-w-md text-center">
@@ -36,9 +37,9 @@ const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
 
         <div className="flex justify-center">
           {role === "TEACHER" ? (
-            <StartLectureBtn onStart={handleEnter} />
+            <StartLectureBtn onStart={handleEnter} lectureId={lectureId} />
           ) : (
-            <JoinLectureBtn onStart={handleEnter} />
+            <JoinLectureBtn onStart={handleEnter} lectureId={lectureId} />
           )}
         </div>
         <div>

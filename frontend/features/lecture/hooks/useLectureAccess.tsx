@@ -7,6 +7,9 @@ export const useLectureAccess = (lectureId: string) => {
   const [role, setRole] = useState<"ADMIN" | "TEACHER" | "STUDENT" | null>(
     null,
   );
+  const [lectureStatus, setLectureStatus] = useState<
+    "NOT_STARTED" | "STARTED" | "COMPLETED" | null
+  >(null);
   const [error, setError] = useState(null);
   const [mode, setMode] = useState<"LOBBY" | "MEETING">("LOBBY");
   useEffect(() => {
@@ -17,6 +20,7 @@ export const useLectureAccess = (lectureId: string) => {
         const data: any = await getLectureAccess(lectureId);
         console.log(data);
         setRole(data.role);
+        setLectureStatus(data.status);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.log(error);
@@ -28,5 +32,5 @@ export const useLectureAccess = (lectureId: string) => {
     load();
   }, [lectureId]);
 
-  return { isLoading, mode, setMode, role, error };
+  return { isLoading, mode, setMode, role, error, lectureStatus };
 };
