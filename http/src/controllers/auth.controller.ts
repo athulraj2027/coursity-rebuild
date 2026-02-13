@@ -7,7 +7,7 @@ const AuthController = {
     const { name, email, role, password } = req.body;
     try {
       const user = await AuthServices.signupUser(name, email, role, password);
-      const token = generateToken(user.id, user.role);
+      const token = generateToken(user.id, user.role, user.name);
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: false,
@@ -35,7 +35,7 @@ const AuthController = {
     try {
       const { email, password, role } = req.body;
       const user = await AuthServices.signinUser(email, password, role);
-      const token = generateToken(user.id, user.role);
+      const token = generateToken(user.id, user.role, user.name);
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: false,

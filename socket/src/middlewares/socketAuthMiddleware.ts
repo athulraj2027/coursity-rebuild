@@ -2,13 +2,14 @@ import { Socket } from "socket.io";
 import jwt from "jsonwebtoken";
 
 export interface AuthenticatedSocket extends Socket {
-  userId?: string;
-  role?: string;
+  userId: string;
+  role: string;
+  username: string;
 }
 
 export const socketAuthMiddleware = (
   socket: AuthenticatedSocket,
-  next: (err?: Error) => void
+  next: (err?: Error) => void,
 ) => {
   try {
     const token =
@@ -25,10 +26,13 @@ export const socketAuthMiddleware = (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: string;
       role: string;
+      username: string;
     };
 
+    console.log("token : ", decoded);
     socket.userId = decoded.userId;
     socket.role = decoded.role;
+    socket.username = decoded.username;
 
     next();
   } catch (error) {

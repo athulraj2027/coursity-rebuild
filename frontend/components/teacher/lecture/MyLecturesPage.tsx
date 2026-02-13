@@ -164,7 +164,12 @@ const MyLecturesPage = () => {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => <LectureActions lectureId={row.original.id} />,
+      cell: ({ row }) => (
+        <LectureActions
+          lectureId={row.original.id}
+          status={row.original.status}
+        />
+      ),
     },
   ];
 

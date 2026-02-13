@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
-const Meeting = () => {
+const Meeting = ({ lectureId }: { lectureId: string }) => {
   return (
     <div>
-      <p>Hisfdasdf</p>
+      <p>{lectureId}</p>
     </div>
-  )
-}
+  );
+};
 
-export default Meeting
+export default Meeting;

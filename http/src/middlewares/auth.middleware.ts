@@ -20,10 +20,11 @@ export const authMiddleware = (
     ) as AuthPayload;
 
     // attach user to reques
-    // console.log(decoded);
+    console.log(decoded);
     req.user = {
       id: decoded.userId as string,
       role: decoded.role,
+      username: decoded.username,
     };
 
     // console.log(req.user);

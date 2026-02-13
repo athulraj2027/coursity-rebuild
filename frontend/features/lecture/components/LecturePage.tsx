@@ -21,7 +21,10 @@ const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
 
   if (error) return <NoAccess error={error} />;
   if (isLoading || !role) return <Loading />;
-  if (mode === "MEETING" || lectureStatus === "STARTED") return <Meeting />;
+
+  if (mode === "MEETING" || (lectureStatus === "STARTED" && role === "TEACHER"))
+    return <Meeting lectureId={lectureId} />;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 to-gray-800 px-4">
       <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-10 w-full max-w-md text-center">

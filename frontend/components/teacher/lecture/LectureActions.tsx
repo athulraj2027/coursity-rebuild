@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Pause, Pencil, X } from "lucide-react";
+import { Eye, Pencil, Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -16,7 +16,13 @@ import LectureEditCard from "./LectureEditCard";
 
 type ModalType = "VIEW" | "EDIT" | "CANCEL" | "START";
 
-const LectureActions = ({ lectureId }: { lectureId: string }) => {
+const LectureActions = ({
+  lectureId,
+  status,
+}: {
+  lectureId: string;
+  status: "NOT_STARTED" | "STARTED" | "COMPLETED";
+}) => {
   const [modal, setModal] = useState(false);
   const [modalType, setModalType] = useState<ModalType | null>(null);
 
@@ -70,11 +76,12 @@ const LectureActions = ({ lectureId }: { lectureId: string }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                disabled={status === "STARTED"}
                 size="icon"
                 variant="ghost"
                 onClick={() => openModal("START")}
               >
-                <Pause size={16} />
+                <Play size={16} />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Start lecture</TooltipContent>
@@ -99,6 +106,7 @@ const LectureActions = ({ lectureId }: { lectureId: string }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
+                disabled={status !== "NOT_STARTED"}
                 size="icon"
                 variant="destructive"
                 onClick={() => openModal("CANCEL")}

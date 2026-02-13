@@ -8,7 +8,9 @@ export function roomSocket(socket: Socket) {
   socket.on("create-room", async ({ lectureId }, cb) =>
     CreateRoomHandler(socket, lectureId, cb),
   );
-  socket.on("join-room", async ({ lectureId }) => JoinRoomHandler(lectureId));
+  socket.on("join-room", async ({ lectureId }, cb) =>
+    JoinRoomHandler(socket, lectureId, cb),
+  );
   socket.on("leave-room", () => {});
   socket.on("close-room", () => {});
   socket.on("disconnect", () => {});

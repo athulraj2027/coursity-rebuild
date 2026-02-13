@@ -249,13 +249,20 @@ export default function LecturesPage() {
                   </CardContent>
 
                   <CardFooter className="border-t pt-4">
-                    <Button className="w-full">
+                    <Button
+                      className="w-full"
+                      onClick={() => {
+                        if (lecture.status === "STARTED") {
+                          window.open(`/lecture/${lecture.id}`, "_blank");
+                        }
+                      }}
+                    >
                       <Video className="h-4 w-4 mr-2" />
                       {lecture.status === "STARTED"
                         ? "Join Now"
                         : lecture.status === "COMPLETED"
-                          ? "View Recording"
-                          : "View Details"}
+                          ? "View Details"
+                          : "Not Started"}
                     </Button>
                   </CardFooter>
                 </Card>

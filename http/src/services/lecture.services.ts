@@ -68,6 +68,15 @@ const LectureServices = {
     // update attendance
     return LectureRepositories.endLectureOwner(lectureId);
   },
+
+  joinLecture: async (lectureId: string, user: any) => {
+    switch (user.role) {
+      case "ADMIN":
+        return LectureRepositories.findByIdInternal(lectureId);
+      case "STUDENT":
+        return LectureRepositories.findByIdStudent(user.id, lectureId);
+    }
+  },
 };
 
 export default LectureServices;

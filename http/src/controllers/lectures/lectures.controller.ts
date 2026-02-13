@@ -79,7 +79,29 @@ const LectureController = {
     }
   },
 
-  joinLecture: async () => {},
+  joinLecture: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = req.user;
+    try {
+      const lecture = await LectureServices.joinLecture(id as string, user);
+      if (!lecture)
+        return res
+          .status(200)
+          .json({ success: false, message: "Lecture not found" });
+      // add attendance
+      return res.status(200).json(lecture);
+    } catch (error: any) {
+      console.log("Failed to fetch lecture for student: ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to fetch lecture" });
+    }
+  },
 };
 
 export default LectureController;
