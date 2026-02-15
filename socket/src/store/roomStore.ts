@@ -8,7 +8,9 @@ class RoomStore {
   }
 
   getRoom(lectureId: string) {
-    return this.rooms.get(lectureId);
+    const room = this.rooms.get(lectureId);
+    if (!room) return null;
+    return room;
   }
 
   removeRoom(lectureId: string) {

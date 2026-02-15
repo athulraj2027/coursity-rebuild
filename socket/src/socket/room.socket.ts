@@ -1,7 +1,10 @@
 import type { Socket } from "socket.io";
 import {
+  CloseRoomHandler,
   CreateRoomHandler,
+  DisconnectHandler,
   JoinRoomHandler,
+  LeaveRoomHandler,
 } from "../handlers/room.handlers.js";
 
 export function roomSocket(socket: Socket) {
@@ -11,7 +14,11 @@ export function roomSocket(socket: Socket) {
   socket.on("join-room", async ({ lectureId }, cb) =>
     JoinRoomHandler(socket, lectureId, cb),
   );
-  socket.on("leave-room", () => {});
-  socket.on("close-room", () => {});
-  socket.on("disconnect", () => {});
+  socket.on("leave-room", ({ lectureId }) => {
+    LeaveRoomHandler(socket, lectureId);
+  });
+  socket.on("close-room", ({ lectureId }) =>
+    CloseRoomHandler(socket, lectureId),
+  );
+  socket.on("disconnect", () => DisconnectHandler(socket));
 }

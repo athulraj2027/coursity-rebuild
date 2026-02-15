@@ -6,12 +6,27 @@ export class User {
   public transports: Map<string, Transport>;
   public producers: Map<string, Producer>;
   public consumers: Map<string, Consumer>;
+  public lectureId: string;
 
-  constructor(socketId: string, userId: string) {
+  constructor(socketId: string, userId: string, lectureId: string) {
     this.socketId = socketId;
     this.userId = userId;
+    this.lectureId = lectureId;
     this.transports = new Map();
     this.consumers = new Map();
     this.producers = new Map();
+  }
+  addTransport(transport: Transport) {
+    this.transports.set(transport.id, transport);
+  }
+
+  getTransportById(id: string) {
+    return this.transports.get(id);
+  }
+  addProducer(producer: Producer) {
+    this.producers.set(producer.id, producer);
+  }
+  addConsumer(consumer: Consumer) {
+    this.consumers.set(consumer.id, consumer);
   }
 }

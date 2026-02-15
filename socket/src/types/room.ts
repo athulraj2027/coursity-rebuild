@@ -1,12 +1,5 @@
-import type { Consumer, Producer, Router, Transport } from "mediasoup/types";
-
-export interface User {
-  socketId: string;
-  userId: string;
-  transports: Map<string, Transport>;
-  producers: Map<string, Producer>;
-  consumers: Map<string, Consumer>;
-}
+import type { Router } from "mediasoup/types";
+import type { User } from "../store/user.js";
 
 export interface RoomInterface {
   router: Router;

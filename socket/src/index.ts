@@ -5,7 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { createWorker } from "./mediasoup/worker.js";
-import { roomSocket } from "./socket/socket.js";
+import { roomSocket, transportSocket } from "./socket/socket.js";
 import { socketAuthMiddleware } from "./middlewares/socketAuthMiddleware.js";
 const PORT = process.env.PORT;
 const app = express();
@@ -27,6 +27,7 @@ io.use(socketAuthMiddleware);
   await createWorker();
   io.on("connection", (socket) => {
     roomSocket(socket);
+    transportSocket(socket);
   });
 
   server.listen(PORT, () => {

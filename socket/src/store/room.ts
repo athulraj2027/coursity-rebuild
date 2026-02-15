@@ -1,5 +1,5 @@
 import type { Router } from "mediasoup/types";
-import type { User } from "../types/room.js";
+import type { User } from "./user.js";
 
 export class Room {
   public router: Router;
@@ -16,5 +16,19 @@ export class Room {
 
   addPeer(user: User) {
     this.peers.set(user.userId, user);
+  }
+
+  removePeer(user: User) {
+    this.peers.delete(user.userId);
+  }
+
+  getRouter() {
+    return this.router;
+  }
+
+  getUser(userId: string) {
+    const user = this.peers.get(userId);
+    if (!user) return null;
+    return user;
   }
 }
