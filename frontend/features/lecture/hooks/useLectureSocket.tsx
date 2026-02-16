@@ -1,9 +1,12 @@
 "use client";
 import { socket } from "@/lib/socket";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const useLectureSocket = () => {
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
+
   useEffect(() => {
     socket.on("new-user-joined", ({ username }) => {
       toast.success(`${username} joined the lecture`);
@@ -19,7 +22,7 @@ export const useLectureSocket = () => {
         window.location.href = "/";
       }, 1000);
     });
-    
+
     return () => {
       socket.off("new-user-joined");
       socket.off("peer-left");

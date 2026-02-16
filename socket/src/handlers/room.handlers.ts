@@ -10,16 +10,26 @@ export async function CreateRoomHandler(
   lectureId: string,
   cb: (data: any) => void,
 ) {
-  const { id, userId } = socket;
-  const router = await createRouter();
-  const user = new User(id, userId, lectureId);
-  const room = new Room(lectureId, router, userId);
-  roomStore.addRoom(lectureId, room);
-  userStore.add(socket.id, user);
-  room.addPeer(user);
-  socket.join(lectureId);
-  console.log("new room : ", room);
-  cb({ success: true, rtpCapabilities: room.router.rtpCapabilities });
+  try {
+    const { userId, role } = socket;
+    if (role !== "TEACHER") {
+      cb({ success: false, message: "Only teacher can create room" });
+      return;
+    }
+    const existingRoom = roomStore.getRoom(lectureId);
+    if (existingRoom) {
+      cb({ success: true }); // Room already exists
+      return;
+    }
+    const router = await createRouter();
+    const room = new Room(lectureId, router, userId);
+    roomStore.addRoom(lectureId, room);
+
+    cb({ success: true });
+  } catch (err) {
+    console.error("CreateRoom error:", err);
+    cb({ success: false });
+  }
 }
 
 export function JoinRoomHandler(
@@ -27,32 +37,45 @@ export function JoinRoomHandler(
   lectureId: string,
   cb: (data: any) => void,
 ) {
-  const { id, userId, username } = socket;
-  const room = roomStore.getRoom(lectureId);
-  if (!room) {
-    cb({ success: false, message: "Room not found" });
-    return;
-  }
-  if (userStore.get(socket.id)) {
-    cb({ success: false, message: "Already joined" });
-    return;
-  }
+  try {
+    const { id, userId, username } = socket;
 
-  const existingUser = room.peers.get(userId);
+    const room = roomStore.getRoom(lectureId);
 
-  if (existingUser) {
-    for (const transport of existingUser.transports.values()) transport.close();
-    userStore.remove(existingUser.socketId);
-    room.peers.delete(userId);
+    if (!room) {
+      cb({ success: false, message: "Room not found" });
+      return;
+    }
+    const existingUser = room.peers.get(userId);
+
+    if (existingUser) {
+      for (const transport of existingUser.transports.values()) {
+        transport.close();
+      }
+
+      userStore.remove(existingUser.socketId);
+      room.peers.delete(userId);
+    }
+    const user = new User(id, userId, lectureId);
+
+    room.addPeer(user);
+    userStore.add(id, user);
+
+    socket.join(lectureId);
+
+    socket.to(lectureId).emit("new-user-joined", {
+      userId,
+      username,
+    });
+
+    cb({
+      success: true,
+      rtpCapabilities: room.router.rtpCapabilities,
+    });
+  } catch (err) {
+    console.error("JoinRoom error:", err);
+    cb({ success: false });
   }
-
-  const user = new User(id, userId, lectureId);
-  room.addPeer(user);
-  userStore.add(socket.id, user);
-  socket.join(lectureId);
-  socket.to(lectureId).emit("new-user-joined", { username });
-  console.log("joined room  - ", lectureId);
-  cb({ success: true, rtpCapabilities: room.router.rtpCapabilities });
 }
 
 export function DisconnectHandler(socket: Socket) {

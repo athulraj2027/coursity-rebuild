@@ -3,19 +3,15 @@ import Loading from "../../../components/common/Loading";
 import NoAccess from "./NoAccess";
 import StartLectureBtn from "./StartLectureBtn";
 import JoinLectureBtn from "./JoinLectureBtn";
-import Meeting from "./Meeting";
-import { useMediastream } from "../hooks/useMediastream";
+import Meeting from "./Meeting/Meeting";
 import { useLectureAccess } from "../hooks/useLectureAccess";
 import { useSocketStatus } from "../hooks/useSocketStatus";
 
 const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
-  const { requestMedia } = useMediastream();
   const { isLoading, mode, setMode, role, error, lectureStatus } =
     useLectureAccess(lectureId);
   const { isConnected, transport } = useSocketStatus();
   const handleEnter = async () => {
-    const media = await requestMedia();
-    if (!media) return;
     setMode("MEETING");
   };
 
@@ -23,7 +19,7 @@ const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
   if (isLoading || !role) return <Loading />;
 
   if (mode === "MEETING" || (lectureStatus === "STARTED" && role === "TEACHER"))
-    return <Meeting lectureId={lectureId} />;
+    return <Meeting lectureId={lectureId} role={role} />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 to-gray-800 px-4">
