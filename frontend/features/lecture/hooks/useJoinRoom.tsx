@@ -121,11 +121,6 @@ export const useJoinRoom = () => {
           },
         );
         recvTransportRef.current = recvTransport;
-        console.log(
-          "recvTransportId && recvTransportrefId",
-          recvTransport.id,
-          recvTransportRef.current.id,
-        );
       },
     );
     return;
@@ -166,7 +161,6 @@ export const useJoinRoom = () => {
         socket.emit(
           "pause-produce",
           {
-            kind: "video",
             producerId: videoProducer.id,
             lectureId,
           },
@@ -179,7 +173,6 @@ export const useJoinRoom = () => {
       videoProducer?.observer.on("resume", () => {
         console.log("resuming producer ...");
         socket.emit("resume-produce", {
-          kind: "video",
           producerId: videoProducer.id,
           lectureId,
         });
@@ -235,7 +228,6 @@ export const useJoinRoom = () => {
         socket.emit(
           "pause-produce",
           {
-            kind: "audio",
             producerId: audioProducer.id,
             lectureId,
           },
@@ -247,7 +239,6 @@ export const useJoinRoom = () => {
 
       audioProducer?.observer.on("resume", () => {
         socket.emit("resume-produce", {
-          kind: "audio",
           producerId: audioProducer.id,
           lectureId,
         });
@@ -324,7 +315,6 @@ export const useJoinRoom = () => {
     }
   };
 
-  
   return {
     createMeetingEssentials,
     stopScreenShare,

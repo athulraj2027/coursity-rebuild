@@ -52,6 +52,8 @@ export async function ConnectTransportHandler(
     cb({ success: false, message: "Transport not found" });
     return;
   }
+  console.log("hiasdfas");
 
-  await connectTransport(transport, dtlsParameters);
+  const res = await connectTransport(transport, dtlsParameters);
+  cb(res);
 }

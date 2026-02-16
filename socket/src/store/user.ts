@@ -19,12 +19,14 @@ export class User {
   addTransport(transport: Transport) {
     this.transports.set(transport.id, transport);
   }
-
   getTransportById(id: string) {
     return this.transports.get(id);
   }
   addProducer(producer: Producer) {
     this.producers.set(producer.id, producer);
+  }
+  getProducerById(producerId: string) {
+    return this.producers.get(producerId);
   }
   addConsumer(consumer: Consumer) {
     this.consumers.set(consumer.id, consumer);

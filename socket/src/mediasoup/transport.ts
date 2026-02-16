@@ -29,5 +29,5 @@ export async function connectTransport(
   dtlsParameters: DtlsParameters,
 ) {
   await transport.connect({ dtlsParameters });
-  return;
+  return { success: true };
 }
