@@ -31,4 +31,8 @@ export class User {
   addConsumer(consumer: Consumer) {
     this.consumers.set(consumer.id, consumer);
   }
+
+  getConsumerById(consumerId: string) {
+    return this.consumers.get(consumerId);
+  }
 }

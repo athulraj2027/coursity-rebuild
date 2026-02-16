@@ -1,0 +1,118 @@
+import type { AppData, RtpCapabilities } from "mediasoup/types";
+import type { Socket } from "socket.io";
+import { roomStore } from "../store/roomStore.js";
+
+interface ProducersListInterface {
+  producerId: string;
+  peerId: string;
+  appData: AppData;
+  kind: "audio" | "video";
+  paused: boolean;
+}
+
+export async function ConsumeHandler(
+  socket: Socket,
+  lectureId: string,
+  producer: {
+    producerId: string;
+    kind: "audio" | "video";
+    appData: AppData;
+    paused: boolean;
+  },
+  rtpCapabilities: RtpCapabilities,
+  transportId: string,
+  cb: (data: any) => void,
+) {
+  const { userId } = socket;
+  const { producerId, appData } = producer;
+
+  const user = roomStore.getRoom(lectureId)?.getUser(userId);
+  const transport = user?.getTransportById(transportId);
+  if (!transport) {
+    cb({ success: false, message: "No transport found" });
+    return;
+  }
+  const consumer = await transport.consume({
+    producerId,
+    rtpCapabilities,
+    appData,
+  });
+  if (!consumer) {
+    console.log("no consumer created");
+    cb({ success: false, message: "Consumer creation failed" });
+    return;
+  }
+
+  user?.addConsumer(consumer);
+
+  const params = {
+    id: consumer.id,
+    producerId,
+    appData: consumer.appData,
+    kind: consumer.kind,
+    rtpParameters: consumer.rtpParameters,
+    producerUserId: userId,
+  };
+
+  console.log("the params sending from the consume event");
+  cb({ success: true, params });
+}
+
+export async function GetProducersHandler(
+  socket: Socket,
+  lectureId: string,
+  cb: (data: any) => void,
+) {
+  const { userId } = socket;
+  const room = roomStore.getRoom(lectureId);
+  if (!room) {
+    cb({ success: false, message: "No room found" });
+    return;
+  }
+
+  const producerList: ProducersListInterface[] = [];
+  room.peers.forEach((peer, id) => {
+    if (id === userId) return;
+    peer.producers.forEach((producer) => {
+      producerList.push({
+        producerId: producer.id,
+        peerId: id,
+        appData: producer.appData,
+        kind: producer.kind,
+        paused: producer.paused,
+      });
+    });
+
+    console.log("producerList : ", producerList);
+    cb({
+      success: true,
+      producers: producerList,
+    });
+  });
+}
+
+export async function ResumeConsumerHandler(
+  socket: Socket,
+  lectureId: string,
+  consumerId: string,
+  cb: (data: any) => void,
+) {
+  const { userId } = socket;
+
+  const consumer = roomStore
+    .getRoom(lectureId)
+    ?.getUser(userId)
+    ?.getConsumerById(consumerId);
+
+  if (!consumer) {
+    cb({ success: false, message: "No consumer found" });
+    return;
+  }
+
+  if (!consumer.paused) {
+    cb({ success: false, message: "Consumer already resumed" });
+    return;
+  }
+
+  await consumer.resume();
+}

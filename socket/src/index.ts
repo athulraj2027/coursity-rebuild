@@ -9,6 +9,7 @@ import {
   roomSocket,
   transportSocket,
   producerSocket,
+  consumerSocket,
 } from "./socket/socket.js";
 import { socketAuthMiddleware } from "./middlewares/socketAuthMiddleware.js";
 
@@ -34,6 +35,7 @@ io.use(socketAuthMiddleware);
     roomSocket(socket);
     transportSocket(socket);
     producerSocket(socket);
+    consumerSocket(socket);
   });
 
   server.listen(PORT, () => {

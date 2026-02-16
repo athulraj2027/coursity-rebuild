@@ -1,6 +1,11 @@
 import { socket } from "@/lib/socket";
 import * as mediasoupClient from "mediasoup-client";
-import { Producer, Transport, TransportOptions } from "mediasoup-client/types";
+import {
+  Consumer,
+  Producer,
+  Transport,
+  TransportOptions,
+} from "mediasoup-client/types";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -16,6 +21,8 @@ export const useJoinRoom = () => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const localScreenStreamRef = useRef<MediaStream | null>(null);
   const localScreenRef = useRef<HTMLVideoElement>(null);
+
+  const consumersRef = useRef<Consumer[]>([]);
 
   const createMeetingEssentials = async (
     rtpCapabilities: mediasoupClient.types.RtpCapabilities,
