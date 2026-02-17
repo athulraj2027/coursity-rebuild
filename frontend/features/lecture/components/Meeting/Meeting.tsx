@@ -30,6 +30,9 @@ const Meeting = ({
     stopMic,
     startScreenShare,
     stopScreenShare,
+    localStream,
+    remoteStreams,
+    localScreenStream,
   } = useJoinRoom();
 
   useEffect(() => {
@@ -109,7 +112,11 @@ const Meeting = ({
             ${activePanel ? "hidden lg:block" : "block"}
           `}
         >
-          {/* <MainVideos stream={stream} /> */}
+          <MainVideos
+            localStream={localStream}
+            remoteStreams={remoteStreams}
+            localScreenStream={localScreenStream}
+          />
         </div>
 
         {/* CHAT */}

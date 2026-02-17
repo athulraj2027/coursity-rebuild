@@ -4,7 +4,7 @@ import { roomStore } from "../store/roomStore.js";
 
 interface ProducersListInterface {
   producerId: string;
-  peerId: string;
+  userId: string;
   appData: AppData;
   kind: "audio" | "video";
   paused: boolean;
@@ -63,31 +63,34 @@ export async function GetProducersHandler(
   lectureId: string,
   cb: (data: any) => void,
 ) {
+  console.log("gettting producers for lecture id : ", lectureId);
   const { userId } = socket;
   const room = roomStore.getRoom(lectureId);
   if (!room) {
+    console.log("no room");
     cb({ success: false, message: "No room found" });
     return;
   }
 
+  console.log("user id : ", userId);
   const producerList: ProducersListInterface[] = [];
   room.peers.forEach((peer, id) => {
     if (id === userId) return;
-    peer.producers.forEach((producer) => {
+    peer.producers.forEach((producer, id) => {
       producerList.push({
         producerId: producer.id,
-        peerId: id,
+        userId,
         appData: producer.appData,
         kind: producer.kind,
         paused: producer.paused,
       });
     });
+  });
 
-    console.log("producerList : ", producerList);
-    cb({
-      success: true,
-      producers: producerList,
-    });
+  console.log("producerList : ", producerList);
+  cb({
+    success: true,
+    producers: producerList,
   });
 }
 

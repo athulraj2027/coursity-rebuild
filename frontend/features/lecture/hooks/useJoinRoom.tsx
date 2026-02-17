@@ -1,28 +1,86 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { socket } from "@/lib/socket";
 import * as mediasoupClient from "mediasoup-client";
-import {
-  Consumer,
-  Producer,
-  Transport,
-  TransportOptions,
-} from "mediasoup-client/types";
-import { useRef } from "react";
+import { Producer, Transport, TransportOptions } from "mediasoup-client/types";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export const useJoinRoom = () => {
+  // device refs
   const deviceRef = useRef<mediasoupClient.Device | null>(null);
   const sendTransportRef = useRef<Transport | null>(null);
   const recvTransportRef = useRef<Transport | null>(null);
+
+  //producer refs
   const videoProducerRef = useRef<Producer | undefined>(undefined);
   const audioProducerRef = useRef<Producer | undefined>(undefined);
   const screenProducerRef = useRef<Producer | undefined>(undefined);
 
-  const localStreamRef = useRef<MediaStream | null>(null);
+  //local media refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
-  const localScreenStreamRef = useRef<MediaStream | null>(null);
+  const [localScreenStream, setLocalScreenStream] =
+    useState<MediaStream | null>(null);
   const localScreenRef = useRef<HTMLVideoElement>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
-  const consumersRef = useRef<Consumer[]>([]);
+  //consumer refs
+  const consumersRef = useRef<Map<string, mediasoupClient.types.Consumer>>(
+    new Map(),
+  );
+  const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(
+    new Map(),
+  );
+
+  useEffect(() => {
+    return () => {
+      sendTransportRef.current?.close();
+      recvTransportRef.current?.close();
+      videoProducerRef.current?.close();
+      audioProducerRef.current?.close();
+      screenProducerRef.current?.close();
+    };
+  }, []);
+
+  const consume = async (producer: {
+    appData: { lectureId: string };
+    kind: "video" | "audio";
+    userId: string;
+    paused: boolean;
+    producerId: string;
+  }) => {
+    console.log("producer for consumption : ", producer);
+    socket.emit(
+      "consume",
+      {
+        rtpCapabilities: deviceRef.current?.rtpCapabilities,
+        lectureId: producer.appData.lectureId,
+        producer,
+        transportId: recvTransportRef.current?.id,
+      },
+      async (data: any) => {
+        console.log("data after consume event : ", data);
+        if (!data.success) return;
+        const { params } = data;
+        const consumer = await recvTransportRef.current!.consume({
+          id: params.id,
+          producerId: params.producerId,
+          kind: params.kind,
+          rtpParameters: params.rtpParameters,
+        });
+
+        console.log("consumer created:", consumer);
+        consumersRef.current.set(consumer.id, consumer);
+
+        const stream = new MediaStream();
+        stream.addTrack(consumer.track);
+        setRemoteStreams((prev) => {
+          const updated = new Map(prev);
+          updated.set(params.producerUserId, stream);
+          return updated;
+        });
+      },
+    );
+  };
 
   const createMeetingEssentials = async (
     rtpCapabilities: mediasoupClient.types.RtpCapabilities,
@@ -128,36 +186,52 @@ export const useJoinRoom = () => {
           },
         );
         recvTransportRef.current = recvTransport;
+
+        console.log("emitting get producers");
+        socket.emit(
+          "get-producers",
+          { lectureId },
+          async (res: {
+            success: boolean;
+            producers: {
+              appData: { lectureId: string };
+              kind: "video" | "audio";
+              userId: string;
+              paused: boolean;
+              producerId: string;
+            }[];
+          }) => {
+            // console.log("producers : ", res.producers);
+            for (const producer of res.producers) {
+              await consume(producer);
+            }
+          },
+        );
       },
     );
+
     return;
   };
 
   const startVideo = async (lectureId: string) => {
     try {
+      const mediastream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      setLocalStream(mediastream);
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = mediastream;
+      }
+
+      const track = mediastream.getVideoTracks()[0];
       if (videoProducerRef.current) {
-        const mediastream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        localStreamRef.current = mediastream;
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = mediastream;
-        }
-        const newTrack = mediastream.getVideoTracks()[0];
         await videoProducerRef.current.replaceTrack({
-          track: newTrack,
+          track,
         });
         videoProducerRef.current.resume();
         return;
       }
-      const mediastream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      localStreamRef.current = mediastream;
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = mediastream;
-      }
-      const track = mediastream.getVideoTracks()[0];
+
       const videoProducer = await sendTransportRef.current?.produce({
         track,
       });
@@ -185,8 +259,6 @@ export const useJoinRoom = () => {
         });
       });
 
-      videoProducer?.observer.on("close", () => {});
-
       videoProducerRef.current = videoProducer;
     } catch (error) {
       console.log("Error starting video:", error);
@@ -197,7 +269,7 @@ export const useJoinRoom = () => {
   const stopVideo = async () => {
     try {
       videoProducerRef.current?.pause();
-      const track = localStreamRef.current?.getVideoTracks()[0];
+      const track = localStream?.getVideoTracks()[0];
       track?.stop();
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = null;
@@ -210,23 +282,19 @@ export const useJoinRoom = () => {
 
   const startMic = async (lectureId: string) => {
     try {
+      const mediastream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      const track = mediastream.getAudioTracks()[0];
+
       if (audioProducerRef.current) {
-        const mediastream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        localStreamRef.current = mediastream;
-        const newTrack = mediastream.getAudioTracks()[0];
         await audioProducerRef.current.replaceTrack({
-          track: newTrack,
+          track,
         });
         audioProducerRef.current.resume();
         return;
       }
-      const mediastream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      localStreamRef.current = mediastream;
-      const track = mediastream.getAudioTracks()[0];
+
       const audioProducer = await sendTransportRef.current?.produce({
         track,
       });
@@ -262,7 +330,7 @@ export const useJoinRoom = () => {
   const stopMic = async () => {
     try {
       audioProducerRef.current?.pause();
-      const track = localStreamRef.current?.getAudioTracks()[0];
+      const track = localStream?.getAudioTracks()[0];
       track?.stop();
     } catch (error) {
       console.log("Error muting mic:", error);
@@ -275,7 +343,7 @@ export const useJoinRoom = () => {
       const mediastream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
       });
-      localScreenStreamRef.current = mediastream;
+      setLocalScreenStream(mediastream);
       if (localScreenRef.current) {
         localScreenRef.current.srcObject = mediastream;
       }
@@ -300,7 +368,9 @@ export const useJoinRoom = () => {
         socket.emit(
           "stop-screen-share",
           { producerId: screenProducer.id, lectureId },
-          () => {},
+          () => {
+            console.log("screenshare closed ");
+          },
         );
       });
 
@@ -314,7 +384,7 @@ export const useJoinRoom = () => {
   const stopScreenShare = async () => {
     try {
       screenProducerRef.current?.close();
-      const track = localScreenStreamRef.current?.getVideoTracks()[0];
+      const track = localScreenStream?.getVideoTracks()[0];
       track?.stop();
     } catch (error) {
       console.log("Error stopping screenshare:", error);
@@ -330,5 +400,8 @@ export const useJoinRoom = () => {
     startScreenShare,
     stopMic,
     stopVideo,
+    remoteStreams,
+    localStream,
+    localScreenStream,
   };
 };

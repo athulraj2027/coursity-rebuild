@@ -28,6 +28,6 @@ export function consumerSocket(socket: Socket) {
   socket.on(
     "resume-consumer",
     async ({ lectureId, consumerId }, cb) =>
-      await ResumeConsumerHandler(socket, lectureId, consumerId, cb),
+      await ResumeConsumerHandler(socket,lectureId, consumerId, cb),
   );
 }
