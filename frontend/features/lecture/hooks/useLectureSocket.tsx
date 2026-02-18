@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 export const useLectureSocket = (
   setExistingUsers: React.Dispatch<React.SetStateAction<any[]>>,
+  consume: (producer: any) => void,
 ) => {
   useEffect(() => {
     const handleNewUser = (params: { userId: string; username: string }) => {
@@ -31,14 +32,21 @@ export const useLectureSocket = (
       }, 1000);
     };
 
+    const handleNewProducer = ({ producer }: any) => {
+      console.log("new producer started : ", producer);
+      consume(producer);
+    };
+
     socket.on("new-user-joined", handleNewUser);
     socket.on("peer-left", handlePeerLeft);
     socket.on("lecture-ended", handleLectureEnded);
+    socket.on("new-producer", handleNewProducer);
 
     return () => {
       socket.off("new-user-joined", handleNewUser);
       socket.off("peer-left", handlePeerLeft);
       socket.off("lecture-ended", handleLectureEnded);
+      socket.off("new-producer", handleNewProducer);
     };
-  }, [setExistingUsers]);
+  }, [setExistingUsers, consume]);
 };

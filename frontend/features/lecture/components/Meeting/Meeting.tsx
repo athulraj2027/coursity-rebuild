@@ -37,11 +37,12 @@ const Meeting = ({
     localScreenStream,
     existingUsers,
     setExistingUsers,
+    consume,
   } = useJoinRoom();
 
   const { message, setMessage, messages, sendMessage } = useMessage(lectureId);
 
-  useLectureSocket(setExistingUsers);
+  useLectureSocket(setExistingUsers, consume);
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;

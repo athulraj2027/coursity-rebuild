@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io";
 import { connectTransport, createTransport } from "../mediasoup/transport.js";
 import { roomStore } from "../store/roomStore.js";
-import type { DtlsParameters, Transport } from "mediasoup/types";
+import type { DtlsParameters } from "mediasoup/types";
 
 export async function CreateTransportHandler(
   socket: Socket,
@@ -52,7 +52,6 @@ export async function ConnectTransportHandler(
     cb({ success: false, message: "Transport not found" });
     return;
   }
-  console.log("hiasdfas");
 
   const res = await connectTransport(transport, dtlsParameters);
   cb(res);

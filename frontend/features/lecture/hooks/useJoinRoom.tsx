@@ -5,6 +5,15 @@ import { Producer, Transport, TransportOptions } from "mediasoup-client/types";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+export type RemoteStreamData = {
+  stream: MediaStream;
+  appData?: {
+    lectureId?: string;
+    mediaTag?: string;
+    username: string;
+  };
+};
+
 export const useJoinRoom = () => {
   // device refs
   const deviceRef = useRef<mediasoupClient.Device | null>(null);
@@ -27,12 +36,11 @@ export const useJoinRoom = () => {
   const consumersRef = useRef<Map<string, mediasoupClient.types.Consumer>>(
     new Map(),
   );
-  const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(
-    new Map(),
-  );
+  const [remoteStreams, setRemoteStreams] = useState<
+    Map<string, RemoteStreamData>
+  >(new Map());
 
   const [existingUsers, setExistingUsers] = useState<object[]>([]);
-
 
   useEffect(() => {
     return () => {
@@ -45,7 +53,7 @@ export const useJoinRoom = () => {
   }, []);
 
   const consume = async (producer: {
-    appData: { lectureId: string };
+    appData: { lectureId: string; username: string };
     kind: "video" | "audio";
     userId: string;
     paused: boolean;
@@ -69,6 +77,7 @@ export const useJoinRoom = () => {
           producerId: params.producerId,
           kind: params.kind,
           rtpParameters: params.rtpParameters,
+          appData: params.appData,
         });
 
         console.log("consumer created:", consumer);
@@ -78,7 +87,10 @@ export const useJoinRoom = () => {
         stream.addTrack(consumer.track);
         setRemoteStreams((prev) => {
           const updated = new Map(prev);
-          updated.set(params.producerUserId, stream);
+          updated.set(params.producerUserId, {
+            stream,
+            appData: consumer.appData,
+          });
           return updated;
         });
       },
@@ -198,7 +210,7 @@ export const useJoinRoom = () => {
           async (res: {
             success: boolean;
             producers: {
-              appData: { lectureId: string };
+              appData: { lectureId: string; username: string };
               kind: "video" | "audio";
               userId: string;
               paused: boolean;
@@ -410,6 +422,6 @@ export const useJoinRoom = () => {
     localScreenStream,
     existingUsers,
     setExistingUsers,
-  
+    consume,
   };
 };

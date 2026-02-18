@@ -24,7 +24,7 @@ export async function ProduceHandler(
   const producer = await CreateProducer(transport, {
     kind,
     rtpParameters,
-    appData,
+    appData: { ...appData, username },
   });
 
   producer.observer.on("pause", () => {
@@ -43,7 +43,6 @@ export async function ProduceHandler(
   cb({ id: producer.id });
   socket.to(lectureId).emit("new-producer", {
     producer: {
-      username,
       appData: producer.appData,
       producerId: producer.id,
       kind,
