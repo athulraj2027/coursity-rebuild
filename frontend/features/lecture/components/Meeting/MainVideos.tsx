@@ -12,7 +12,7 @@ const MainVideos = ({
   localScreenStream: MediaStream | null;
 }) => {
   const remoteUsers = [1, 2, 3, 4, 5, 6];
-  const participants = ["local", ...remoteUsers];
+  const participants = [...remoteUsers];
   const count = participants.length;
 
   return (

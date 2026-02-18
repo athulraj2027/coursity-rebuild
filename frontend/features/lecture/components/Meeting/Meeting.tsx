@@ -9,6 +9,8 @@ import { useJoinRoom } from "../../hooks/useJoinRoom";
 import { socket } from "@/lib/socket";
 import { toast } from "sonner";
 import Header from "./Header";
+import { useLectureSocket } from "../../hooks/useLectureSocket";
+import { useMessage } from "../../hooks/useMessage";
 
 const Meeting = ({
   lectureId,
@@ -33,8 +35,13 @@ const Meeting = ({
     localStream,
     remoteStreams,
     localScreenStream,
+    existingUsers,
+    setExistingUsers,
   } = useJoinRoom();
 
+  const { message, setMessage, messages, sendMessage } = useMessage(lectureId);
+
+  useLectureSocket(setExistingUsers);
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
@@ -47,6 +54,7 @@ const Meeting = ({
             socket.emit("create-room", { lectureId }, resolve);
           });
 
+          console.log("createresponse  : ", createResponse);
           if (!createResponse.success) {
             toast.error("Failed to start lecture");
             return;
@@ -63,8 +71,13 @@ const Meeting = ({
           toast.error("Failed to join lecture");
           return;
         }
+        console.log("join response : ", joinResponse);
         if (role !== "TEACHER") toast.success("You have joined the lecture");
-        await createMeetingEssentials(joinResponse.rtpCapabilities, lectureId);
+        await createMeetingEssentials(
+          joinResponse.rtpCapabilities,
+          lectureId,
+          joinResponse.existingUsers,
+        );
       } catch (err) {
         console.error(err);
         toast.error("Something went wrong");
@@ -126,7 +139,12 @@ const Meeting = ({
             ${activePanel === "chat" ? "block" : "hidden lg:block"}
           `}
         >
-          <Chat />
+          <Chat
+            message={message}
+            messages={messages}
+            sendMessage={sendMessage}
+            setMessage={setMessage}
+          />
         </div>
 
         {/* PARTICIPANTS */}
@@ -136,7 +154,7 @@ const Meeting = ({
             ${activePanel === "participants" ? "block" : "hidden lg:block"}
           `}
         >
-          <Participants />
+          <Participants users={existingUsers} />
         </div>
       </div>
 

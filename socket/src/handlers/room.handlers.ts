@@ -1,6 +1,6 @@
 import { createRouter } from "../mediasoup/router.js";
 import { Room } from "../store/room.js";
-import type { Socket } from "socket.io";
+import type { Server, Socket } from "socket.io";
 import { User } from "../store/user.js";
 import { roomStore } from "../store/roomStore.js";
 import { userStore } from "../store/userStore.js";
@@ -11,18 +11,18 @@ export async function CreateRoomHandler(
   cb: (data: any) => void,
 ) {
   try {
-    const { userId, role } = socket;
+    const { id, userId, role, username } = socket;
     if (role !== "TEACHER") {
       cb({ success: false, message: "Only teacher can create room" });
       return;
     }
     const existingRoom = roomStore.getRoom(lectureId);
     if (existingRoom) {
-      cb({ success: true }); // Room already exists
+      cb({ success: true });
       return;
     }
     const router = await createRouter();
-    const room = new Room(lectureId, router, userId);
+    const room = new Room(lectureId, router, username, userId);
     roomStore.addRoom(lectureId, room);
 
     cb({ success: true });
@@ -32,31 +32,31 @@ export async function CreateRoomHandler(
   }
 }
 
-export function JoinRoomHandler(
+export async function JoinRoomHandler(
+  io: Server,
   socket: Socket,
   lectureId: string,
   cb: (data: any) => void,
 ) {
   try {
     const { id, userId, username } = socket;
-
     const room = roomStore.getRoom(lectureId);
-
     if (!room) {
       cb({ success: false, message: "Room not found" });
       return;
     }
+
     const existingUser = room.peers.get(userId);
 
+    console.log("existing user : ", existingUser);
     if (existingUser) {
-      for (const transport of existingUser.transports.values()) {
-        transport.close();
-      }
-
-      userStore.remove(existingUser.socketId);
-      room.peers.delete(userId);
+      cb({ success: false });
+      return;
     }
-    const user = new User(id, userId, lectureId);
+
+    const existingUsers = room.getAllUsernames();
+    console.log("existing users  :", existingUsers);
+    const user = new User(id, userId, username, lectureId);
 
     room.addPeer(user);
     userStore.add(id, user);
@@ -71,6 +71,7 @@ export function JoinRoomHandler(
     cb({
       success: true,
       rtpCapabilities: room.router.rtpCapabilities,
+      existingUsers,
     });
   } catch (err) {
     console.error("JoinRoom error:", err);

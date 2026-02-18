@@ -31,6 +31,9 @@ export const useJoinRoom = () => {
     new Map(),
   );
 
+  const [existingUsers, setExistingUsers] = useState<object[]>([]);
+
+
   useEffect(() => {
     return () => {
       sendTransportRef.current?.close();
@@ -85,6 +88,7 @@ export const useJoinRoom = () => {
   const createMeetingEssentials = async (
     rtpCapabilities: mediasoupClient.types.RtpCapabilities,
     lectureId: string,
+    existingUsers: object[],
   ) => {
     console.log("rtpcapabilities : ", rtpCapabilities);
     const device = new mediasoupClient.Device();
@@ -210,6 +214,7 @@ export const useJoinRoom = () => {
       },
     );
 
+    setExistingUsers(existingUsers);
     return;
   };
 
@@ -403,5 +408,8 @@ export const useJoinRoom = () => {
     remoteStreams,
     localStream,
     localScreenStream,
+    existingUsers,
+    setExistingUsers,
+  
   };
 };

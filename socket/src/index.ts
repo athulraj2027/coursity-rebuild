@@ -10,6 +10,7 @@ import {
   transportSocket,
   producerSocket,
   consumerSocket,
+  messageSocket,
 } from "./socket/socket.js";
 import { socketAuthMiddleware } from "./middlewares/socketAuthMiddleware.js";
 
@@ -32,10 +33,11 @@ io.use(socketAuthMiddleware);
 (async () => {
   await createWorker();
   io.on("connection", (socket) => {
-    roomSocket(socket);
+    roomSocket(socket, io);
     transportSocket(socket);
     producerSocket(socket);
     consumerSocket(socket);
+    messageSocket(socket);
   });
 
   server.listen(PORT, () => {

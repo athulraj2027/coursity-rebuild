@@ -3,14 +3,21 @@ import type { Consumer, Producer, Transport } from "mediasoup/types";
 export class User {
   public socketId: string;
   public userId: string;
+  public username: string;
   public transports: Map<string, Transport>;
   public producers: Map<string, Producer>;
   public consumers: Map<string, Consumer>;
   public lectureId: string;
 
-  constructor(socketId: string, userId: string, lectureId: string) {
+  constructor(
+    socketId: string,
+    userId: string,
+    username: string,
+    lectureId: string,
+  ) {
     this.socketId = socketId;
     this.userId = userId;
+    this.username = username;
     this.lectureId = lectureId;
     this.transports = new Map();
     this.consumers = new Map();
