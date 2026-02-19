@@ -96,14 +96,14 @@ export async function StopProducerHandler(
   cb: (data: any) => void,
 ) {
   const { userId } = socket;
-  const producer = roomStore
-    .getRoom(lectureId)
-    ?.getUser(userId)
-    ?.getProducerById(producerId);
+  const room = roomStore.getRoom(lectureId);
+  const user = room?.getUser(userId);
+  const producer = user?.getProducerById(producerId);
   if (!producer) {
     cb({ success: false });
     return;
   }
 
+  user?.removeProducer(producer.id);
   await CloseProducer(producer);
 }

@@ -1,4 +1,4 @@
-import type { AppData, RtpCapabilities } from "mediasoup/types";
+import type { AppData, Consumer, RtpCapabilities } from "mediasoup/types";
 import type { Socket } from "socket.io";
 import { roomStore } from "../store/roomStore.js";
 
@@ -42,6 +42,10 @@ export async function ConsumeHandler(
     cb({ success: false, message: "Consumer creation failed" });
     return;
   }
+
+  consumer.observer.on("close", () => {
+    console.log("consumer closed : ", consumer.id);
+  });
 
   user?.addConsumer(consumer);
 
@@ -118,4 +122,35 @@ export async function ResumeConsumerHandler(
   }
 
   await consumer.resume();
+}
+
+export async function StopConsumerHandler(
+  socket: Socket,
+  producerId: string,
+  lectureId: string,
+  cb: (data: any) => void,
+) {
+  const { userId } = socket;
+  const room = roomStore.getRoom(lectureId);
+  if (!room) {
+    console.log("No room found");
+    cb({ success: false, message: "No room found" });
+    return;
+  }
+  const user = room.getUser(userId);
+  if (!user) {
+    console.log("No user found");
+    cb({ success: false, message: "No user found" });
+    return;
+  }
+  console.log('user"s consumers :', user.consumers.values());
+  console.log("producerid : ", producerId);
+  const consumer = user.getConsumerByProducerId(producerId);
+  if (!consumer) {
+    console.log("No consumer found");
+    cb({ success: false, message: "No consumer found" });
+    return;
+  }
+  user.removeConsumer(consumer.id);
+  cb({ success: true });
 }

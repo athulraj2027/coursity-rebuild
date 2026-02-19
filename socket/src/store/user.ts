@@ -42,4 +42,19 @@ export class User {
   getConsumerById(consumerId: string) {
     return this.consumers.get(consumerId);
   }
+
+  getConsumerByProducerId(producerId: string) {
+    this.consumers.forEach((consumer, id) => {
+      if (consumer.producerId === producerId) return consumer;
+    });
+    return null;
+  }
+
+  removeConsumer(consumerId: string) {
+    this.consumers.delete(consumerId);
+  }
+
+  removeProducer(producerId: string) {
+    this.producers.delete(producerId);
+  }
 }

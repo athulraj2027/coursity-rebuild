@@ -5,8 +5,12 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 export const useLectureSocket = (
+  lectureId: string,
   setExistingUsers: React.Dispatch<React.SetStateAction<any[]>>,
   consume: (producer: any) => void,
+  removeProducerById: (producerId: string, lectureId: string) => void,
+  pauseVideoUI: (producerId: string) => void,
+  resumeVideoUI: (producerId: string) => void,
 ) => {
   useEffect(() => {
     const handleNewUser = (params: { userId: string; username: string }) => {
@@ -43,16 +47,42 @@ export const useLectureSocket = (
       consume(producer);
     };
 
+    const handleProducerPaused = ({ producerId }: { producerId: string }) => {
+      console.log("producer paused : ", producerId);
+      pauseVideoUI(producerId);
+    };
+    const handleProducerResumed = ({ producerId }: { producerId: string }) => {
+      console.log("producer resumed : ", producerId);
+      resumeVideoUI(producerId);
+    };
+    const handleProducerStopped = ({ producerId }: { producerId: string }) => {
+      console.log("producer stopped : ", producerId);
+      removeProducerById(producerId, lectureId);
+    };
+
     socket.on("new-user-joined", handleNewUser);
     socket.on("peer-left", handlePeerLeft);
     socket.on("lecture-ended", handleLectureEnded);
     socket.on("new-producer", handleNewProducer);
+    socket.on("producerpaused", handleProducerPaused);
+    socket.on("producerresumed", handleProducerResumed);
+    socket.on("producerclosed", handleProducerStopped);
 
     return () => {
       socket.off("new-user-joined", handleNewUser);
       socket.off("peer-left", handlePeerLeft);
       socket.off("lecture-ended", handleLectureEnded);
       socket.off("new-producer", handleNewProducer);
+      socket.off("producerpaused", handleProducerPaused);
+      socket.off("producerresumed", handleProducerResumed);
+      socket.off("producerclosed", handleProducerStopped);
     };
-  }, [setExistingUsers, consume]);
+  }, [
+    setExistingUsers,
+    consume,
+    removeProducerById,
+    lectureId,
+    pauseVideoUI,
+    resumeVideoUI,
+  ]);
 };

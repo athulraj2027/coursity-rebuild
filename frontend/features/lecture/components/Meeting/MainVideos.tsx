@@ -35,10 +35,10 @@ const MainVideos = ({
   const hasAnyScreenShare = !!remoteScreenShare || !!localScreenStream;
 
   return (
-    <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4">
+    <div className="flex-1 p-4 flex flex-col gap-4 overflow-hidden">
       {/* ================== SCREEN SPOTLIGHT ================== */}
       {hasAnyScreenShare && (
-        <div className="w-full rounded-xl border border-yellow-600 overflow-hidden aspect-video">
+        <div className="relative w-full rounded-xl border border-yellow-600 overflow-hidden aspect-video max-h-[60vh] shrink-0">
           {/* Local Screen */}
           {localScreenStream && <VideoPlayer stream={localScreenStream} />}
 
@@ -56,7 +56,7 @@ const MainVideos = ({
 
       {/* ================== VIDEO GRID ================== */}
       <div
-        className={`grid ${
+        className={`flex-1 min-h-0 grid overflow-y-auto ${
           hasAnyScreenShare
             ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
             : getGridClass(normalRemoteVideos.length + (localStream ? 1 : 0))
@@ -78,7 +78,14 @@ const MainVideos = ({
             key={key}
             className="relative rounded-xl aspect-video border border-gray-700 overflow-hidden"
           >
-            <VideoPlayer stream={data.stream} />
+            {!data.paused && <VideoPlayer stream={data.stream} />}
+
+            {data.paused && (
+              <div className="flex items-center justify-center h-full bg-gray-800 text-gray-400 text-sm">
+                Camera Off
+              </div>
+            )}
+
             <div className="absolute top-2 left-2 text-xs bg-gray-800 px-2 py-1 rounded">
               {data.appData?.username}
             </div>

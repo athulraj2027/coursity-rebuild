@@ -13,6 +13,8 @@ export type RemoteStreamData = {
     username: string;
   };
   kind: "audio" | "video";
+  producerId: string;
+  paused?: boolean;
 };
 
 export const useJoinRoom = () => {
@@ -101,11 +103,35 @@ export const useJoinRoom = () => {
             stream,
             appData: consumer.appData,
             kind: consumer.kind,
+            producerId: consumer.producerId,
+            paused: consumer.paused,
           });
           return updated;
         });
       },
     );
+  };
+
+  const removeProducerById = (producerId: string, lectureId: string) => {
+    consumersRef.current.forEach((consumer, consumerId) => {
+      if (consumer.producerId === producerId) {
+        consumer.close();
+        consumersRef.current.delete(consumerId);
+      }
+    });
+
+    // Remove from remoteStreams
+    setRemoteStreams((prev) => {
+      const updated = new Map(prev);
+
+      for (const [key] of updated.entries()) {
+        if (key.startsWith(producerId)) {
+          updated.delete(key);
+        }
+      }
+
+      return updated;
+    });
   };
 
   const createMeetingEssentials = async (
@@ -287,6 +313,8 @@ export const useJoinRoom = () => {
         });
       });
 
+      videoProducer?.observer.on("close", () => {});
+
       videoProducerRef.current = videoProducer;
     } catch (error) {
       console.log("Error starting video:", error);
@@ -306,6 +334,40 @@ export const useJoinRoom = () => {
       console.log("Error in stopping video : ", error);
       toast.error("Failed to turn off camera.");
     }
+  };
+
+  const pauseVideoUI = (producerId: string) => {
+    setRemoteStreams((prev) => {
+      const updated = new Map(prev);
+
+      for (const [key, value] of updated.entries()) {
+        if (value.producerId === producerId) {
+          updated.set(key, {
+            ...value,
+            paused: true,
+          });
+        }
+      }
+
+      return updated;
+    });
+  };
+
+  const resumeVideoUI = (producerId: string) => {
+    setRemoteStreams((prev) => {
+      const updated = new Map(prev);
+
+      for (const [key, value] of updated.entries()) {
+        if (value.producerId === producerId) {
+          updated.set(key, {
+            ...value,
+            paused: false,
+          });
+        }
+      }
+
+      return updated;
+    });
   };
 
   const startMic = async (lectureId: string) => {
@@ -440,5 +502,8 @@ export const useJoinRoom = () => {
     setExistingUsers,
     consume,
     leaveRoom,
+    removeProducerById,
+    pauseVideoUI,
+    resumeVideoUI,
   };
 };

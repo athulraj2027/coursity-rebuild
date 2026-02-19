@@ -3,6 +3,7 @@ import {
   ConsumeHandler,
   GetProducersHandler,
   ResumeConsumerHandler,
+  StopConsumerHandler,
 } from "../handlers/consumer.handlers.js";
 
 export function consumerSocket(socket: Socket) {
@@ -28,6 +29,10 @@ export function consumerSocket(socket: Socket) {
   socket.on(
     "resume-consumer",
     async ({ lectureId, consumerId }, cb) =>
-      await ResumeConsumerHandler(socket,lectureId, consumerId, cb),
+      await ResumeConsumerHandler(socket, lectureId, consumerId, cb),
+  );
+
+  socket.on("close-consumer", async ({ producerId, lectureId }, cb) =>
+    StopConsumerHandler(socket, producerId, lectureId, cb),
   );
 }

@@ -39,11 +39,21 @@ const Meeting = ({
     setExistingUsers,
     consume,
     leaveRoom,
+    removeProducerById,
+    pauseVideoUI,
+    resumeVideoUI,
   } = useJoinRoom();
 
   const { message, setMessage, messages, sendMessage } = useMessage(lectureId);
 
-  useLectureSocket(setExistingUsers, consume);
+  useLectureSocket(
+    lectureId,
+    setExistingUsers,
+    consume,
+    removeProducerById,
+    pauseVideoUI,
+    resumeVideoUI,
+  );
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
