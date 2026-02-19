@@ -15,6 +15,7 @@ type ControlBarProps = {
   stopMic: () => Promise<void>;
   startScreenShare: (lectureId: string) => Promise<void>;
   stopScreenShare: () => Promise<void>;
+  leaveRoom: (lectureId: string) => void;
   lectureId: string;
 };
 
@@ -26,6 +27,7 @@ const ControlBar = ({
   startScreenShare,
   stopScreenShare,
   lectureId,
+  leaveRoom,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
@@ -61,7 +63,8 @@ const ControlBar = ({
     }
   };
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
+    await leaveRoom(lectureId);
     window.location.href = "/"; // or router.push(...)
   };
 

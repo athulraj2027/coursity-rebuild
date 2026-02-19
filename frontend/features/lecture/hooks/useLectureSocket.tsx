@@ -16,7 +16,13 @@ export const useLectureSocket = (
       setExistingUsers((prev) => [...prev, params]);
     };
 
-    const handlePeerLeft = ({ username }: { username: string }) => {
+    const handlePeerLeft = ({
+      username,
+      socketId,
+    }: {
+      username: string;
+      socketId: string;
+    }) => {
       toast.warning(`${username} left the lecture`);
 
       setExistingUsers((prev) =>

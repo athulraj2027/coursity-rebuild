@@ -14,17 +14,55 @@ const MainVideos = ({
 }) => {
   const remoteStreamsArray = Array.from(remoteStreams.entries());
 
-  const count =
-    remoteStreamsArray.length +
-    (localStream ? 1 : 0) +
-    (localScreenStream ? 1 : 0);
+  // Separate audio & video
+  const remoteVideoStreams = remoteStreamsArray.filter(
+    ([, data]) => data.kind === "video",
+  );
+
+  const remoteAudioStreams = remoteStreamsArray.filter(
+    ([, data]) => data.kind === "audio",
+  );
+
+  // Detect remote screen share
+  const remoteScreenShare = remoteVideoStreams.find(
+    ([, data]) => data.appData?.mediaTag === "screen",
+  );
+
+  const normalRemoteVideos = remoteVideoStreams.filter(
+    ([, data]) => data.appData?.mediaTag !== "screen",
+  );
+
+  const hasAnyScreenShare = !!remoteScreenShare || !!localScreenStream;
 
   return (
-    <div className="flex-1 p-4 overflow-y-auto">
+    <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4">
+      {/* ================== SCREEN SPOTLIGHT ================== */}
+      {hasAnyScreenShare && (
+        <div className="w-full rounded-xl border border-yellow-600 overflow-hidden aspect-video">
+          {/* Local Screen */}
+          {localScreenStream && <VideoPlayer stream={localScreenStream} />}
+
+          {/* Remote Screen */}
+          {remoteScreenShare && !localScreenStream && (
+            <>
+              <VideoPlayer stream={remoteScreenShare[1].stream} />
+              <div className="absolute top-2 left-2 text-xs bg-yellow-600 px-2 py-1 rounded">
+                {remoteScreenShare[1].appData?.username} &apos; s Screen
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ================== VIDEO GRID ================== */}
       <div
-        className={`grid ${getGridClass(count)} gap-4 content-start auto-rows-fr`}
+        className={`grid ${
+          hasAnyScreenShare
+            ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"
+            : getGridClass(normalRemoteVideos.length + (localStream ? 1 : 0))
+        } gap-4 auto-rows-fr`}
       >
-        {/* LOCAL VIDEO */}
+        {/* LOCAL CAMERA */}
         {localStream && (
           <div className="relative rounded-xl aspect-video border border-gray-700 overflow-hidden">
             <VideoPlayer stream={localStream} />
@@ -34,20 +72,10 @@ const MainVideos = ({
           </div>
         )}
 
-        {/* SCREEN SHARE (if exists) */}
-        {localScreenStream && (
-          <div className="relative rounded-xl aspect-video border border-yellow-600 overflow-hidden">
-            <VideoPlayer stream={localScreenStream} />
-            <div className="absolute top-2 left-2 text-xs bg-yellow-600 px-2 py-1 rounded">
-              Your Screen
-            </div>
-          </div>
-        )}
-
-        {/* REMOTE VIDEOS */}
-        {remoteStreamsArray.map(([socketId, data]) => (
+        {/* REMOTE NORMAL VIDEOS */}
+        {normalRemoteVideos.map(([key, data]) => (
           <div
-            key={socketId}
+            key={key}
             className="relative rounded-xl aspect-video border border-gray-700 overflow-hidden"
           >
             <VideoPlayer stream={data.stream} />
@@ -57,6 +85,19 @@ const MainVideos = ({
           </div>
         ))}
       </div>
+
+      {/* ================== HIDDEN AUDIO ================== */}
+      {remoteAudioStreams.map(([key, data]) => (
+        <audio
+          key={key}
+          ref={(el) => {
+            if (el && el.srcObject !== data.stream) {
+              el.srcObject = data.stream;
+            }
+          }}
+          autoPlay
+        />
+      ))}
     </div>
   );
 };

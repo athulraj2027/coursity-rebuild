@@ -12,6 +12,7 @@ export type RemoteStreamData = {
     mediaTag?: string;
     username: string;
   };
+  kind: "audio" | "video";
 };
 
 export const useJoinRoom = () => {
@@ -31,6 +32,9 @@ export const useJoinRoom = () => {
     useState<MediaStream | null>(null);
   const localScreenRef = useRef<HTMLVideoElement>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [localMicStream, setLocalMicStream] = useState<MediaStream | null>(
+    null,
+  );
 
   //consumer refs
   const consumersRef = useRef<Map<string, mediasoupClient.types.Consumer>>(
@@ -80,6 +84,12 @@ export const useJoinRoom = () => {
           appData: params.appData,
         });
 
+        const key = `${params.producerId}-${params.appData.mediaTag || "camera"}`;
+
+        consumer.on("trackended", () => {
+          console.log("track ended");
+        });
+
         console.log("consumer created:", consumer);
         consumersRef.current.set(consumer.id, consumer);
 
@@ -87,9 +97,10 @@ export const useJoinRoom = () => {
         stream.addTrack(consumer.track);
         setRemoteStreams((prev) => {
           const updated = new Map(prev);
-          updated.set(params.producerUserId, {
+          updated.set(key, {
             stream,
             appData: consumer.appData,
+            kind: consumer.kind,
           });
           return updated;
         });
@@ -302,6 +313,7 @@ export const useJoinRoom = () => {
       const mediastream = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
+      setLocalMicStream(mediastream);
       const track = mediastream.getAudioTracks()[0];
 
       if (audioProducerRef.current) {
@@ -347,7 +359,7 @@ export const useJoinRoom = () => {
   const stopMic = async () => {
     try {
       audioProducerRef.current?.pause();
-      const track = localStream?.getAudioTracks()[0];
+      const track = localMicStream?.getAudioTracks()[0];
       track?.stop();
     } catch (error) {
       console.log("Error muting mic:", error);
@@ -409,6 +421,10 @@ export const useJoinRoom = () => {
     }
   };
 
+  const leaveRoom = async (lectureId: string) => {
+    socket.emit("leave-room", { lectureId });
+  };
+
   return {
     createMeetingEssentials,
     stopScreenShare,
@@ -423,5 +439,6 @@ export const useJoinRoom = () => {
     existingUsers,
     setExistingUsers,
     consume,
+    leaveRoom,
   };
 };

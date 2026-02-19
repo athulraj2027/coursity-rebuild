@@ -58,7 +58,9 @@ export async function JoinRoomHandler(
     console.log("existing users  :", existingUsers);
     const user = new User(id, userId, username, lectureId);
 
+    
     room.addPeer(user);
+    console.log("room  : ", room);
     userStore.add(id, user);
 
     socket.join(lectureId);
@@ -94,7 +96,9 @@ export function DisconnectHandler(socket: Socket) {
 
   room.peers.delete(user.userId);
 
-  socket.to(user.lectureId).emit("peer-left", { username });
+  socket
+    .to(user.lectureId)
+    .emit("peer-left", { username, socketId: socket.id });
 
   // 4. If teacher disconnected
   if (user.userId === room.teacherId) {
@@ -104,6 +108,33 @@ export function DisconnectHandler(socket: Socket) {
   }
 }
 
-export function LeaveRoomHandler(socket: Socket, lectureId: string) {}
+export function LeaveRoomHandler(socket: Socket, lectureId: string) {
+  const { username } = socket;
+  const user = userStore.get(socket.id);
+  if (!user) return;
+
+  const room = roomStore.getRoom(user.lectureId);
+  if (!room) return;
+
+  for (const transport of user.transports.values()) transport.close();
+  for (const producer of user.producers.values()) producer.close();
+  for (const consumer of user.consumers.values()) consumer.close();
+
+  room.peers.delete(user.userId);
+
+  socket
+    .to(user.lectureId)
+    .emit("peer-left", { username, socketId: socket.id });
+
+  // 4. If teacher disconnected
+  if (user.userId === room.teacherId) {
+    console.log("emitting the lecture ended");
+    socket.to(user.lectureId).emit("lecture-ended");
+    socket.to(lectureId).socketsLeave(lectureId);
+    roomStore.removeRoom(user.lectureId);
+  }
+
+  return;
+}
 
 export function CloseRoomHandler(socket: Socket, lectureId: string) {}

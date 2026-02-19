@@ -38,6 +38,7 @@ const Meeting = ({
     existingUsers,
     setExistingUsers,
     consume,
+    leaveRoom,
   } = useJoinRoom();
 
   const { message, setMessage, messages, sendMessage } = useMessage(lectureId);
@@ -86,10 +87,6 @@ const Meeting = ({
     };
 
     init();
-
-    return () => {
-      socket.emit("leave-room", { lectureId });
-    };
   }, [lectureId, role, createMeetingEssentials]);
 
   return (
@@ -167,6 +164,7 @@ const Meeting = ({
         stopMic={stopMic}
         startScreenShare={startScreenShare}
         stopScreenShare={stopScreenShare}
+        leaveRoom={leaveRoom}
       />
     </div>
   );
