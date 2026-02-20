@@ -1,84 +1,25 @@
 import AttendanceRepositories from "../repositories/attendance.repositories.js";
+import LectureRepositories from "../repositories/lectures.repositories.js";
+import ParticipantRepository from "../repositories/participants.repositories.js";
 import { AppError } from "../utils/AppError.js";
 const LATE_THRESHOLD_MIN = 10;
 const PRESENT_THRESHOLD_PERCENT = 70;
 
 const AttendanceService = {
-  markAttendanceJoin: async (lectureId: string, studentId: string) => {
-    const lecture = await AttendanceRepositories.findLectureById(lectureId);
-    if (!lecture) throw new AppError("Lecture not found", 400);
-
-    if (lecture.status !== "STARTED") {
-      throw new AppError("Lecture is not live", 400);
-    }
-
-    const enrollment = await AttendanceRepositories.isStudentEnrolled(
-      studentId,
-      lecture.courseId,
-    );
-
-    if (!enrollment) {
-      throw new AppError("Student not enrolled in course", 300);
-    }
-
-    return AttendanceRepositories.upsertJoinTime(
-      lectureId,
-      studentId,
-      new Date(),
-    );
-  },
-
-  markAttendanceComplete: async (
-    lectureId: string,
-    studentId: string,
-    leaveTime: Date,
-  ) => {
-    const lecture = await AttendanceRepositories.findLectureById(lectureId);
-    if (!lecture) throw new AppError("Lecture not found", 400);
-    if (lecture.status !== "STARTED")
-      throw new AppError("Lecture is not live", 403);
-
-    const attendance =
-      await AttendanceRepositories.findAttendanceByStudentAndLectureIds(
-        lectureId,
-        studentId,
-      );
-
-    if (!attendance || !attendance.joinTime)
-      throw new AppError("Attendance credentials not found", 400);
-
-    const now = new Date();
-    const sessionDuration = Math.floor(
-      (now.getTime() - attendance.joinTime.getTime()) / 1000,
-    );
-
-    return AttendanceRepositories.updateLeaveTime(
-      lectureId,
-      studentId,
-      leaveTime,
-      sessionDuration,
-    );
-  },
-
   finalizeAttendance: async (teacherId: string, lectureId: string) => {
     const lecture =
       await AttendanceRepositories.findLectureWithCourse(lectureId);
 
     if (!lecture) throw new AppError("Lecture not found", 400);
 
-    if (lecture.course.teacherId !== teacherId) {
+    if (lecture.course.teacherId !== teacherId)
       throw new AppError("Unauthorized", 403);
-    }
 
-    if (lecture.status !== "STARTED") {
+    if (lecture.status !== "STARTED")
       throw new AppError("Lecture is not live", 403);
-    }
-
-    if (!lecture.startTime) {
-      throw new AppError("Lecture start time missing", 400);
-    }
 
     const lectureEndTime = new Date();
+
     const lectureDurationSec = Math.floor(
       (lectureEndTime.getTime() - lecture.startTime.getTime()) / 1000,
     );
@@ -87,48 +28,53 @@ const AttendanceService = {
       lecture.courseId,
     );
 
-    const attendances =
-      await AttendanceRepositories.getAttendancesByLectureId(lectureId);
+    const participants =
+      await ParticipantRepository.getParticipantsByLectureId(lectureId);
 
-    const attendanceMap = new Map(attendances.map((a) => [a.studentId, a]));
+    const durationMap = new Map<string, number>();
+
+    for (const p of participants) {
+      if (p.role !== "STUDENT") continue;
+
+      const leaveTime = p.leaveTime ?? lectureEndTime;
+
+      const sessionDuration = Math.floor(
+        (leaveTime.getTime() - p.joinTime.getTime()) / 1000,
+      );
+
+      const existing = durationMap.get(p.userId) || 0;
+      durationMap.set(p.userId, existing + sessionDuration);
+    }
 
     for (const enrollment of enrollments) {
-      const attendance = attendanceMap.get(enrollment.studentId);
-
-      // Case 1: Student never joined → ABSENT
-      if (!attendance) {
-        await AttendanceRepositories.markAbsent(
-          lectureId,
-          enrollment.studentId,
-        );
-        continue;
-      }
+      const totalDuration = durationMap.get(enrollment.studentId) || 0;
 
       const attendedPercent =
         lectureDurationSec === 0
           ? 0
-          : (attendance.durationSec / lectureDurationSec) * 100;
+          : (totalDuration / lectureDurationSec) * 100;
 
-      const joinedLate =
-        attendance.joinTime &&
-        (attendance.joinTime.getTime() - lecture.startTime.getTime()) /
-          (1000 * 60) >
-          LATE_THRESHOLD_MIN;
+      const status =
+        attendedPercent >= PRESENT_THRESHOLD_PERCENT
+          ? "PRESENT"
+          : totalDuration > 0
+            ? "LATE"
+            : "ABSENT";
 
-      let status: "PRESENT" | "LATE" | "ABSENT" = "ABSENT";
-
-      if (attendedPercent >= PRESENT_THRESHOLD_PERCENT) {
-        status = joinedLate ? "LATE" : "PRESENT";
-      }
-
-      await AttendanceRepositories.updateAttendanceStatus(
-        attendance.id,
+      await AttendanceRepositories.upsertAttendance({
+        lectureId,
+        studentId: enrollment.studentId,
+        durationSec: totalDuration,
         status,
-      );
+      });
     }
 
-    await AttendanceRepositories.completeLecture(lectureId);
+    await LectureRepositories.endLectureOwner(lectureId);
 
+    await ParticipantRepository.closeAllActiveParticipants(
+      lectureId,
+      lectureEndTime,
+    );
     return { message: "Attendance finalized successfully" };
   },
 };

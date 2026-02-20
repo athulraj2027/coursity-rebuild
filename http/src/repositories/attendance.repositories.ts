@@ -24,27 +24,6 @@ const AttendanceRepository = {
     });
   },
 
-  upsertJoinTime: (lectureId: string, studentId: string, joinTime: Date) => {
-    return prisma.attendance.upsert({
-      where: {
-        studentId_lectureId: {
-          studentId,
-          lectureId,
-        },
-      },
-      create: {
-        studentId,
-        lectureId,
-        joinTime,
-        durationSec: 0,
-        status: "ABSENT", // temporary, finalized later
-      },
-      update: {
-        joinTime,
-      },
-    });
-  },
-
   findAttendanceByStudentAndLectureIds: async (
     lectureId: string,
     studentId: string,
@@ -55,26 +34,6 @@ const AttendanceRepository = {
           studentId,
           lectureId,
         },
-      },
-    });
-  },
-
-  updateLeaveTime: (
-    lectureId: string,
-    studentId: string,
-    leaveTime: Date,
-    durationSec: number,
-  ) => {
-    return prisma.attendance.update({
-      where: {
-        studentId_lectureId: {
-          studentId,
-          lectureId,
-        },
-      },
-      data: {
-        leaveTime,
-        durationSec,
       },
     });
   },
@@ -122,10 +81,34 @@ const AttendanceRepository = {
     });
   },
 
-  completeLecture: (lectureId: string) => {
-    return prisma.lecture.update({
-      where: { id: lectureId },
-      data: { status: "COMPLETED" },
+  upsertAttendance: async ({
+    lectureId,
+    studentId,
+    durationSec,
+    status,
+  }: {
+    lectureId: string;
+    studentId: string;
+    durationSec: number;
+    status: "PRESENT" | "LATE" | "ABSENT";
+  }) => {
+    return prisma.attendance.upsert({
+      where: {
+        studentId_lectureId: {
+          studentId,
+          lectureId,
+        },
+      },
+      update: {
+        durationSec,
+        status,
+      },
+      create: {
+        lectureId,
+        studentId,
+        durationSec,
+        status,
+      },
     });
   },
 };

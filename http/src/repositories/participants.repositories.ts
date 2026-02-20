@@ -39,6 +39,30 @@ const ParticipantRepository = {
         leaveTime: null,
       },
     }),
+
+  getParticipantsByLectureId: async (lectureId: string) => {
+    return prisma.participant.findMany({
+      where: { lectureId },
+      select: {
+        userId: true,
+        role: true,
+        joinTime: true,
+        leaveTime: true,
+      },
+    });
+  },
+
+  closeAllActiveParticipants: async (lectureId: string, endTime: Date) => {
+    return prisma.participant.updateMany({
+      where: {
+        lectureId,
+        leaveTime: null,
+      },
+      data: {
+        leaveTime: endTime,
+      },
+    });
+  },
 };
 
 export default ParticipantRepository;
