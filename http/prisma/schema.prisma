@@ -143,8 +143,6 @@ model Attendance {
   studentId   String
   lectureId   String
 
-  joinTime    DateTime?
-  leaveTime   DateTime?
   durationSec Int       @default(0)
   status      AttendanceStatus
 

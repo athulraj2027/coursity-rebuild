@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import LectureServices from "../../services/lecture.services.js";
+import ParticipantService from "../../services/participant.service.js";
 
 const LectureController = {
   getLectures: async (req: Request, res: Response) => {
@@ -88,7 +89,18 @@ const LectureController = {
         return res
           .status(200)
           .json({ success: false, message: "Lecture not found" });
-      // add attendance
+
+      if (lecture.status !== "STARTED")
+        return res
+          .status(200)
+          .json({ success: false, message: "Lecture not started" });
+
+      // check whether already joined
+      const participant = await ParticipantService.upsertParticipant(
+        id as string,
+        user,
+      );
+
       return res.status(200).json(lecture);
     } catch (error: any) {
       console.log("Failed to fetch lecture for student: ", error);
@@ -100,6 +112,26 @@ const LectureController = {
       return res
         .status(500)
         .json({ success: false, message: "Failed to fetch lecture" });
+    }
+  },
+
+  leaveLecture: async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = req.user;
+
+    try {
+      await ParticipantService.leaveLecture(id as string, user);
+      return res.status(200).json({ message: "Left lecture successfully" });
+    } catch (error: any) {
+      console.log("Failed to fetch lecture for student: ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to leave lecture" });
     }
   },
 };

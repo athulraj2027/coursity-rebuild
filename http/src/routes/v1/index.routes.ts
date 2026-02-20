@@ -15,7 +15,7 @@ router.use("/courses", courseRoutes);
 router.use("/lectures", lectureRoutes);
 router.use("/uploads", uploadsRoutes);
 router.use("/enrollment", authMiddleware, enrollmentRoutes);
-router.use("/attendance", authMiddleware, attendanceRoutes);
+router.use("/attendance", attendanceRoutes);
 router.use("/payment", authMiddleware, paymentRoutes);
 
 export default router;

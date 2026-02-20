@@ -123,8 +123,9 @@ const TeacherLectureController = {
   endLecture: async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = req.user;
+    console.log("user ; ", req.user);
+    console.log("body : ", req.body);
     try {
-      await LectureServices.endLecture(id as string, user.id);
       await AttendanceService.finalizeAttendance(user.id, id as string);
       return res.status(200).json({ success: true });
     } catch (error: any) {

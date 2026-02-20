@@ -4,6 +4,7 @@ import type { Server, Socket } from "socket.io";
 import { User } from "../store/user.js";
 import { roomStore } from "../store/roomStore.js";
 import { userStore } from "../store/userStore.js";
+import { callInternalApi } from "../lib/http.js";
 
 export async function CreateRoomHandler(
   socket: Socket,
@@ -58,7 +59,6 @@ export async function JoinRoomHandler(
     console.log("existing users  :", existingUsers);
     const user = new User(id, userId, username, lectureId);
 
-    
     room.addPeer(user);
     console.log("room  : ", room);
     userStore.add(id, user);
@@ -81,9 +81,9 @@ export async function JoinRoomHandler(
   }
 }
 
-export function DisconnectHandler(socket: Socket) {
+export async function DisconnectHandler(socket: Socket) {
   console.log("disconnecting the user : ", socket.id);
-  const { username } = socket;
+  const { username, userId, role } = socket;
   const user = userStore.get(socket.id);
   if (!user) return;
 
@@ -102,14 +102,38 @@ export function DisconnectHandler(socket: Socket) {
 
   // 4. If teacher disconnected
   if (user.userId === room.teacherId) {
-    console.log("emitting the lecture ended");
-    socket.to(user.lectureId).emit("lecture-ended");
-    roomStore.removeRoom(user.lectureId);
+    if (user.userId === room.teacherId) {
+      room.teacherDisconnectedAt = Date.now();
+
+      setTimeout(async () => {
+        const stillDisconnected = !room.peers.has(room.teacherId);
+
+        if (stillDisconnected) {
+          // await endLectureService(user.lectureId);
+          socket.to(user.lectureId).emit("lecture-ended");
+          roomStore.removeRoom(user.lectureId);
+        }
+      }, 120000); // 2 minutes
+    }
+  } else {
+    try {
+      await callInternalApi(
+        `/lectures/${user.lectureId}/leave`,
+        "PATCH",
+        {},
+        {
+          userId,
+          role,
+        },
+      );
+    } catch (error) {
+      console.log("api failed", error);
+    }
   }
 }
 
-export function LeaveRoomHandler(socket: Socket, lectureId: string) {
-  const { username } = socket;
+export async function LeaveRoomHandler(socket: Socket, lectureId: string) {
+  const { username, userId, role } = socket;
   const user = userStore.get(socket.id);
   if (!user) return;
 
@@ -126,12 +150,27 @@ export function LeaveRoomHandler(socket: Socket, lectureId: string) {
     .to(user.lectureId)
     .emit("peer-left", { username, socketId: socket.id });
 
-  // 4. If teacher disconnected
   if (user.userId === room.teacherId) {
     console.log("emitting the lecture ended");
+    try {
+      await callInternalApi(
+        `/lectures/teacher/${lectureId}/end`,
+        "POST",
+        {},
+        { userId, role },
+      );
+    } catch (error) {
+      console.log("api failed", error);
+    }
+
     socket.to(user.lectureId).emit("lecture-ended");
     socket.to(lectureId).socketsLeave(lectureId);
     roomStore.removeRoom(user.lectureId);
+  } else {
+    socket
+      .to(user.lectureId)
+      .emit("peer-left", { username, socketId: socket.id });
+    socket.disconnect();
   }
 
   return;

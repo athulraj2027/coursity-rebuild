@@ -5,6 +5,7 @@ import teacherLectureRoutes from "./teacher.lecture.routes.js";
 import studentLectureRoutes from "./student.lecture.routes.js";
 import adminLectureRoutes from "./admin.lecture.routes.js";
 import LectureController from "../../../controllers/lectures/lectures.controller.js";
+import { internalAuth } from "../../../middlewares/internal.middleware.js";
 const router = express.Router();
 
 router.use(
@@ -13,12 +14,7 @@ router.use(
   roleMiddleware("ADMIN"),
   adminLectureRoutes,
 );
-router.use(
-  "/teacher",
-  authMiddleware,
-  roleMiddleware("TEACHER"),
-  teacherLectureRoutes,
-);
+router.use("/teacher", teacherLectureRoutes);
 router.use(
   "/student",
   authMiddleware,
@@ -35,5 +31,7 @@ router.post(
   roleMiddleware(["ADMIN", "STUDENT"]),
   LectureController.joinLecture,
 );
+
+router.patch("/:id/leave", internalAuth, LectureController.leaveLecture);
 
 export default router;

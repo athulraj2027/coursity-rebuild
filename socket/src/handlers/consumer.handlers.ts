@@ -45,6 +45,7 @@ export async function ConsumeHandler(
 
   consumer.observer.on("close", () => {
     console.log("consumer closed : ", consumer.id);
+    user?.removeConsumer(consumer.id);
   });
 
   user?.addConsumer(consumer);
@@ -151,6 +152,5 @@ export async function StopConsumerHandler(
     cb({ success: false, message: "No consumer found" });
     return;
   }
-  user.removeConsumer(consumer.id);
   cb({ success: true });
 }

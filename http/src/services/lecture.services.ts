@@ -1,3 +1,4 @@
+import type { Role } from "@prisma/client";
 import CourseRepositories from "../repositories/courses.repositories.js";
 import LectureRepositories from "../repositories/lectures.repositories.js";
 import { AppError } from "../utils/AppError.js";
@@ -69,12 +70,16 @@ const LectureServices = {
     return LectureRepositories.endLectureOwner(lectureId);
   },
 
-  joinLecture: async (lectureId: string, user: any) => {
+  joinLecture: async (
+    lectureId: string,
+    user: { userId: string; role: Role },
+  ) => {
+    const { userId } = user;
     switch (user.role) {
       case "ADMIN":
         return LectureRepositories.findByIdInternal(lectureId);
       case "STUDENT":
-        return LectureRepositories.findByIdStudent(user.id, lectureId);
+        return LectureRepositories.findByIdStudent(userId, lectureId);
     }
   },
 };

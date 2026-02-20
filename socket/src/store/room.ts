@@ -7,6 +7,7 @@ export class Room {
   public teacherId: string;
   public teacherName: string;
   public peers: Map<string, User>;
+  public teacherDisconnectedAt: number | null;
 
   constructor(
     lectureId: string,
@@ -19,6 +20,7 @@ export class Room {
     this.teacherId = teacherId;
     this.teacherName = teachername;
     this.peers = new Map();
+    this.teacherDisconnectedAt = null;
   }
 
   addPeer(user: User) {
