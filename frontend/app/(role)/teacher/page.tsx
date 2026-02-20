@@ -1,3 +1,5 @@
+import StakingPage from "@/components/teacher/DashboardPage";
+
 export default function TeacherMainPage() {
-  return;
+  return <StakingPage />;
 }

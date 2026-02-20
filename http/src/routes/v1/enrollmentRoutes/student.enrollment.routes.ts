@@ -3,6 +3,7 @@ import StudentEnrollmentController from "../../../controllers/enrollment/student
 const router = express.Router();
 
 router.get("/my", StudentEnrollmentController.getEnrolledCourses);
+router.get("/:id", StudentEnrollmentController.getEnrollmentData);
 router.get("/my/:id", StudentEnrollmentController.getEnrolledCourseById);
 
 export default router;

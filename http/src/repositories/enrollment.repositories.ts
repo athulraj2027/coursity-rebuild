@@ -48,7 +48,7 @@ const EnrollmentRepositories = {
       },
     });
   },
-  
+
   // fetch course which student enrolled with id
   async findEnrolledCourseById(studentId: string, courseId: string) {
     return prisma.enrollment.findFirst({
@@ -84,12 +84,71 @@ const EnrollmentRepositories = {
     courseId: string;
     user: any;
   }) {
-    return prisma.enrollment.create({
+    return await prisma.enrollment.create({
       data: {
         studentId: params.user.id,
         courseId: params.courseId,
         paymentId: params.paymentId,
       },
+    });
+  },
+
+  async enrollmentDataById(id: string, userId: string) {
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id, studentId: userId },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            imageUrl: true,
+            price: true,
+            startDate: true,
+            teacher: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            lectures: {
+              where: { isDeleted: false },
+              orderBy: { startTime: "asc" },
+              select: {
+                id: true,
+                title: true,
+                startTime: true,
+                status: true,
+              },
+            },
+          },
+        },
+        payment: {
+          select: {
+            id: true,
+            amount: true,
+            currency: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    if (!enrollment) {
+      throw new Error("Enrollment not found");
+    }
+
+    return {
+      success: true,
+      enrollmentId: enrollment.id,
+      course: enrollment.course,
+      payment: enrollment.payment,
+    };
+  },
+
+  async getEnrollmentById(id: string, userId: string) {
+    return prisma.enrollment.findUnique({
+      where: { id, studentId: userId },
     });
   },
 };

@@ -63,42 +63,45 @@ const EnrolledCourses = () => {
           return (
             <Card
               key={course.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow"
+              className="overflow-hidden rounded-2xl border bg-background hover:shadow-xl transition-all duration-300"
             >
-              {/* Image */}
-              <div className="relative h-40 w-full bg-linear-to-br from-primary/20 to-primary/5">
-                <img
-                  src={course.imageUrl}
-                  alt={course.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                  }}
-                />
+              {/* Hero Section */}
+              <div className="relative h-48 w-full bg-gradient-to-br from-muted/40 to-muted/10 flex items-center justify-center">
+                {course.imageUrl ? (
+                  <img
+                    src={course.imageUrl}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-4xl font-bold text-muted-foreground">
+                    {course.title.charAt(0)}
+                  </div>
+                )}
               </div>
 
-              <CardHeader className="space-y-2">
-                <h3 className="font-bold text-lg line-clamp-2">
-                  {course.title}
-                </h3>
-              </CardHeader>
+              <CardContent className="p-5 space-y-4">
+                {/* Title */}
+                <div>
+                  <h3 className="text-lg font-semibold leading-tight line-clamp-2">
+                    {course.title}
+                  </h3>
 
-              <CardContent className="space-y-3">
-                {/* Teacher */}
-                <div className="flex items-center gap-2 text-sm">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    {course.teacher?.name}
+                  {/* Subtle badge */}
+                  <span className="inline-block mt-2 text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground">
+                    Live Course
                   </span>
                 </div>
 
-                {/* Start Date */}
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    Started {new Date(course.startDate).toLocaleDateString()}
-                  </span>
+                {/* Description Preview */}
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {course.description}
+                </p>
+
+                {/* Meta Row */}
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{course.teacher?.name}</span>
+                  <span>{new Date(course.startDate).toLocaleDateString()}</span>
                 </div>
 
                 {/* Progress */}
@@ -107,31 +110,25 @@ const EnrolledCourses = () => {
                     <span className="text-muted-foreground">Progress</span>
                     <span>{progress}%</span>
                   </div>
-                  <div className="w-full bg-muted h-2 rounded-full">
+                  <div className="w-full bg-muted h-1.5 rounded-full">
                     <div
-                      className="bg-primary h-2 rounded-full transition-all"
+                      className="bg-primary h-1.5 rounded-full transition-all"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
-
-                {/* Lectures count */}
-                <div className="flex items-center gap-2 text-sm">
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    {completedLectures}/{totalLectures} lectures completed
-                  </span>
-                </div>
               </CardContent>
 
-              <CardFooter className="border-t pt-4">
+              {/* CTA */}
+              <div className="px-5 pb-5">
                 <Button
-                  className="w-full"
+                  variant="secondary"
+                  className="w-full rounded-xl"
                   onClick={() => router.push(`/student/course/${course.id}`)}
                 >
-                  Go to Course
+                  Open Course
                 </Button>
-              </CardFooter>
+              </div>
             </Card>
           );
         })}

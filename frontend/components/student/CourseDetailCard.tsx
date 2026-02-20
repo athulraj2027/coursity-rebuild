@@ -31,71 +31,91 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <Card className="overflow-hidden">
-        {/* Image */}
-        <div className="relative h-64 w-full bg-linear-to-br from-primary/20 to-primary/5">
+      <Card
+        className="group overflow-hidden rounded-3xl border bg-background shadow-sm 
+             transition-all duration-500 ease-out 
+             hover:shadow-2xl hover:-translate-y-1"
+      >
+        {/* Hero Section */}
+        <div className="relative h-72 w-full overflow-hidden">
+          {/* Background Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
+
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <BookOpen className="h-20 w-20 text-muted-foreground/30" />
+              <BookOpen className="h-24 w-24 text-muted-foreground/20 transition-all duration-500 group-hover:scale-110" />
             </div>
           )}
 
-          <div className="absolute top-4 right-4">
-            <Badge variant={isEnrollmentOpen ? "default" : "secondary"}>
+          {/* Enrollment Badge */}
+          <div className="absolute top-6 right-6">
+            <Badge
+              className={`rounded-md px-3 py-1 text-xs ${
+                isEnrollmentOpen
+                  ? "bg-emerald-500 text-white"
+                  : "bg-muted text-foreground"
+              }`}
+            >
               {isEnrollmentOpen ? "Enrollment Open" : "Enrollment Closed"}
             </Badge>
           </div>
         </div>
 
-        <CardHeader className="space-y-4">
-          <CardTitle className="text-3xl font-bold tracking-tight">
+        <CardHeader className="space-y-5 pt-8">
+          <CardTitle className="text-4xl font-bold tracking-tight leading-tight">
             {title}
           </CardTitle>
 
-          <p className="text-muted-foreground leading-relaxed">{description}</p>
+          <p className="text-muted-foreground text-base leading-relaxed max-w-3xl">
+            {description}
+          </p>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <GraduationCap className="h-4 w-4" />
-            <span>Instructor:</span>
-            <span className="font-medium text-foreground">{teacher?.name}</span>
+          {/* Instructor */}
+          <div className="text-sm text-muted-foreground">
+            Instructor:{" "}
+            <span className="font-semibold text-foreground">
+              {teacher?.name}
+            </span>
           </div>
 
           {/* Price */}
-          <div className="flex items-center gap-2">
-            <div className="text-3xl font-bold text-primary">
+          <div className="flex items-end gap-3">
+            <div className="text-4xl font-bold text-primary">
               {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
             </div>
             {price > 0 && (
-              <span className="text-sm text-muted-foreground">/ course</span>
+              <span className="text-sm text-muted-foreground mb-1">
+                one-time payment
+              </span>
             )}
           </div>
         </CardHeader>
 
-        <Separator />
+        <Separator className="opacity-40" />
 
-        <CardContent className="pt-6 space-y-6">
+        <CardContent className="pt-8 space-y-8">
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-muted/50 space-y-1">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <BookOpen className="h-4 w-4" />
-                Lectures completed
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="rounded-2xl bg-muted/40 p-6 transition-all duration-300 hover:bg-muted/60 hover:-translate-y-1">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">
+                Lectures
               </div>
-              <div className="text-2xl font-bold">{_count?.lectures ?? 0}</div>
+              <div className="text-3xl font-bold mt-2">
+                {_count?.lectures ?? 0}
+              </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-muted/50 space-y-1">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <Calendar className="h-4 w-4" />
+            <div className="rounded-2xl bg-muted/40 p-6 transition-all duration-300 hover:bg-muted/60 hover:-translate-y-1">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">
                 Start Date
               </div>
-              <div className="text-sm font-semibold">
+              <div className="text-sm font-semibold mt-2">
                 {new Date(startDate).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -104,17 +124,20 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-muted/50 space-y-1">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                <IndianRupee className="h-4 w-4" />
+            <div className="rounded-2xl bg-muted/40 p-6 transition-all duration-300 hover:bg-muted/60 hover:-translate-y-1">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide">
                 Price
               </div>
-              <div className="text-lg font-bold text-primary">
+              <div className="text-2xl font-bold text-primary mt-2">
                 {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
               </div>
             </div>
           </div>
-          <EnrollBtn courseId={courseId} />
+
+          {/* Enroll Button */}
+          <div className="pt-4">
+            <EnrollBtn courseId={courseId} />
+          </div>
         </CardContent>
       </Card>
     </div>

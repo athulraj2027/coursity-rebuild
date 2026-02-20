@@ -47,15 +47,15 @@ export default function AppNavbar() {
 
   // 🔹 Student
   const links: NavbarNavLink[] = [
-    { href: "/courses", label: "Top Courses" },
-    { href: "/lectures", label: "Top Teachers" },
+    // { href: "/courses", label: "Top Courses" },
+    // { href: "/lectures", label: "Top Teachers" },
   ];
 
   return (
     <Navbar
       navigationLinks={links}
-      signInText="Logout"
-      ctaText="Sign in"
+      // signInText="Logout"
+      // ctaText="Sign in"
       //   onSignInClick={logout}
       onCtaClick={() => router.push("/sign-in")}
     />

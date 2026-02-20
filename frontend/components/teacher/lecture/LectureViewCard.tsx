@@ -92,23 +92,6 @@ const LectureViewCard = ({ lectureId }: { lectureId: string }) => {
 
           <Separator />
 
-          {/* Live State */}
-          <div className="flex items-center gap-3 text-sm">
-            <Video className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Meeting Status:</span>
-            <span className="font-medium">
-              {meetingId ? "Live / Started" : "Not started yet"}
-            </span>
-          </div>
-
-          {/* Action Placeholder */}
-          <div className="pt-2 text-sm text-muted-foreground italic">
-            Actions (Start / Join) will appear here when realtime is enabled
-          </div>
-
-          {/* Attendance Section */}
-          <Separator />
-
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Attendance Details</h3>

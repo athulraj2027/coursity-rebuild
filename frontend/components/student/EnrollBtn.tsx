@@ -34,7 +34,7 @@ const EnrollBtn = ({ courseId }: { courseId: string }) => {
           });
 
           toast.success("Enrolled successfully 🎉");
-          router.push(`/student`);
+          router.push(`/student/payment-success`);
         },
       };
 
@@ -45,7 +45,7 @@ const EnrollBtn = ({ courseId }: { courseId: string }) => {
       toast.error(error.message);
     }
   };
-//   if (loading) return null;
+  //   if (loading) return null;
   return <Button onClick={handleEnroll}>Enroll Now</Button>;
 };
 

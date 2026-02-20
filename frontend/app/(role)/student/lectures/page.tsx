@@ -201,70 +201,69 @@ export default function LecturesPage() {
               return (
                 <Card
                   key={lecture.id}
-                  className="hover:shadow-lg transition-shadow"
+                  className="group overflow-hidden rounded-2xl border bg-background hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
-                  <CardHeader>
-                    <h3 className="font-bold text-lg line-clamp-2">
-                      {lecture.title}
-                    </h3>
-                  </CardHeader>
+                  <CardContent className="p-5 space-y-4">
+                    {/* Top Row */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-semibold leading-snug line-clamp-2">
+                        {lecture.title}
+                      </h3>
 
-                  <CardContent className="space-y-3">
-                    {/* Course */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        {lecture.course.title}
-                      </span>
+                      {/* Status Badge */}
+                      {lecture.status === "STARTED" && (
+                        <Badge className="bg-emerald-500 text-white text-xs rounded-md">
+                          Live
+                        </Badge>
+                      )}
+                      {lecture.status === "NOT_STARTED" && isUpcoming && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs rounded-md"
+                        >
+                          Upcoming
+                        </Badge>
+                      )}
+                      {lecture.status === "COMPLETED" && (
+                        <Badge variant="outline" className="text-xs rounded-md">
+                          Completed
+                        </Badge>
+                      )}
                     </div>
 
-                    {/* Teacher */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        {lecture.course.teacher.name}
-                      </span>
+                    {/* Course + Teacher */}
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <div>{lecture.course.title}</div>
+                      <div>{lecture.course.teacher.name}</div>
                     </div>
 
                     {/* Date */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        {startTime.toLocaleString()}
-                      </span>
-                    </div>
-
-                    {/* Status Badge */}
-                    <div>
-                      {lecture.status === "STARTED" && (
-                        <Badge className="bg-green-600">Live</Badge>
-                      )}
-                      {lecture.status === "NOT_STARTED" && isUpcoming && (
-                        <Badge variant="secondary">Upcoming</Badge>
-                      )}
-                      {lecture.status === "COMPLETED" && (
-                        <Badge variant="outline">Completed</Badge>
-                      )}
+                    <div className="text-xs text-muted-foreground">
+                      {startTime.toLocaleString()}
                     </div>
                   </CardContent>
 
-                  <CardFooter className="border-t pt-4">
+                  {/* CTA */}
+                  <div className="px-5 pb-5">
                     <Button
-                      className="w-full"
+                      variant={
+                        lecture.status === "STARTED" ? "default" : "secondary"
+                      }
+                      className="w-full rounded-xl"
+                      disabled={lecture.status === "NOT_STARTED"}
                       onClick={() => {
                         if (lecture.status === "STARTED") {
                           window.open(`/lecture/${lecture.id}`, "_blank");
                         }
                       }}
                     >
-                      <Video className="h-4 w-4 mr-2" />
                       {lecture.status === "STARTED"
-                        ? "Join Now"
+                        ? "Join Live Session"
                         : lecture.status === "COMPLETED"
-                          ? "View Details"
-                          : "Not Started"}
+                          ? "View Recording"
+                          : "Starts Soon"}
                     </Button>
-                  </CardFooter>
+                  </div>
                 </Card>
               );
             })}

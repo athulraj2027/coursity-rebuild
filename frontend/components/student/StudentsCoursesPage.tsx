@@ -451,73 +451,78 @@ const CourseCard = ({
   const isUpcoming = startDate > new Date();
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Course Image */}
-      <div className="relative h-48 w-full bg-linear-to-br from-primary/20 to-primary/5">
-        <img
-          src={course.imageUrl}
-          alt={course.title}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = "none";
-          }}
-        />
+    <Card className="group overflow-hidden rounded-2xl border bg-background hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      {/* Hero Section */}
+      <div className="relative h-52 w-full bg-gradient-to-br from-muted/40 to-muted/10 flex items-center justify-center">
+        {course.imageUrl ? (
+          <img
+            src={course.imageUrl}
+            alt={course.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+            }}
+          />
+        ) : (
+          <div className="text-4xl font-semibold text-muted-foreground">
+            {course.title.charAt(0)}
+          </div>
+        )}
+
+        {/* Free Badge */}
         {course.price === 0 && (
-          <Badge className="absolute top-3 right-3 bg-green-600">Free</Badge>
+          <Badge className="absolute top-4 right-4 bg-emerald-500 text-white rounded-md px-2 py-1 text-xs">
+            Free
+          </Badge>
         )}
       </div>
 
-      <CardHeader className="space-y-2">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-lg line-clamp-2">{course.title}</h3>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-3">
-        {/* Teacher */}
-        <div className="flex items-center gap-2 text-sm">
-          <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">{course.teacher.name}</span>
+      <CardContent className="p-5 space-y-4">
+        {/* Title */}
+        <div>
+          <h3 className="text-lg font-semibold leading-snug line-clamp-2">
+            {course.title}
+          </h3>
         </div>
 
-        {/* Start Date */}
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">
-            Starts{" "}
+        {/* Description (optional if you have it) */}
+        {course.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {course.description}
+          </p>
+        )}
+
+        {/* Meta Info Row */}
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{course.teacher.name}</span>
+
+          <span>
             {startDate.toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
             })}
           </span>
-          {isUpcoming && (
-            <Badge variant="secondary" className="text-xs">
-              Upcoming
-            </Badge>
-          )}
         </div>
 
-        {/* Students Enrolled */}
-        <div className="flex items-center gap-2 text-sm">
-          <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">
-            {course._count.enrollments}{" "}
-            {course._count.enrollments === 1 ? "student" : "students"} enrolled
-          </span>
+        {/* Enrollment Info */}
+        <div className="text-xs text-muted-foreground">
+          {course._count.enrollments}{" "}
+          {course._count.enrollments === 1 ? "student" : "students"} enrolled
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t pt-4">
-        <div className="flex items-center gap-1">
-          <IndianRupee className="h-5 w-5 text-primary" />
-          <span className="text-2xl font-bold text-primary">
-            {course.price === 0 ? "Free" : course.price.toLocaleString()}
-          </span>
+      {/* Footer */}
+      <div className="flex items-center justify-between px-5 pb-5">
+        <div className="text-xl font-semibold text-primary">
+          {course.price === 0 ? "Free" : `₹${course.price.toLocaleString()}`}
         </div>
-        <Button onClick={onView}>View Details</Button>
-      </CardFooter>
+
+        <Button variant="secondary" className="rounded-xl" onClick={onView}>
+          View Course
+        </Button>
+      </div>
     </Card>
   );
 };
