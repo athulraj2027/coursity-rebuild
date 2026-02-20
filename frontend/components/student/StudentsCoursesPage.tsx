@@ -71,7 +71,7 @@ const ITEMS_PER_PAGE = 9;
 const StudentsCoursesPage = () => {
   const { isLoading, error, data } = useAllCoursesQueryPublic();
 
-  const [modal, setModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [filters, setFilters] = useState<FilterOptions>({
@@ -364,8 +364,7 @@ const StudentsCoursesPage = () => {
               <CourseCard
                 key={course.id}
                 course={course}
-                modal={modal}
-                setModal={setModal}
+                onView={() => setSelectedCourseId(course.id)}
               />
             ))}
           </div>
@@ -430,6 +429,12 @@ const StudentsCoursesPage = () => {
           )}
         </>
       )}
+      {selectedCourseId && (
+        <Modal
+          Card={<CourseDetailCard courseId={selectedCourseId} />}
+          setModal={() => setSelectedCourseId(null)}
+        />
+      )}
     </div>
   );
 };
@@ -437,14 +442,11 @@ const StudentsCoursesPage = () => {
 // Course Card Component
 const CourseCard = ({
   course,
-  setModal,
-  modal,
+  onView,
 }: {
   course: Course;
-  modal: boolean;
-  setModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onView: () => void;
 }) => {
-  const [courseId, setCourseId] = useState<string | null>(null);
   const startDate = new Date(course.startDate);
   const isUpcoming = startDate > new Date();
 
@@ -514,21 +516,8 @@ const CourseCard = ({
             {course.price === 0 ? "Free" : course.price.toLocaleString()}
           </span>
         </div>
-        <Button
-          onClick={() => {
-            setModal(true);
-            setCourseId(course.id);
-          }}
-        >
-          View Details
-        </Button>
+        <Button onClick={onView}>View Details</Button>
       </CardFooter>
-      {modal && courseId && (
-        <Modal
-          Card={<CourseDetailCard courseId={courseId} />}
-          setModal={setModal}
-        />
-      )}
     </Card>
   );
 };

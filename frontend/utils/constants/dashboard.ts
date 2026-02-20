@@ -7,7 +7,7 @@ import {
   Notebook,
   Pen,
   User,
-  User2,
+  // User2,
   User2Icon,
 } from "lucide-react";
 
@@ -15,9 +15,7 @@ export const TEACHER_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "My Courses", url: "/my-courses", icon: Notebook },
   { name: "My Lectures", url: "/my-lectures", icon: Group },
-  { name: "Enrollments", url: "/enrollments", icon: Newspaper },
   { name: "Payouts", url: "/payouts", icon: IndianRupee },
-  { name: "Attendance", url: "/attendance", icon: User2 },
   { name: "Profile", url: "/profile", icon: User },
 ];
 

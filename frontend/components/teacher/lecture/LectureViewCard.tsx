@@ -105,6 +105,67 @@ const LectureViewCard = ({ lectureId }: { lectureId: string }) => {
           <div className="pt-2 text-sm text-muted-foreground italic">
             Actions (Start / Join) will appear here when realtime is enabled
           </div>
+
+          {/* Attendance Section */}
+          <Separator />
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Attendance Details</h3>
+              <Badge variant="secondary">
+                {attendance.length} Student{attendance.length !== 1 && "s"}
+              </Badge>
+            </div>
+
+            {attendance.length === 0 ? (
+              <div className="text-sm text-muted-foreground italic">
+                No attendance records available for this lecture.
+              </div>
+            ) : (
+              <div className="rounded-lg border overflow-hidden">
+                <div className="grid grid-cols-4 bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground">
+                  <span>Student</span>
+                  <span>Duration</span>
+                  <span>Status</span>
+                  <span>Email</span>
+                </div>
+
+                {attendance.map((record) => (
+                  <div
+                    key={record.id}
+                    className="grid grid-cols-4 items-center px-4 py-3 text-sm border-t"
+                  >
+                    <div className="font-medium">
+                      {record.student?.name || "Unknown"}
+                    </div>
+
+                    <div>
+                      {Math.floor(record.durationSec / 60)} min{" "}
+                      {record.durationSec % 60}s
+                    </div>
+
+                    <div>
+                      <Badge
+                        variant={
+                          record.status === "PRESENT"
+                            ? "default"
+                            : record.status === "LATE"
+                              ? "secondary"
+                              : "outline"
+                        }
+                      >
+                        {record.status}
+                      </Badge>
+                    </div>
+
+                    <div className="text-muted-foreground text-xs">
+                      {record.student?.email}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

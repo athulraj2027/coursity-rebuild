@@ -76,7 +76,7 @@ const LectureActions = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                disabled={status === "STARTED"}
+                disabled={status !== "NOT_STARTED"}
                 size="icon"
                 variant="ghost"
                 onClick={() => openModal("START")}

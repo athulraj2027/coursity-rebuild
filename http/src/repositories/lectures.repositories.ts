@@ -121,6 +121,7 @@ const LectureRepositories = {
     return prisma.lecture.findFirst({
       where: {
         id: lectureId,
+        isDeleted: false,
         course: {
           teacherId,
         },
@@ -132,11 +133,28 @@ const LectureRepositories = {
             title: true,
           },
         },
-        attendance: true,
+        attendance: {
+          include: {
+            student: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: {
+            durationSec: "desc",
+          },
+        },
+        participants: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   },
-
   //  Student – single lecture (enrollment enforced)
   async findByIdStudent(studentId: string, lectureId: string) {
     return prisma.lecture.findFirst({
