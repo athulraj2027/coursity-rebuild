@@ -43,10 +43,10 @@ type SortOption = {
   direction: "asc" | "desc";
 };
 
-const statusColor: Record<string, "default" | "secondary" | "destructive"> = {
-  NOT_STARTED: "secondary",
-  STARTED: "default",
-  COMPLETED: "destructive",
+const statusStyles: Record<string, string> = {
+  NOT_STARTED: "bg-neutral-100 text-neutral-500 border-neutral-200",
+  STARTED: "bg-black text-white border-black",
+  COMPLETED: "bg-neutral-900 text-neutral-300 border-neutral-700",
 };
 
 const MyLecturesPage = () => {
@@ -57,7 +57,6 @@ const MyLecturesPage = () => {
   const [statusFilter, setStatusFilter] = useState<
     "all" | "NOT_STARTED" | "STARTED" | "COMPLETED"
   >("all");
-
   const [sortOption, setSortOption] = useState<SortOption>({
     field: "createdAt",
     direction: "desc",
@@ -65,7 +64,6 @@ const MyLecturesPage = () => {
 
   const tableData: LectureTableRow[] = useMemo(() => {
     if (!data) return [];
-
     return data.map((lecture: any) => ({
       id: lecture.id,
       title: lecture.title,
@@ -96,7 +94,6 @@ const MyLecturesPage = () => {
     filtered.sort((a, b) => {
       let aVal: number | string;
       let bVal: number | string;
-
       switch (sortOption.field) {
         case "title":
           aVal = a.title.toLowerCase();
@@ -113,7 +110,6 @@ const MyLecturesPage = () => {
         default:
           return 0;
       }
-
       if (aVal < bVal) return sortOption.direction === "asc" ? -1 : 1;
       if (aVal > bVal) return sortOption.direction === "asc" ? 1 : -1;
       return 0;
@@ -124,8 +120,10 @@ const MyLecturesPage = () => {
 
   const hasActiveFilters = searchQuery !== "" || statusFilter !== "all";
 
-  if (isLoading) return <Loading />;
-  if (error) return <Error />;
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+  };
 
   const columns: ColumnDef<LectureTableRow>[] = [
     {
@@ -137,8 +135,8 @@ const MyLecturesPage = () => {
       header: "Lecture",
       cell: ({ row }) => (
         <div>
-          <p className="font-medium">{row.original.title}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="font-medium text-black">{row.original.title}</p>
+          <p className="text-xs text-neutral-400 mt-0.5">
             {row.original.courseTitle}
           </p>
         </div>
@@ -152,9 +150,11 @@ const MyLecturesPage = () => {
       accessorKey: "status",
       header: "Status",
       cell: ({ getValue }) => (
-        <Badge variant={statusColor[getValue<string>()]}>
+        <span
+          className={`inline-block text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border ${statusStyles[getValue<string>()]}`}
+        >
           {getValue<string>().replace("_", " ")}
-        </Badge>
+        </span>
       ),
     },
     {
@@ -173,86 +173,152 @@ const MyLecturesPage = () => {
     },
   ];
 
-  return (
-    <div className="px-7 flex flex-col gap-4">
-      <h1 className="text-3xl font-extrabold">My Lectures</h1>
+  if (isLoading) return <Loading />;
+  if (error) return <Error />;
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search lectures..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
+            Teacher Portal
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+            My Lectures
+          </h1>
+          <p className="text-sm text-neutral-400 font-medium mt-1">
+            Manage and monitor all your scheduled sessions
+          </p>
         </div>
 
-        <Select
-          value={`${sortOption.field}-${sortOption.direction}`}
-          onValueChange={(v) => {
-            const [field, direction] = v.split("-") as any;
-            setSortOption({ field, direction });
-          }}
-        >
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="createdAt-desc">Newest</SelectItem>
-            <SelectItem value="createdAt-asc">Oldest</SelectItem>
-            <SelectItem value="startTime-asc">Start Time ↑</SelectItem>
-            <SelectItem value="startTime-desc">Start Time ↓</SelectItem>
-            <SelectItem value="title-asc">Title A–Z</SelectItem>
-            <SelectItem value="title-desc">Title Z–A</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[250px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input
+              placeholder="Search lectures or courses..."
+              className="pl-10 bg-white border-black/10 rounded-xl focus-visible:ring-black/20 text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-        <Popover open={showFilters} onOpenChange={setShowFilters}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-64">
-            <div className="space-y-3">
-              <p className="font-semibold">Status</p>
-              <Select
-                value={statusFilter}
-                onValueChange={(v: any) => setStatusFilter(v)}
+          {/* Sort */}
+          <Select
+            value={`${sortOption.field}-${sortOption.direction}`}
+            onValueChange={(v) => {
+              const [field, direction] = v.split("-") as [
+                SortOption["field"],
+                SortOption["direction"],
+              ];
+              setSortOption({ field, direction });
+            }}
+          >
+            <SelectTrigger className="w-44 bg-white border-black/10 rounded-xl text-sm">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt-desc">Newest First</SelectItem>
+              <SelectItem value="createdAt-asc">Oldest First</SelectItem>
+              <SelectItem value="startTime-asc">Start Time ↑</SelectItem>
+              <SelectItem value="startTime-desc">Start Time ↓</SelectItem>
+              <SelectItem value="title-asc">Title A–Z</SelectItem>
+              <SelectItem value="title-desc">Title Z–A</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Filters Popover */}
+          <Popover open={showFilters} onOpenChange={setShowFilters}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 bg-white border-black/10 rounded-xl text-sm hover:bg-neutral-50"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="NOT_STARTED">Not Started</SelectItem>
-                  <SelectItem value="STARTED">Live</SelectItem>
-                  <SelectItem value="COMPLETED">Completed</SelectItem>
-                </SelectContent>
-              </Select>
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+                {hasActiveFilters && (
+                  <Badge className="ml-1 px-1.5 min-w-5 h-5 bg-black text-white text-[10px] rounded-full">
+                    {[
+                      searchQuery ? 1 : 0,
+                      statusFilter !== "all" ? 1 : 0,
+                    ].reduce((a, b) => a + b, 0)}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-64 rounded-2xl border-black/10 shadow-xl"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-black">Filters</p>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-auto p-0 text-xs text-neutral-400 hover:text-black"
+                    >
+                      Clear all
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                    Status
+                  </p>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(v: any) => setStatusFilter(v)}
+                  >
+                    <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="NOT_STARTED">Not Started</SelectItem>
+                      <SelectItem value="STARTED">Live</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-              {hasActiveFilters && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setStatusFilter("all");
-                  }}
-                  className="w-full gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  Clear filters
-                </Button>
-              )}
-            </div>
-          </PopoverContent>
-        </Popover>
+          {/* Clear */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="gap-2 text-neutral-400 hover:text-black rounded-xl"
+            >
+              <X className="h-4 w-4" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Results count */}
+        <p className="text-xs text-neutral-400 font-medium mb-4">
+          Showing{" "}
+          <span className="text-black font-semibold">
+            {processedData.length}
+          </span>{" "}
+          of{" "}
+          <span className="text-black font-semibold">{tableData.length}</span>{" "}
+          lectures
+        </p>
+
+        {/* Table */}
+        <div className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm">
+          <DataTable columns={columns} data={processedData} />
+        </div>
       </div>
-
-      <DataTable columns={columns} data={processedData} />
     </div>
   );
 };

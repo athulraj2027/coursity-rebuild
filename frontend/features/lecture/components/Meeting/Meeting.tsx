@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import Header from "./Header";
 import { useLectureSocket } from "../../hooks/useLectureSocket";
 import { useMessage } from "../../hooks/useMessage";
+import { MessageSquare, Users, Video } from "lucide-react";
+
+type ActivePanel = "chat" | "participants" | null;
 
 const Meeting = ({
   lectureId,
@@ -19,9 +22,7 @@ const Meeting = ({
   lectureId: string;
   role: "ADMIN" | "TEACHER" | "STUDENT";
 }) => {
-  const [activePanel, setActivePanel] = useState<
-    "chat" | "participants" | null
-  >(null);
+  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const hasInitialized = useRef(false);
 
   const {
@@ -54,6 +55,7 @@ const Meeting = ({
     pauseVideoUI,
     resumeVideoUI,
   );
+
   useEffect(() => {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
@@ -65,8 +67,6 @@ const Meeting = ({
           const createResponse = await new Promise<any>((resolve) => {
             socket.emit("create-room", { lectureId }, resolve);
           });
-
-          console.log("createresponse  : ", createResponse);
           if (!createResponse.success) {
             toast.error("Failed to start lecture");
             return;
@@ -83,8 +83,9 @@ const Meeting = ({
           toast.error("Failed to join lecture");
           return;
         }
-        console.log("join response : ", joinResponse);
+
         if (role !== "TEACHER") toast.success("You have joined the lecture");
+
         await createMeetingEssentials(
           joinResponse.rtpCapabilities,
           lectureId,
@@ -99,39 +100,47 @@ const Meeting = ({
     init();
   }, [lectureId, role, createMeetingEssentials]);
 
+  const mobileTabs: {
+    key: ActivePanel;
+    label: string;
+    icon: React.ElementType;
+  }[] = [
+    { key: null, label: "Videos", icon: Video },
+    { key: "chat", label: "Chat", icon: MessageSquare },
+    { key: "participants", label: "People", icon: Users },
+  ];
+
   return (
-    <div className="h-screen w-full flex flex-col bg-gray-900 text-white">
+    <div className="h-screen w-full flex flex-col bg-neutral-950 text-white overflow-hidden">
+      {/* Header */}
       <Header />
-      {/* MOBILE PANEL SWITCH BUTTONS */}
-      <div className="lg:hidden flex gap-2 px-4 py-2 border-b border-gray-700">
-        <button
-          onClick={() => setActivePanel("chat")}
-          className="px-3 py-1 bg-gray-800 rounded"
-        >
-          Chat
-        </button>
-        <button
-          onClick={() => setActivePanel("participants")}
-          className="px-3 py-1 bg-gray-800 rounded"
-        >
-          Participants
-        </button>
-        <button
-          onClick={() => setActivePanel(null)}
-          className="px-3 py-1 bg-gray-800 rounded"
-        >
-          Videos
-        </button>
+
+      {/* Mobile tab switcher */}
+      <div className="lg:hidden flex items-center gap-1 px-3 py-2 border-b border-white/8 bg-neutral-900 shrink-0">
+        {mobileTabs.map(({ key, label, icon: Icon }) => {
+          const isActive = activePanel === key;
+          return (
+            <button
+              key={String(key)}
+              onClick={() => setActivePanel(key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                isActive
+                  ? "bg-white text-black"
+                  : "text-neutral-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />
+              {label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* VIDEOS (always visible on desktop, conditional on mobile) */}
+      {/* Main content */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Videos */}
         <div
-          className={`
-            flex-1
-            ${activePanel ? "hidden lg:block" : "block"}
-          `}
+          className={`flex-1 min-w-0 min-h-0 ${activePanel !== null ? "hidden lg:flex" : "flex"} flex-col`}
         >
           <MainVideos
             localStream={localStream}
@@ -140,32 +149,59 @@ const Meeting = ({
           />
         </div>
 
-        {/* CHAT */}
+        {/* Chat panel */}
         <div
           className={`
-            w-full lg:w-80 border-l border-gray-700 h-full
-            ${activePanel === "chat" ? "block" : "hidden lg:block"}
+            w-full lg:w-80 shrink-0
+            border-l border-white/8 bg-neutral-900
+            flex flex-col min-h-0
+            ${activePanel === "chat" ? "flex" : "hidden lg:flex"}
           `}
         >
-          <Chat
-            message={message}
-            messages={messages}
-            sendMessage={sendMessage}
-            setMessage={setMessage}
-          />
+          <div className="hidden lg:flex items-center gap-2 px-4 py-3 border-b border-white/8 shrink-0">
+            <MessageSquare
+              className="w-4 h-4 text-neutral-400"
+              strokeWidth={1.8}
+            />
+            <span className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              Chat
+            </span>
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <Chat
+              message={message}
+              messages={messages}
+              sendMessage={sendMessage}
+              setMessage={setMessage}
+            />
+          </div>
         </div>
 
-        {/* PARTICIPANTS */}
+        {/* Participants panel */}
         <div
           className={`
-            w-full lg:w-72 border-l border-gray-700
-            ${activePanel === "participants" ? "block" : "hidden lg:block"}
+            w-full lg:w-64 shrink-0
+            border-l border-white/8 bg-neutral-900
+            flex flex-col min-h-0
+            ${activePanel === "participants" ? "flex" : "hidden lg:flex"}
           `}
         >
-          <Participants users={existingUsers} />
+          <div className="hidden lg:flex items-center gap-2 px-4 py-3 border-b border-white/8 shrink-0">
+            <Users className="w-4 h-4 text-neutral-400" strokeWidth={1.8} />
+            <span className="text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+              Participants
+            </span>
+            <span className="ml-auto text-[10px] font-bold text-neutral-500 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
+              {existingUsers.length}
+            </span>
+          </div>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <Participants users={existingUsers} />
+          </div>
         </div>
       </div>
 
+      {/* Control bar */}
       <ControlBar
         lectureId={lectureId}
         startVideo={startVideo}

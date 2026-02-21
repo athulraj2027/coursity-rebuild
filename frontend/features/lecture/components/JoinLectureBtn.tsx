@@ -14,7 +14,14 @@ const JoinLectureBtn = ({
     console.log(data);
     onStart();
   };
-  return <Button onClick={handleJoin}>Join Lecture</Button>;
+  return (
+    <Button
+      className="bg-black text-white border-black hover:bg-black/80 active:bg-black/90"
+      onClick={handleJoin}
+    >
+      Join Lecture
+    </Button>
+  );
 };
 
 export default JoinLectureBtn;

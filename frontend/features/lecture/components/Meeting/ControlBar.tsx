@@ -5,6 +5,7 @@ import {
   Video,
   VideoOff,
   MonitorUp,
+  MonitorOff,
 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -19,6 +20,42 @@ type ControlBarProps = {
   lectureId: string;
 };
 
+/* ─── Single Control Button ───────────────────────────────────────────────── */
+const ControlBtn = ({
+  onClick,
+  active,
+  danger,
+  label,
+  children,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  danger?: boolean;
+  label: string;
+  children: React.ReactNode;
+}) => {
+  const base = "flex flex-col items-center gap-1.5 group focus:outline-none";
+
+  const iconBase =
+    "w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-150 border";
+
+  const iconStyle = danger
+    ? "bg-red-500/20 border-red-500/30 text-red-400 hover:bg-red-500 hover:border-red-500 hover:text-white"
+    : active
+      ? "bg-white text-black border-white hover:bg-white/90"
+      : "bg-white/5 text-neutral-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20";
+
+  return (
+    <button onClick={onClick} className={base} aria-label={label}>
+      <div className={`${iconBase} ${iconStyle}`}>{children}</div>
+      <span className="text-[10px] font-medium text-neutral-600 group-hover:text-neutral-400 transition-colors tracking-wide">
+        {label}
+      </span>
+    </button>
+  );
+};
+
+/* ─── Control Bar ─────────────────────────────────────────────────────────── */
 const ControlBar = ({
   startVideo,
   stopVideo,
@@ -65,54 +102,53 @@ const ControlBar = ({
 
   const handleLeave = async () => {
     await leaveRoom(lectureId);
-    window.location.href = "/"; // or router.push(...)
+    window.location.href = "/";
   };
 
   return (
-    <div className="flex justify-center items-center gap-6 py-4 border-t border-gray-700 bg-gray-900">
-      {/* MIC */}
-      <button
+    <div className="shrink-0 flex items-center justify-center gap-3 sm:gap-5 px-4 py-3 border-t border-white/8 bg-neutral-900">
+      <ControlBtn
         onClick={handleMicToggle}
-        className={`p-4 rounded-full transition ${
-          isMicOn
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-gray-700 hover:bg-gray-600"
-        }`}
+        active={isMicOn}
+        label={isMicOn ? "Mute" : "Unmute"}
       >
-        {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
-      </button>
+        {isMicOn ? (
+          <Mic className="w-4.5 h-4.5" strokeWidth={1.8} />
+        ) : (
+          <MicOff className="w-4.5 h-4.5" strokeWidth={1.8} />
+        )}
+      </ControlBtn>
 
-      {/* CAMERA */}
-      <button
+      <ControlBtn
         onClick={handleVideoToggle}
-        className={`p-4 rounded-full transition ${
-          isVideoOn
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-gray-700 hover:bg-gray-600"
-        }`}
+        active={isVideoOn}
+        label={isVideoOn ? "Stop Video" : "Start Video"}
       >
-        {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
-      </button>
+        {isVideoOn ? (
+          <Video className="w-4.5 h-4.5" strokeWidth={1.8} />
+        ) : (
+          <VideoOff className="w-4.5 h-4.5" strokeWidth={1.8} />
+        )}
+      </ControlBtn>
 
-      {/* SCREEN SHARE */}
-      <button
+      <ControlBtn
         onClick={handleScreenToggle}
-        className={`p-4 rounded-full transition ${
-          isScreenSharing
-            ? "bg-blue-600 hover:bg-blue-700"
-            : "bg-gray-700 hover:bg-gray-600"
-        }`}
+        active={isScreenSharing}
+        label={isScreenSharing ? "Stop Share" : "Share Screen"}
       >
-        <MonitorUp size={20} />
-      </button>
+        {isScreenSharing ? (
+          <MonitorOff className="w-4.5 h-4.5" strokeWidth={1.8} />
+        ) : (
+          <MonitorUp className="w-4.5 h-4.5" strokeWidth={1.8} />
+        )}
+      </ControlBtn>
 
-      {/* LEAVE */}
-      <button
-        onClick={handleLeave}
-        className="p-4 rounded-full bg-red-600 hover:bg-red-700 transition"
-      >
-        <PhoneOff size={20} />
-      </button>
+      {/* Divider */}
+      <div className="w-px h-8 bg-white/8 mx-1 sm:mx-2" />
+
+      <ControlBtn onClick={handleLeave} danger label="Leave">
+        <PhoneOff className="w-4.5 h-4.5" strokeWidth={1.8} />
+      </ControlBtn>
     </div>
   );
 };

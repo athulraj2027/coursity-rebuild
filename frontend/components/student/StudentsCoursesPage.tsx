@@ -15,16 +15,14 @@ import {
 } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Badge } from "../ui/badge";
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import {
   Search,
   SlidersHorizontal,
   X,
-  GraduationCap,
-  Calendar,
-  IndianRupee,
+  Users,
   ChevronLeft,
   ChevronRight,
+  BookOpen,
 } from "lucide-react";
 import Modal from "../common/Modal";
 import CourseDetailCard from "./CourseDetailCard";
@@ -36,13 +34,8 @@ type Course = {
   imageUrl: string;
   price: number;
   startDate: string;
-  teacher: {
-    id: string;
-    name: string;
-  };
-  _count: {
-    enrollments: number;
-  };
+  teacher: { id: string; name: string };
+  _count: { enrollments: number };
   createdAt: string;
 };
 
@@ -68,6 +61,98 @@ type FilterOptions = {
 
 const ITEMS_PER_PAGE = 9;
 
+/* ─── Course Card ─────────────────────────────────────────────────────────── */
+const CourseCard = ({
+  course,
+  onView,
+}: {
+  course: Course;
+  onView: () => void;
+}) => {
+  const startDate = new Date(course.startDate);
+
+  return (
+    <div className="group bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
+      {/* Thumbnail */}
+      <div className="relative h-32 w-full bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0">
+        {course.imageUrl ? (
+          <img
+            src={course.imageUrl}
+            alt={course.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
+            <BookOpen className="w-5 h-5 text-white" strokeWidth={1.5} />
+          </div>
+        )}
+        {/* Price badge */}
+        <span
+          className={`absolute top-2.5 right-2.5 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full border ${
+            course.price === 0
+              ? "bg-black text-white border-black"
+              : "bg-white text-black border-black/15"
+          }`}
+        >
+          {course.price === 0 ? "Free" : `₹${course.price.toLocaleString()}`}
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-4 flex flex-col gap-2.5 flex-1">
+        {/* Teacher */}
+        <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider truncate">
+          {course.teacher.name}
+        </p>
+
+        {/* Title */}
+        <h3 className="text-sm font-semibold text-black leading-snug line-clamp-2">
+          {course.title}
+        </h3>
+
+        {/* Description */}
+        {course.description && (
+          <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed">
+            {course.description}
+          </p>
+        )}
+
+        {/* Meta footer */}
+        <div className="flex items-center justify-between mt-auto pt-2 border-t border-black/5">
+          <div className="flex items-center gap-1 text-neutral-400">
+            <Users className="w-3 h-3" strokeWidth={1.8} />
+            <span className="text-[11px] font-medium">
+              {course._count.enrollments} student
+              {course._count.enrollments !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span className="text-[11px] text-neutral-400 font-medium">
+            {startDate.toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="px-4 pb-4">
+        <Button
+          onClick={onView}
+          className="w-full bg-black text-white hover:bg-black/80 rounded-xl text-xs h-8"
+        >
+          View Course
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Main Page ───────────────────────────────────────────────────────────── */
 const StudentsCoursesPage = () => {
   const { isLoading, error, data } = useAllCoursesQueryPublic();
 
@@ -81,50 +166,40 @@ const StudentsCoursesPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter function
   const filterData = (courses: Course[]): Course[] => {
     let filtered = [...courses];
-
-    // Search filter
     if (searchQuery) {
       filtered = filtered.filter(
-        (course) =>
-          course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          course.description
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          course.teacher.name.toLowerCase().includes(searchQuery.toLowerCase()),
+        (c) =>
+          c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          c.teacher.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
-
-    // Price range filter
     if (filters.priceRange !== "all") {
-      filtered = filtered.filter((course) => {
+      filtered = filtered.filter((c) => {
         switch (filters.priceRange) {
           case "free":
-            return course.price === 0;
+            return c.price === 0;
           case "paid":
-            return course.price > 0;
+            return c.price > 0;
           case "under1000":
-            return course.price > 0 && course.price < 1000;
+            return c.price > 0 && c.price < 1000;
           case "1000to5000":
-            return course.price >= 1000 && course.price <= 5000;
+            return c.price >= 1000 && c.price <= 5000;
           case "above5000":
-            return course.price > 5000;
+            return c.price > 5000;
           default:
             return true;
         }
       });
     }
-
-    // Start date filter
     if (filters.startDate !== "all") {
       const now = new Date();
-      filtered = filtered.filter((course) => {
-        const startDate = new Date(course.startDate);
-        const diffTime = startDate.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+      filtered = filtered.filter((c) => {
+        const diffDays = Math.ceil(
+          (new Date(c.startDate).getTime() - now.getTime()) / 86400000,
+        );
         switch (filters.startDate) {
           case "upcoming":
             return diffDays > 0;
@@ -137,15 +212,11 @@ const StudentsCoursesPage = () => {
         }
       });
     }
-
     return filtered;
   };
 
-  // Sort function
-  const sortData = (courses: Course[]): Course[] => {
-    const sorted = [...courses];
-
-    sorted.sort((a, b) => {
+  const sortData = (courses: Course[]): Course[] =>
+    [...courses].sort((a, b) => {
       switch (sortOption) {
         case "newest":
           return (
@@ -170,221 +241,234 @@ const StudentsCoursesPage = () => {
       }
     });
 
-    return sorted;
-  };
-
-  // Process data
   const processedData = useMemo(() => {
     if (!data) return [];
-    const filtered = filterData(data);
-    return sortData(filtered);
+    return sortData(filterData(data));
   }, [data, searchQuery, sortOption, filters]);
 
-  // Pagination
   const totalPages = Math.ceil(processedData.length / ITEMS_PER_PAGE);
   const paginatedData = processedData.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
 
-  // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, sortOption, filters]);
 
-  // Check if any filters are active
   const hasActiveFilters =
     filters.priceRange !== "all" ||
     filters.startDate !== "all" ||
     searchQuery !== "";
-
-  // Clear all filters
   const clearFilters = () => {
     setSearchQuery("");
-    setFilters({
-      priceRange: "all",
-      startDate: "all",
-    });
+    setFilters({ priceRange: "all", startDate: "all" });
   };
 
   if (isLoading) return <Loading />;
   if (error) return <Error />;
 
   return (
-    <div className="px-7 flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold">Explore Courses</h1>
-        <div className="text-sm text-muted-foreground">
-          {processedData.length}{" "}
-          {processedData.length === 1 ? "course" : "courses"} available
-        </div>
-      </div>
-
-      {/* Search, Filter, and Sort Bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Search */}
-        <div className="relative flex-1 min-w-62.5">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search courses, teachers..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Sort */}
-        <Select
-          value={sortOption}
-          onValueChange={(value: SortOption) => setSortOption(value)}
-        >
-          <SelectTrigger className="w-45">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-            <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-            <SelectItem value="price-low">Price (Low-High)</SelectItem>
-            <SelectItem value="price-high">Price (High-Low)</SelectItem>
-            <SelectItem value="popular">Most Popular</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Filters Popover */}
-        <Popover open={showFilters} onOpenChange={setShowFilters}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {hasActiveFilters && (
-                <Badge variant="secondary" className="ml-1 px-1 min-w-5">
-                  {[
-                    filters.priceRange !== "all" ? 1 : 0,
-                    filters.startDate !== "all" ? 1 : 0,
-                    searchQuery ? 1 : 0,
-                  ].reduce((a, b) => a + b, 0)}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold">Filters</h4>
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="h-auto p-0 text-xs"
-                  >
-                    Clear all
-                  </Button>
-                )}
-              </div>
-
-              {/* Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Price Range</label>
-                <Select
-                  value={filters.priceRange}
-                  onValueChange={(value: FilterOptions["priceRange"]) =>
-                    setFilters((prev) => ({ ...prev, priceRange: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Prices</SelectItem>
-                    <SelectItem value="free">Free</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="under1000">Under ₹1,000</SelectItem>
-                    <SelectItem value="1000to5000">₹1,000 - ₹5,000</SelectItem>
-                    <SelectItem value="above5000">Above ₹5,000</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Start Date Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Start Date</label>
-                <Select
-                  value={filters.startDate}
-                  onValueChange={(value: FilterOptions["startDate"]) =>
-                    setFilters((prev) => ({ ...prev, startDate: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Dates</SelectItem>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="this-week">This Week</SelectItem>
-                    <SelectItem value="this-month">This Month</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+    <div className="min-h-screen bg-neutral-50">
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
+            Student Portal
+          </p>
+          <div className="flex items-end justify-between gap-4 flex-wrap">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+                Explore Courses
+              </h1>
+              <p className="text-sm text-neutral-400 font-medium mt-1">
+                Discover and enroll in courses that match your goals
+              </p>
             </div>
-          </PopoverContent>
-        </Popover>
+            <span className="text-xs text-neutral-400 font-medium shrink-0">
+              <span className="text-black font-semibold">
+                {processedData.length}
+              </span>{" "}
+              {processedData.length === 1 ? "course" : "courses"} available
+            </span>
+          </div>
+        </div>
 
-        {/* Clear filters button */}
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="gap-2"
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <div className="relative flex-1 min-w-[250px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input
+              placeholder="Search courses, teachers..."
+              className="pl-10 bg-white border-black/10 rounded-xl focus-visible:ring-black/20 text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <Select
+            value={sortOption}
+            onValueChange={(v: SortOption) => setSortOption(v)}
           >
-            <X className="h-4 w-4" />
-            Clear
-          </Button>
-        )}
-      </div>
+            <SelectTrigger className="w-44 bg-white border-black/10 rounded-xl text-sm">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+              <SelectItem value="name-asc">Name (A–Z)</SelectItem>
+              <SelectItem value="name-desc">Name (Z–A)</SelectItem>
+              <SelectItem value="price-low">Price (Low–High)</SelectItem>
+              <SelectItem value="price-high">Price (High–Low)</SelectItem>
+              <SelectItem value="popular">Most Popular</SelectItem>
+            </SelectContent>
+          </Select>
 
-      {/* Course Grid */}
-      {paginatedData.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed rounded-lg">
-          <p className="text-muted-foreground mb-2">No courses found</p>
+          <Popover open={showFilters} onOpenChange={setShowFilters}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 bg-white border-black/10 rounded-xl text-sm hover:bg-neutral-50"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                Filters
+                {hasActiveFilters && (
+                  <Badge className="ml-1 px-1.5 min-w-5 h-5 bg-black text-white text-[10px] rounded-full">
+                    {[
+                      filters.priceRange !== "all" ? 1 : 0,
+                      filters.startDate !== "all" ? 1 : 0,
+                      searchQuery ? 1 : 0,
+                    ].reduce((a, b) => a + b, 0)}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-72 rounded-2xl border-black/10 shadow-xl"
+              align="end"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-black">Filters</h4>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-auto p-0 text-xs text-neutral-400 hover:text-black"
+                    >
+                      Clear all
+                    </Button>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                    Price Range
+                  </label>
+                  <Select
+                    value={filters.priceRange}
+                    onValueChange={(v: FilterOptions["priceRange"]) =>
+                      setFilters((p) => ({ ...p, priceRange: v }))
+                    }
+                  >
+                    <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Prices</SelectItem>
+                      <SelectItem value="free">Free</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                      <SelectItem value="under1000">Under ₹1,000</SelectItem>
+                      <SelectItem value="1000to5000">
+                        ₹1,000 – ₹5,000
+                      </SelectItem>
+                      <SelectItem value="above5000">Above ₹5,000</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                    Start Date
+                  </label>
+                  <Select
+                    value={filters.startDate}
+                    onValueChange={(v: FilterOptions["startDate"]) =>
+                      setFilters((p) => ({ ...p, startDate: v }))
+                    }
+                  >
+                    <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Dates</SelectItem>
+                      <SelectItem value="upcoming">Upcoming</SelectItem>
+                      <SelectItem value="this-week">This Week</SelectItem>
+                      <SelectItem value="this-month">This Month</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
           {hasActiveFilters && (
-            <Button variant="link" onClick={clearFilters}>
-              Clear filters to see all courses
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="gap-2 text-neutral-400 hover:text-black rounded-xl"
+            >
+              <X className="h-4 w-4" />
+              Clear
             </Button>
           )}
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedData.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onView={() => setSelectedCourseId(course.id)}
-              />
-            ))}
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-4">
+        {/* Empty State */}
+        {paginatedData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-56 border border-dashed border-black/15 rounded-2xl bg-white">
+            <p className="text-sm font-medium text-neutral-400 mb-3">
+              No courses found
+            </p>
+            {hasActiveFilters && (
               <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="text-black underline text-xs"
               >
-                <ChevronLeft className="h-4 w-4" />
+                Clear filters to see all courses
               </Button>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedData.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  onView={() => setSelectedCourseId(course.id)}
+                />
+              ))}
+            </div>
 
-              <div className="flex items-center gap-1">
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1.5 mt-8">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-xl border-black/10 bg-white w-8 h-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => {
-                    // Show first page, last page, current page, and pages around current
                     if (
                       page === 1 ||
                       page === totalPages ||
@@ -393,9 +477,13 @@ const StudentsCoursesPage = () => {
                       return (
                         <Button
                           key={page}
-                          variant={currentPage === page ? "default" : "outline"}
                           size="icon"
                           onClick={() => setCurrentPage(page)}
+                          className={`rounded-xl w-8 h-8 text-xs font-semibold ${
+                            currentPage === page
+                              ? "bg-black text-white border-black"
+                              : "bg-white text-black border border-black/10 hover:bg-neutral-50"
+                          }`}
                         >
                           {page}
                         </Button>
@@ -405,30 +493,35 @@ const StudentsCoursesPage = () => {
                       page === currentPage + 2
                     ) {
                       return (
-                        <span key={page} className="px-2">
-                          ...
+                        <span
+                          key={page}
+                          className="text-neutral-400 text-sm px-1"
+                        >
+                          …
                         </span>
                       );
                     }
                     return null;
                   },
                 )}
-              </div>
 
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="rounded-xl border-black/10 bg-white w-8 h-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       {selectedCourseId && (
         <Modal
           Card={<CourseDetailCard courseId={selectedCourseId} />}
@@ -436,94 +529,6 @@ const StudentsCoursesPage = () => {
         />
       )}
     </div>
-  );
-};
-
-// Course Card Component
-const CourseCard = ({
-  course,
-  onView,
-}: {
-  course: Course;
-  onView: () => void;
-}) => {
-  const startDate = new Date(course.startDate);
-  const isUpcoming = startDate > new Date();
-
-  return (
-    <Card className="group overflow-hidden rounded-2xl border bg-background hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      {/* Hero Section */}
-      <div className="relative h-52 w-full bg-gradient-to-br from-muted/40 to-muted/10 flex items-center justify-center">
-        {course.imageUrl ? (
-          <img
-            src={course.imageUrl}
-            alt={course.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = "none";
-            }}
-          />
-        ) : (
-          <div className="text-4xl font-semibold text-muted-foreground">
-            {course.title.charAt(0)}
-          </div>
-        )}
-
-        {/* Free Badge */}
-        {course.price === 0 && (
-          <Badge className="absolute top-4 right-4 bg-emerald-500 text-white rounded-md px-2 py-1 text-xs">
-            Free
-          </Badge>
-        )}
-      </div>
-
-      <CardContent className="p-5 space-y-4">
-        {/* Title */}
-        <div>
-          <h3 className="text-lg font-semibold leading-snug line-clamp-2">
-            {course.title}
-          </h3>
-        </div>
-
-        {/* Description (optional if you have it) */}
-        {course.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {course.description}
-          </p>
-        )}
-
-        {/* Meta Info Row */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{course.teacher.name}</span>
-
-          <span>
-            {startDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </span>
-        </div>
-
-        {/* Enrollment Info */}
-        <div className="text-xs text-muted-foreground">
-          {course._count.enrollments}{" "}
-          {course._count.enrollments === 1 ? "student" : "students"} enrolled
-        </div>
-      </CardContent>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between px-5 pb-5">
-        <div className="text-xl font-semibold text-primary">
-          {course.price === 0 ? "Free" : `₹${course.price.toLocaleString()}`}
-        </div>
-
-        <Button variant="secondary" className="rounded-xl" onClick={onView}>
-          View Course
-        </Button>
-      </div>
-    </Card>
   );
 };
 

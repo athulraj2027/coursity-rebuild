@@ -1,5 +1,5 @@
 "use client";
-import { meApi } from "@/services/auth.services";
+import { dashboardApi, meApi } from "@/services/auth.services";
 import { useQuery } from "@tanstack/react-query";
 
 export const useMe = () =>
@@ -8,3 +8,6 @@ export const useMe = () =>
     queryFn: meApi,
     retry: false,
   });
+
+export const useMyDashboardQuery = () =>
+  useQuery({ queryKey: ["dashboard"], queryFn: dashboardApi });

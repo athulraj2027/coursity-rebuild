@@ -53,6 +53,14 @@ type FilterOptions = {
   dateRange: "all" | "today" | "week" | "month" | "year";
 };
 
+const Label = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => <label className={className}>{children}</label>;
+
 const MyCoursesPage = () => {
   const { isLoading, data, error } = useMyCoursesQuery();
   const [modal, setModal] = useState(false);
@@ -74,10 +82,8 @@ const MyCoursesPage = () => {
     }
   }, [error]);
 
-  // Transform data
   const tableData: CourseTableRow[] = useMemo(() => {
     if (!data) return [];
-
     return data.map((course: any) => ({
       id: course.id,
       name: course.title,
@@ -91,18 +97,13 @@ const MyCoursesPage = () => {
     }));
   }, [data]);
 
-  // Filter function
   const filterData = (data: CourseTableRow[]): CourseTableRow[] => {
     let filtered = [...data];
-
-    // Search filter
     if (searchQuery) {
       filtered = filtered.filter((course) =>
         course.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
-
-    // Price range filter
     if (filters.priceRange !== "all") {
       filtered = filtered.filter((course) => {
         switch (filters.priceRange) {
@@ -121,8 +122,6 @@ const MyCoursesPage = () => {
         }
       });
     }
-
-    // Student range filter
     if (filters.studentRange !== "all") {
       filtered = filtered.filter((course) => {
         switch (filters.studentRange) {
@@ -139,16 +138,13 @@ const MyCoursesPage = () => {
         }
       });
     }
-
-    // Date range filter
     if (filters.dateRange !== "all") {
       const now = new Date();
       filtered = filtered.filter((course) => {
-        const diffTime = Math.abs(
-          now.getTime() - course.rawCreatedAt.getTime(),
+        const diffDays = Math.ceil(
+          Math.abs(now.getTime() - course.rawCreatedAt.getTime()) /
+            (1000 * 60 * 60 * 24),
         );
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
         switch (filters.dateRange) {
           case "today":
             return diffDays <= 1;
@@ -163,18 +159,12 @@ const MyCoursesPage = () => {
         }
       });
     }
-
     return filtered;
   };
 
-  // Sort function
   const sortData = (data: CourseTableRow[]): CourseTableRow[] => {
-    const sorted = [...data];
-
-    sorted.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
+    return [...data].sort((a, b) => {
+      let aValue: any, bValue: any;
       switch (sortOption.field) {
         case "name":
           aValue = a.name.toLowerCase();
@@ -199,36 +189,25 @@ const MyCoursesPage = () => {
         default:
           return 0;
       }
-
       if (aValue < bValue) return sortOption.direction === "asc" ? -1 : 1;
       if (aValue > bValue) return sortOption.direction === "asc" ? 1 : -1;
       return 0;
     });
-
-    return sorted;
   };
 
-  // Apply filters and sort
   const processedData = useMemo(() => {
-    const filtered = filterData(tableData);
-    return sortData(filtered);
+    return sortData(filterData(tableData));
   }, [tableData, searchQuery, sortOption, filters]);
 
-  // Check if any filters are active
   const hasActiveFilters =
     filters.priceRange !== "all" ||
     filters.studentRange !== "all" ||
     filters.dateRange !== "all" ||
     searchQuery !== "";
 
-  // Clear all filters
   const clearFilters = () => {
     setSearchQuery("");
-    setFilters({
-      priceRange: "all",
-      studentRange: "all",
-      dateRange: "all",
-    });
+    setFilters({ priceRange: "all", studentRange: "all", dateRange: "all" });
   };
 
   const columns: ColumnDef<CourseTableRow>[] = useMemo(
@@ -248,8 +227,7 @@ const MyCoursesPage = () => {
               alt={row.original.name}
               className="h-10 w-14 rounded-md object-cover border"
               onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/placeholder-course.jpg";
+                (e.target as HTMLImageElement).src = "/placeholder-course.jpg";
               }}
             />
             <span className="font-medium">{row.original.name}</span>
@@ -264,18 +242,9 @@ const MyCoursesPage = () => {
           return price === 0 ? "Free" : `₹${price.toLocaleString()}`;
         },
       },
-      {
-        accessorKey: "students",
-        header: "Students",
-      },
-      {
-        accessorKey: "createdAt",
-        header: "Created",
-      },
-      {
-        accessorKey: "updatedAt",
-        header: "Updated",
-      },
+      { accessorKey: "students", header: "Students" },
+      { accessorKey: "createdAt", header: "Created" },
+      { accessorKey: "updatedAt", header: "Updated" },
       {
         id: "actions",
         header: "Actions",
@@ -285,222 +254,259 @@ const MyCoursesPage = () => {
     [],
   );
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    return <Error />;
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="px-7 flex flex-col gap-4">
-        <h1 className="text-3xl font-extrabold">My Courses</h1>
-        <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-          <div className="text-center">
-            <p className="text-muted-foreground mb-4">No courses yet</p>
-            <Button onClick={() => setModal(true)}>
-              Create Your First Course <Plus className="ml-2" />
-            </Button>
-          </div>
-        </div>
-        {modal && <Modal Card={<NewCourseCard />} setModal={setModal} />}
-      </div>
-    );
-  }
+  if (isLoading) return <Loading />;
+  if (error) return <Error />;
 
   return (
-    <div className="px-7 flex flex-col gap-4">
-      <h1 className="text-3xl font-extrabold">My Courses</h1>
+    <div className="min-h-screen bg-neutral-50">
+      {/* Subtle grid background */}
+     
 
-      {/* Search, Filter, and Sort Bar */}
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Search */}
-        <div className="relative flex-1 min-w-62.5">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search courses..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      <div className="relative z-10 max-w-5xl mx-auto px-4 py-10">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
+            Teacher Portal
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+            My Courses
+          </h1>
+          <p className="text-sm text-neutral-400 font-medium mt-1">
+            Manage and track all your published courses
+          </p>
         </div>
 
-        {/* Sort */}
-        <Select
-          value={`${sortOption.field}-${sortOption.direction}`}
-          onValueChange={(value) => {
-            const [field, direction] = value.split("-") as [
-              SortOption["field"],
-              SortOption["direction"],
-            ];
-            setSortOption({ field, direction });
-          }}
-        >
-          <SelectTrigger className="w-45">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="createdAt-desc">Newest First</SelectItem>
-            <SelectItem value="createdAt-asc">Oldest First</SelectItem>
-            <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-            <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-            <SelectItem value="price-asc">Price (Low-High)</SelectItem>
-            <SelectItem value="price-desc">Price (High-Low)</SelectItem>
-            <SelectItem value="students-desc">Most Students</SelectItem>
-            <SelectItem value="students-asc">Least Students</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Filters Popover */}
-        <Popover open={showFilters} onOpenChange={setShowFilters}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {hasActiveFilters && (
-                <Badge variant="secondary" className="ml-1 px-1 min-w-5">
-                  {[
-                    filters.priceRange !== "all" ? 1 : 0,
-                    filters.studentRange !== "all" ? 1 : 0,
-                    filters.dateRange !== "all" ? 1 : 0,
-                    searchQuery ? 1 : 0,
-                  ].reduce((a, b) => a + b, 0)}
-                </Badge>
-              )}
+        {/* Empty state */}
+        {!data || data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 border border-dashed border-black/15 rounded-2xl bg-white">
+            <p className="text-neutral-400 text-sm font-medium mb-4">
+              No courses yet
+            </p>
+            <Button
+              onClick={() => setModal(true)}
+              className="bg-black text-white hover:bg-black/80 rounded-xl gap-2"
+            >
+              Create Your First Course <Plus className="w-4 h-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold">Filters</h4>
-                {hasActiveFilters && (
+          </div>
+        ) : (
+          <>
+            {/* Toolbar */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              {/* Search */}
+              <div className="relative flex-1 min-w-[250px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                <Input
+                  placeholder="Search courses..."
+                  className="pl-10 bg-white border-black/10 rounded-xl focus-visible:ring-black/20 text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Sort */}
+              <Select
+                value={`${sortOption.field}-${sortOption.direction}`}
+                onValueChange={(value) => {
+                  const [field, direction] = value.split("-") as [
+                    SortOption["field"],
+                    SortOption["direction"],
+                  ];
+                  setSortOption({ field, direction });
+                }}
+              >
+                <SelectTrigger className="w-44 bg-white border-black/10 rounded-xl text-sm">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="createdAt-desc">Newest First</SelectItem>
+                  <SelectItem value="createdAt-asc">Oldest First</SelectItem>
+                  <SelectItem value="name-asc">Name (A–Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z–A)</SelectItem>
+                  <SelectItem value="price-asc">Price (Low–High)</SelectItem>
+                  <SelectItem value="price-desc">Price (High–Low)</SelectItem>
+                  <SelectItem value="students-desc">Most Students</SelectItem>
+                  <SelectItem value="students-asc">Least Students</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Filters Popover */}
+              <Popover open={showFilters} onOpenChange={setShowFilters}>
+                <PopoverTrigger asChild>
                   <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFilters}
-                    className="h-auto p-0 text-xs"
+                    variant="outline"
+                    className="gap-2 bg-white border-black/10 rounded-xl text-sm hover:bg-neutral-50"
                   >
-                    Clear all
+                    <SlidersHorizontal className="h-4 w-4" />
+                    Filters
+                    {hasActiveFilters && (
+                      <Badge className="ml-1 px-1.5 min-w-5 h-5 bg-black text-white text-[10px] rounded-full">
+                        {[
+                          filters.priceRange !== "all" ? 1 : 0,
+                          filters.studentRange !== "all" ? 1 : 0,
+                          filters.dateRange !== "all" ? 1 : 0,
+                          searchQuery ? 1 : 0,
+                        ].reduce((a, b) => a + b, 0)}
+                      </Badge>
+                    )}
                   </Button>
-                )}
-              </div>
-
-              {/* Price Filter */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Price Range</Label>
-                <Select
-                  value={filters.priceRange}
-                  onValueChange={(value: FilterOptions["priceRange"]) =>
-                    setFilters((prev) => ({ ...prev, priceRange: value }))
-                  }
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-80 rounded-2xl border-black/10 shadow-xl"
+                  align="end"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Prices</SelectItem>
-                    <SelectItem value="free">Free</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="under1000">Under ₹1,000</SelectItem>
-                    <SelectItem value="1000to5000">₹1,000 - ₹5,000</SelectItem>
-                    <SelectItem value="above5000">Above ₹5,000</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-black text-sm">
+                        Filters
+                      </h4>
+                      {hasActiveFilters && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearFilters}
+                          className="h-auto p-0 text-xs text-neutral-400 hover:text-black"
+                        >
+                          Clear all
+                        </Button>
+                      )}
+                    </div>
 
-              {/* Students Filter */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Student Count</Label>
-                <Select
-                  value={filters.studentRange}
-                  onValueChange={(value: FilterOptions["studentRange"]) =>
-                    setFilters((prev) => ({ ...prev, studentRange: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="none">No Students</SelectItem>
-                    <SelectItem value="1to10">1-10 Students</SelectItem>
-                    <SelectItem value="11to50">11-50 Students</SelectItem>
-                    <SelectItem value="above50">50+ Students</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        Price Range
+                      </Label>
+                      <Select
+                        value={filters.priceRange}
+                        onValueChange={(value: FilterOptions["priceRange"]) =>
+                          setFilters((prev) => ({ ...prev, priceRange: value }))
+                        }
+                      >
+                        <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Prices</SelectItem>
+                          <SelectItem value="free">Free</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="under1000">
+                            Under ₹1,000
+                          </SelectItem>
+                          <SelectItem value="1000to5000">
+                            ₹1,000 – ₹5,000
+                          </SelectItem>
+                          <SelectItem value="above5000">
+                            Above ₹5,000
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              {/* Date Filter */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Created Date</Label>
-                <Select
-                  value={filters.dateRange}
-                  onValueChange={(value: FilterOptions["dateRange"]) =>
-                    setFilters((prev) => ({ ...prev, dateRange: value }))
-                  }
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        Student Count
+                      </Label>
+                      <Select
+                        value={filters.studentRange}
+                        onValueChange={(value: FilterOptions["studentRange"]) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            studentRange: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          <SelectItem value="none">No Students</SelectItem>
+                          <SelectItem value="1to10">1–10 Students</SelectItem>
+                          <SelectItem value="11to50">11–50 Students</SelectItem>
+                          <SelectItem value="above50">50+ Students</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                        Created Date
+                      </Label>
+                      <Select
+                        value={filters.dateRange}
+                        onValueChange={(value: FilterOptions["dateRange"]) =>
+                          setFilters((prev) => ({ ...prev, dateRange: value }))
+                        }
+                      >
+                        <SelectTrigger className="rounded-xl border-black/10 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Time</SelectItem>
+                          <SelectItem value="today">Today</SelectItem>
+                          <SelectItem value="week">Past Week</SelectItem>
+                          <SelectItem value="month">Past Month</SelectItem>
+                          <SelectItem value="year">Past Year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              {/* Clear filters */}
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="gap-2 text-neutral-400 hover:text-black rounded-xl"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="today">Today</SelectItem>
-                    <SelectItem value="week">Past Week</SelectItem>
-                    <SelectItem value="month">Past Month</SelectItem>
-                    <SelectItem value="year">Past Year</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <X className="h-4 w-4" />
+                  Clear
+                </Button>
+              )}
+
+              <div className="flex-1" />
+
+              {/* New Course */}
+              <Button
+                onClick={() => setModal(true)}
+                className="bg-black text-white hover:bg-black/80 rounded-xl gap-2"
+              >
+                New Course <Plus className="w-4 h-4" />
+              </Button>
             </div>
-          </PopoverContent>
-        </Popover>
 
-        {/* Clear filters button (when filters are active) */}
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="gap-2"
-          >
-            <X className="h-4 w-4" />
-            Clear
-          </Button>
+            {/* Results count */}
+            <p className="text-xs text-neutral-400 font-medium mb-4">
+              Showing{" "}
+              <span className="text-black font-semibold">
+                {processedData.length}
+              </span>{" "}
+              of{" "}
+              <span className="text-black font-semibold">
+                {tableData.length}
+              </span>{" "}
+              courses
+            </p>
+
+            {/* Table */}
+            <div className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm">
+              <DataTable columns={columns} data={processedData} />
+            </div>
+          </>
         )}
 
-        <div className="flex-1" />
-
-        {/* New Course Button */}
-        <Button onClick={() => setModal(true)}>
-          New Course <Plus className="ml-2" />
-        </Button>
+        {modal && (
+          <Modal
+            Card={<NewCourseCard setModal={setModal} />}
+            setModal={setModal}
+          />
+        )}
       </div>
-
-      {/* Results count */}
-      <div className="text-sm text-muted-foreground">
-        Showing {processedData.length} of {tableData.length} courses
-      </div>
-
-      <DataTable columns={columns} data={processedData} />
-
-      {modal && (
-        <Modal
-          Card={<NewCourseCard setModal={setModal} />}
-          setModal={setModal}
-        />
-      )}
     </div>
   );
 };
-
-const Label = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => <label className={className}>{children}</label>;
 
 export default MyCoursesPage;

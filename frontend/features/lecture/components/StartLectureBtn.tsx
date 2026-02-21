@@ -16,7 +16,14 @@ const StartLectureBtn = ({
 
     onStart();
   };
-  return <Button onClick={handleStart}>Start Lecture</Button>;
+  return (
+    <Button
+      className="bg-black text-white border-black hover:bg-black/80 active:bg-black/90"
+      onClick={handleStart}
+    >
+      Start Lecture
+    </Button>
+  );
 };
 
 export default StartLectureBtn;

@@ -1,5 +1,5 @@
-import StakingPage from "@/components/teacher/DashboardPage";
+import DashboardPage from "@/components/teacher/DashboardPage";
 
 export default function TeacherMainPage() {
-  return <StakingPage />;
+  return <DashboardPage />;
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import {
   SidebarFooter,
   SidebarMenu,
@@ -11,26 +12,45 @@ import { Moon, Settings, User2 } from "lucide-react";
 import { useMe } from "@/queries/auth.queries";
 
 const Footer = () => {
-  const { isLoading } = useMe();
+  const { data: user, isLoading } = useMe();
+
   if (isLoading) return null;
+
   return (
     <SidebarFooter>
       <SidebarMenu>
+        {/* Dark Mode */}
         <SidebarMenuItem>
           <SidebarMenuButton>
-            <Moon /> Dark Mode
+            <Moon className="mr-2 h-4 w-4" />
+            Dark Mode
           </SidebarMenuButton>
         </SidebarMenuItem>
+
+        {/* Settings */}
         <SidebarMenuItem>
           <SidebarMenuButton>
-            <Settings /> Settings
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
           </SidebarMenuButton>
         </SidebarMenuItem>
-        <SidebarMenuItem>
-          <SidebarMenuButton>
-            <User2 /> Athul Raj NV
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+
+        {/* User Info */}
+        {/* {user && (
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <User2 className="mr-2 h-4 w-4" />
+              <div className="flex flex-col text-left">
+                <span className="text-sm font-medium">{user.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {user.role}
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )} */}
+
+        {/* Logout */}
         <SidebarMenuItem>
           <LogoutBtn />
         </SidebarMenuItem>

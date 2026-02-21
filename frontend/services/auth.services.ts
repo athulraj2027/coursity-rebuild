@@ -35,3 +35,6 @@ export const meApi = () =>
   apiRequest({
     path: "/auth/me",
   });
+
+export const dashboardApi = () =>
+  apiRequest({ path: "/dashboard", method: "GET" });

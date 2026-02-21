@@ -35,7 +35,7 @@ const Modal = ({
                  hover:scale-105 transition-all duration-200
                  rounded-full"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 text-red-500 font-extrabold hover:text-white" />
         </Button>
 
         {/* Modal Card */}

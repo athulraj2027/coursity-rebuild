@@ -13,6 +13,7 @@ import {
 import Modal from "../../common/Modal";
 import LectureViewCard from "./LectureViewCard";
 import LectureEditCard from "./LectureEditCard";
+import CancelLectureCard from "./CancelLectureCard";
 
 type ModalType = "VIEW" | "EDIT" | "CANCEL" | "START";
 
@@ -45,8 +46,7 @@ const LectureActions = ({
         return <LectureEditCard lectureId={lectureId} />;
 
       case "CANCEL":
-        // Later: CancelLectureCard / confirmation dialog
-        return null;
+        return <CancelLectureCard lectureId={lectureId} />;
 
       case "START":
         return;
