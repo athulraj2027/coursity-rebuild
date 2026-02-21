@@ -16,7 +16,7 @@ export const TEACHER_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "My Courses", url: "/my-courses", icon: Notebook },
   { name: "My Lectures", url: "/my-lectures", icon: Group },
-  { name: "Payouts", url: "/payouts", icon: Banknote },
+  { name: "Wallet", url: "/wallet", icon: Banknote },
   { name: "Profile", url: "/profile", icon: User },
 ];
 

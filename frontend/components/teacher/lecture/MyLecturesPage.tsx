@@ -315,14 +315,22 @@ const MyLecturesPage = () => {
           lectures
         </p>
 
-        <div className="flex items-start gap-1 mb-4">
+        <div className="flex items-start gap-1">
           <span className="text-red-600 text-sm">*</span>
           <p className="text-xs text-neutral-400 font-medium">
             Lecture starting option will be enabled 10 minutes prior to the
             scheduled time.
           </p>
         </div>
+
+        <div className="flex items-start gap-1 mb-4">
+          <span className="text-red-600 text-sm">*</span>
+          <p className="text-xs text-neutral-400 font-medium">
+            For creating new lecture, please go to your courses page.
+          </p>
+        </div>
         {/* Table */}
+
         <div className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm">
           <DataTable columns={columns} data={processedData} />
         </div>
