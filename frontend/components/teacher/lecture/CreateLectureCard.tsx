@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { Clock } from "lucide-react";
+import { Clock, Loader2, Video, CalendarDays, Type, Eye } from "lucide-react";
 import { useCreateLecture } from "@/mutations/lecture.mutations";
 
 const CreateLectureCard = ({
@@ -17,11 +14,7 @@ const CreateLectureCard = ({
   courseId: string;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    meetingId: "",
-  });
-
+  const [formData, setFormData] = useState({ title: "", meetingId: "" });
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,47 +25,35 @@ const CreateLectureCard = ({
   };
 
   const { mutate: createLectureApi, isPending } = useCreateLecture();
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.title.trim()) {
-      toast.error("Please enter a lecture title");
-      return;
-    }
-    if (!date) {
-      toast.error("Please select a lecture date");
-      return;
-    }
-    if (!time.trim()) {
-      toast.error("Please select a lecture time");
-      return;
-    }
+    if (!formData.title.trim())
+      return toast.error("Please enter a lecture title");
+    if (!date) return toast.error("Please select a lecture date");
+    if (!time.trim()) return toast.error("Please select a lecture time");
+
     const [hours, minutes] = time.split(":");
     const startTime = new Date(date);
     startTime.setHours(Number(hours), Number(minutes), 0, 0);
-    const now = new Date();
-    if (startTime <= now) {
-      toast.error("Lecture start time must be in the future");
-      return;
-    }
+
+    if (startTime <= new Date())
+      return toast.error("Lecture start time must be in the future");
 
     setIsSubmitting(true);
-
     try {
-      const payload = {
-        title: formData.title.trim(),
-        startTime,
-        courseId,
-      };
-
-      createLectureApi(payload, {
-        onSuccess: () => {
-          toast.success("Lecture created successfully");
-          setModal(false);
-          setFormData({ title: "", meetingId: "" });
-          setDate(undefined);
-          setTime("");
+      createLectureApi(
+        { title: formData.title.trim(), startTime, courseId },
+        {
+          onSuccess: () => {
+            toast.success("Lecture created successfully");
+            setModal(false);
+            setFormData({ title: "", meetingId: "" });
+            setDate(undefined);
+            setTime("");
+          },
         },
-      });
+      );
     } catch (error) {
       console.error(error);
       toast.error("Failed to create lecture");
@@ -80,92 +61,156 @@ const CreateLectureCard = ({
       setIsSubmitting(false);
     }
   };
+
+  // Preview datetime
+  const previewDateTime =
+    date && time
+      ? (() => {
+          const d = new Date(date);
+          const [h, m] = time.split(":");
+          d.setHours(Number(h), Number(m), 0, 0);
+          return d.toLocaleString("en-IN", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          });
+        })()
+      : null;
+
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Create New Lecture</CardTitle>
-      </CardHeader>
+    <div className="w-full bg-white border border-black/8 rounded-2xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-black/6">
+        <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
+          <Video className="w-4 h-4 text-white" strokeWidth={1.5} />
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase">
+            Teacher Portal
+          </p>
+          <h2 className="text-sm font-bold text-black tracking-tight leading-none mt-0.5">
+            Schedule New Lecture
+          </h2>
+        </div>
+      </div>
 
-      <CardContent>
-        <form className="space-y-5" onSubmit={onSubmit}>
-          {/* Lecture Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">Lecture Title</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Introduction to Data Structures"
-              value={formData.title}
-              onChange={handleInputChange}
-            />
-          </div>
+      {/* Form */}
+      <form onSubmit={onSubmit} className="px-6 py-5 space-y-5">
+        {/* Title */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="title"
+            className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600"
+          >
+            <Type className="w-3.5 h-3.5" strokeWidth={1.8} />
+            Lecture Title
+          </label>
+          <Input
+            id="title"
+            name="title"
+            placeholder="Introduction to Data Structures"
+            value={formData.title}
+            onChange={handleInputChange}
+            className="rounded-xl border-black/10 bg-neutral-50 focus-visible:ring-black/20 text-sm placeholder:text-neutral-400"
+          />
+        </div>
 
-          {/* Start Date */}
-          <div className="space-y-2">
-            <Label>Lecture Date</Label>
+        {/* Date */}
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600">
+            <CalendarDays className="w-3.5 h-3.5" strokeWidth={1.8} />
+            Lecture Date
+            {date && (
+              <span className="ml-auto text-[10px] font-bold text-black bg-neutral-100 border border-black/8 px-2 py-0.5 rounded-full">
+                {date.toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
+          </label>
+          <div className="rounded-xl border border-black/10 bg-neutral-50 overflow-hidden">
             <Calendar
               mode="single"
               selected={date}
               onSelect={(selectedDate) => {
                 if (selectedDate) setDate(selectedDate);
               }}
-              className="rounded-lg border"
+              className="w-full"
               captionLayout="dropdown"
-              disabled={(date) => date < new Date()}
+              disabled={(d) => d < new Date()}
             />
           </div>
+        </div>
 
-          {/* Start Time */}
-          <div className="space-y-2">
-            <Label htmlFor="time">Lecture Time (24 hr format)</Label>
-            <div className="relative">
-              <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="time"
-                name="time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+        {/* Time */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor="time"
+            className="flex items-center gap-1.5 text-xs font-semibold text-neutral-600"
+          >
+            <Clock className="w-3.5 h-3.5" strokeWidth={1.8} />
+            Lecture Time
+          </label>
+          <div className="relative">
+            <Clock
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400"
+              strokeWidth={1.8}
+            />
+            <Input
+              id="time"
+              name="time"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="pl-9 rounded-xl border-black/10 bg-neutral-50 focus-visible:ring-black/20 text-sm"
+            />
           </div>
+        </div>
 
-          {/* Preview */}
-          {date && time && (
-            <div className="p-4 bg-muted rounded-lg space-y-1">
-              <p className="text-sm font-medium">Lecture Preview:</p>
-              <p className="text-sm text-muted-foreground">
-                {formData.title || "Untitled Lecture"} -{" "}
-                {new Date(
-                  date.setHours(
-                    parseInt(time.split(":")[0]),
-                    parseInt(time.split(":")[1]),
-                  ),
-                ).toLocaleString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                  hour12: true,
-                })}
+        {/* Preview */}
+        {previewDateTime && (
+          <div className="flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-neutral-50 border border-black/8">
+            <Eye
+              className="w-3.5 h-3.5 text-neutral-400 shrink-0 mt-0.5"
+              strokeWidth={1.8}
+            />
+            <div>
+              <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">
+                Preview
+              </p>
+              <p className="text-xs font-semibold text-black leading-snug">
+                {formData.title || "Untitled Lecture"}
+              </p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">
+                {previewDateTime}
               </p>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isSubmitting || isPending}
-          >
-            {isSubmitting ? "Creating..." : "Create Lecture"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={isSubmitting || isPending}
+          className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-black text-white text-sm font-semibold border border-black hover:bg-black/80 active:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+        >
+          {isSubmitting || isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Creating…
+            </>
+          ) : (
+            "Schedule Lecture"
+          )}
+        </button>
+      </form>
+    </div>
   );
 };
 

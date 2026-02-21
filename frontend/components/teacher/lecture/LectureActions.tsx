@@ -1,7 +1,6 @@
 "use client";
 
 import { Eye, Pencil, Play, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
   Tooltip,
@@ -9,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import Modal from "../../common/Modal";
 import LectureViewCard from "./LectureViewCard";
 import LectureEditCard from "./LectureEditCard";
@@ -19,9 +17,11 @@ type ModalType = "VIEW" | "EDIT" | "CANCEL" | "START";
 
 const LectureActions = ({
   lectureId,
+  startingTime,
   status,
 }: {
   lectureId: string;
+  startingTime: string;
   status: "NOT_STARTED" | "STARTED" | "COMPLETED";
 }) => {
   const [modal, setModal] = useState(false);
@@ -32,89 +32,100 @@ const LectureActions = ({
       window.open(`/lecture/${lectureId}`, "_blank");
       return;
     }
-
     setModalType(type);
     setModal(true);
+  };
+
+  const canStartLecture = () => {
+    if (!startingTime) return false;
+    const now = new Date();
+    const start = new Date(startingTime);
+    const tenMinutesBefore = start.getTime() - 10 * 60 * 1000;
+    const twentyMinutesAfter = start.getTime() + 20 * 60 * 1000;
+    return (
+      now.getTime() >= tenMinutesBefore && now.getTime() <= twentyMinutesAfter
+    );
   };
 
   const renderModalCard = () => {
     switch (modalType) {
       case "VIEW":
         return <LectureViewCard lectureId={lectureId} />;
-
       case "EDIT":
         return <LectureEditCard lectureId={lectureId} />;
-
       case "CANCEL":
         return <CancelLectureCard lectureId={lectureId} />;
-
-      case "START":
-        return;
       default:
         return null;
     }
   };
 
+  const canStart = status === "NOT_STARTED" && canStartLecture();
+  const canCancel = status === "NOT_STARTED";
+
   return (
     <>
       <TooltipProvider>
-        <div className="flex gap-2 justify-center">
+        <div className="flex items-center justify-center gap-1">
           {/* VIEW */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="outline"
+              <button
                 onClick={() => openModal("VIEW")}
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150"
               >
-                <Eye size={16} />
-              </Button>
+                <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
+              </button>
             </TooltipTrigger>
-            <TooltipContent>View lecture</TooltipContent>
+            <TooltipContent className="text-xs">View lecture</TooltipContent>
           </Tooltip>
 
+          {/* START */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                disabled={status !== "NOT_STARTED"}
-                size="icon"
-                variant="ghost"
+              <button
                 onClick={() => openModal("START")}
+                disabled={!canStart}
+                className="w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed bg-black border-black text-white hover:bg-black/80 active:bg-black/90"
               >
-                <Play size={16} />
-              </Button>
+                <Play className="w-3.5 h-3.5" strokeWidth={1.8} />
+              </button>
             </TooltipTrigger>
-            <TooltipContent>Start lecture</TooltipContent>
+            <TooltipContent className="text-xs">
+              {!canStart && status === "NOT_STARTED"
+                ? "Available 10 min before start"
+                : status !== "NOT_STARTED"
+                  ? "Lecture already started or completed"
+                  : "Start lecture"}
+            </TooltipContent>
           </Tooltip>
 
           {/* EDIT */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="outline"
+              <button
                 onClick={() => openModal("EDIT")}
                 disabled
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <Pencil size={16} />
-              </Button>
+                <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
+              </button>
             </TooltipTrigger>
-            <TooltipContent>Edit lecture</TooltipContent>
+            <TooltipContent className="text-xs">Edit lecture</TooltipContent>
           </Tooltip>
 
           {/* CANCEL */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                disabled={status !== "NOT_STARTED"}
-                size="icon"
-                variant="destructive"
+              <button
                 onClick={() => openModal("CANCEL")}
+                disabled={!canCancel}
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-red-200 bg-red-50 text-red-400 hover:bg-red-500 hover:border-red-500 hover:text-white transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <X size={16} />
-              </Button>
+                <X className="w-3.5 h-3.5" strokeWidth={2} />
+              </button>
             </TooltipTrigger>
-            <TooltipContent>Cancel lecture</TooltipContent>
+            <TooltipContent className="text-xs">Cancel lecture</TooltipContent>
           </Tooltip>
         </div>
       </TooltipProvider>

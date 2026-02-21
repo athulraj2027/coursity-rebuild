@@ -58,6 +58,22 @@ const LectureServices = {
 
     if (lecture.status !== "NOT_STARTED")
       throw new AppError("Lecture can't be started again", 403);
+    const now = new Date();
+
+    if (lecture.startTime) {
+      const startTime = new Date(lecture.startTime);
+
+      const tenMinutesBefore = new Date(startTime.getTime() - 10 * 60 * 1000);
+      const twentyMinutesAfter = new Date(startTime.getTime() + 20 * 60 * 1000);
+
+      const canStart = now >= tenMinutesBefore && now <= twentyMinutesAfter;
+
+      if (!canStart)
+        throw new AppError(
+          "Lecture can only be started from 10 minutes before to 20 minutes after the scheduled time.",
+          403,
+        );
+    }
     return LectureRepositories.startLectureOwner(lecture.id);
   },
 

@@ -167,6 +167,7 @@ const MyLecturesPage = () => {
       cell: ({ row }) => (
         <LectureActions
           lectureId={row.original.id}
+          startingTime={row.original.startTime}
           status={row.original.status}
         />
       ),
@@ -195,7 +196,7 @@ const MyLecturesPage = () => {
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
           {/* Search */}
-          <div className="relative flex-1 min-w-[250px]">
+          <div className="relative flex-1 min-w-62.5">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
             <Input
               placeholder="Search lectures or courses..."
@@ -314,6 +315,13 @@ const MyLecturesPage = () => {
           lectures
         </p>
 
+        <div className="flex items-start gap-1 mb-4">
+          <span className="text-red-600 text-sm">*</span>
+          <p className="text-xs text-neutral-400 font-medium">
+            Lecture starting option will be enabled 10 minutes prior to the
+            scheduled time.
+          </p>
+        </div>
         {/* Table */}
         <div className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm">
           <DataTable columns={columns} data={processedData} />

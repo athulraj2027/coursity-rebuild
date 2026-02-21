@@ -106,9 +106,9 @@ const LectureCard = ({ lecture }: { lecture: any }) => {
           <Button
             variant="outline"
             className="w-full border-black/10 bg-white hover:bg-neutral-50 rounded-xl text-xs h-8 text-black"
-            onClick={() => window.open(`/lecture/${lecture.id}`, "_blank")}
+            // onClick={() => window.open(`/lecture/${lecture.id}`, "_blank")}
           >
-            View Recording
+            Completed
           </Button>
         )}
         {isUpcoming && (
