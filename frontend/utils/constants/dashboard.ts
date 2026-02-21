@@ -1,6 +1,7 @@
 import {
   ArrowRightLeft,
   Banknote,
+  BanknoteArrowUp,
   BookSearch,
   Group,
   LayoutDashboard,
@@ -36,4 +37,5 @@ export const ADMIN_LINKS = [
   { name: "Courses", url: "/courses", icon: Notebook },
   { name: "Lectures", url: "/lectures", icon: Group },
   { name: "Enrollments", url: "/enrollments", icon: Newspaper },
+  { name: "Payouts", url: "/payouts", icon: BanknoteArrowUp },
 ];

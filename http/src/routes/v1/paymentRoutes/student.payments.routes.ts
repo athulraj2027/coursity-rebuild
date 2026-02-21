@@ -5,6 +5,5 @@ const router = express.Router();
 
 router.post("/create-order", StudentPaymentController.createOrder);
 router.post("/verify-payment", StudentPaymentController.verifyOrder);
-router.get("/history", StudentPaymentController.getHistory);
 
 export default router;

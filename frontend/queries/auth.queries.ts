@@ -10,4 +10,4 @@ export const useMe = () =>
   });
 
 export const useMyDashboardQuery = () =>
-  useQuery({ queryKey: ["dashboard"], queryFn: dashboardApi });
+  useQuery({ queryKey: ["dashboard"], queryFn: dashboardApi, retry: false });

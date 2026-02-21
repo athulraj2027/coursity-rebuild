@@ -146,42 +146,59 @@ const DashboardRepository = {
     };
   },
   async getAdminDashboard() {
-    // User counts
-    const userStats = await prisma.user.groupBy({
+    // 1️⃣ User counts
+    const userCounts = await prisma.user.groupBy({
       by: ["role"],
       _count: { id: true },
     });
 
-    //  Course count
+    const totalUsers = userCounts.reduce((acc, u) => acc + u._count.id, 0);
+    const totalStudents =
+      userCounts.find((u) => u.role === "STUDENT")?._count.id || 0;
+    const totalTeachers =
+      userCounts.find((u) => u.role === "TEACHER")?._count.id || 0;
+
+    // 2️⃣ Courses
     const totalCourses = await prisma.course.count({
       where: { isDeleted: false },
     });
 
-    // Revenue
-    const revenue = await prisma.payment.aggregate({
+    // 3️⃣ Enrollments
+    const totalEnrollments = await prisma.enrollment.count();
+
+    // 4️⃣ Revenue (sum of PAID payments)
+    const revenueAggregate = await prisma.payment.aggregate({
       _sum: { amount: true },
       where: { status: "PAID" },
     });
+    const totalRevenueReceived = revenueAggregate._sum.amount || 0;
 
-    // Payment breakdown
-    const paymentBreakdown = await prisma.payment.groupBy({
+    // 5️⃣ Lectures by status
+    const lectureStats = await prisma.lecture.groupBy({
       by: ["status"],
       _count: { id: true },
+      where: { isDeleted: false },
     });
 
-    // Active lectures
-    const activeLectures = await prisma.lecture.count({
-      where: {
-        status: "STARTED",
-      },
-    });
+    const totalLectures = lectureStats.reduce((acc, l) => acc + l._count.id, 0);
+    const completedLectures =
+      lectureStats.find((l) => l.status === "COMPLETED")?._count.id || 0;
+    const scheduledLectures =
+      lectureStats.find((l) => l.status === "NOT_STARTED")?._count.id || 0;
+    const liveLectures =
+      lectureStats.find((l) => l.status === "STARTED")?._count.id || 0;
 
     return {
-      users: userStats,
+      totalUsers,
+      totalStudents,
+      totalTeachers,
       totalCourses,
-      totalRevenue: revenue._sum.amount || 0,
-      paymentBreakdown,
-      activeLectures,
+      totalEnrollments,
+      totalRevenueReceived,
+      totalLectures,
+      completedLectures,
+      scheduledLectures,
+      liveLectures,
     };
   },
 };

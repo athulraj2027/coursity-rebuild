@@ -56,30 +56,6 @@ const StudentPaymentController = {
       return res.status(500).json({ success: false, message: "Server error" });
     }
   },
-
-  getHistory: async (req: Request, res: Response) => {
-    const user = req.user;
-    // try {
-    //   const history = await PaymentServices.getHistory();
-    //   if (!history)
-    //     return res
-    //       .status(400)
-    //       .json({ success: false, message: "Couldnt fetch history" });
-
-    //   return res.status(200).json({ success: true, history });
-    // } catch (error: any) {
-    //   console.log(
-    //     `Failed to fetch enrolled courses for student ${req.user.id} : `,
-    //     error,
-    //   );
-    //   if (error.statusCode) {
-    //     return res
-    //       .status(error.statusCode)
-    //       .json({ success: false, message: error.message });
-    //   }
-    //   return res.status(500).json({ success: false, message: "Server error" });
-    // }
-  },
 };
 
 export default StudentPaymentController;
