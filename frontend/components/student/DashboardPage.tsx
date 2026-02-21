@@ -1,8 +1,8 @@
 "use client";
+
 import { useMyDashboardQuery } from "@/queries/auth.queries";
 import React from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BookOpen,
@@ -13,11 +13,15 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
+  PlayCircle,
+  CircleDot,
 } from "lucide-react";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 interface Lecture {
   id: string;
+  title: string;
+  startTime: string;
   status: string;
 }
 interface Course {
@@ -42,7 +46,7 @@ interface Enrollment {
 interface DashboardData {
   summary: { totalCourses: number; attendancePercent: number };
   enrollments: Enrollment[];
-  upcomingLectures: unknown[];
+  upcomingLectures: Lecture[];
 }
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -60,8 +64,40 @@ const formatDate = (iso: string) =>
     year: "numeric",
   });
 
+const formatDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
 const getCompleted = (lectures: Lecture[]) =>
   lectures.filter((l) => l.status === "COMPLETED").length;
+
+/* ─── Color Palette ───────────────────────────────────────────────────────── */
+const colors = {
+  violet: {
+    bg: "bg-violet-500",
+    light: "bg-violet-50",
+    border: "border-violet-200",
+    text: "text-violet-600",
+  },
+  emerald: {
+    bg: "bg-emerald-500",
+    light: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-600",
+  },
+  sky: {
+    bg: "bg-sky-500",
+    light: "bg-sky-50",
+    border: "border-sky-200",
+    text: "text-sky-600",
+  },
+};
+
+const accents = [colors.violet, colors.sky, colors.emerald];
 
 /* ─── Stat Card ───────────────────────────────────────────────────────────── */
 function StatCard({
@@ -69,28 +105,32 @@ function StatCard({
   label,
   value,
   sub,
+  color,
 }: {
   icon: React.ElementType;
   label: string;
   value: string | number;
   sub?: string;
+  color: typeof colors.violet;
 }) {
   return (
-    <Card className="relative overflow-hidden bg-white border border-black/10 shadow-sm hover:shadow-md transition-all duration-300">
-      <div className="absolute inset-0 bg-black/5" />
-      <CardContent className="relative p-5">
+    <Card
+      className={`relative overflow-hidden border ${color.border} bg-white shadow-sm hover:shadow-md transition-all duration-200`}
+    >
+      <div className={`absolute top-0 left-0 right-0 h-0.5 ${color.bg}`} />
+      <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium tracking-widest uppercase text-gray-600 mb-2">
+            <p className="text-[10px] font-semibold tracking-widest uppercase text-neutral-400 mb-2">
               {label}
             </p>
-            <p className="text-3xl font-bold text-black tracking-tight">
-              {value}
-            </p>
-            {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
+            <p className={`text-3xl font-bold ${color.text}`}>{value}</p>
+            {sub && <p className="text-xs text-neutral-400 mt-1">{sub}</p>}
           </div>
-          <div className="p-2.5 rounded-xl bg-black/10">
-            <Icon className="w-5 h-5 text-black" strokeWidth={1.5} />
+          <div
+            className={`w-9 h-9 rounded-lg ${color.bg} flex items-center justify-center`}
+          >
+            <Icon className="w-4 h-4 text-white" strokeWidth={1.8} />
           </div>
         </div>
       </CardContent>
@@ -99,109 +139,103 @@ function StatCard({
 }
 
 /* ─── Course Card ─────────────────────────────────────────────────────────── */
-function CourseCard({ enrollment }: { enrollment: Enrollment }) {
+function CourseCard({
+  enrollment,
+  index,
+}: {
+  enrollment: Enrollment;
+  index: number;
+}) {
+  const accent = accents[index % accents.length];
   const { course, payment, createdAt } = enrollment;
+
   const done = getCompleted(course.lectures);
   const total = course.lectures.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  const isPaid = payment.status === "PAID";
 
   return (
-    <Card className="group relative overflow-hidden bg-white border border-black/10 shadow-sm hover:shadow-lg transition-all duration-300">
-      <CardHeader className="pb-3 pt-5 px-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 min-w-0">
-            <div className="shrink-0 mt-0.5 w-9 h-9 rounded-lg bg-black/10 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-black" strokeWidth={1.5} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-gray-600 tracking-wide uppercase mb-0.5">
-                {course.teacher.name}
-              </p>
-              <h3 className="text-sm font-semibold text-black leading-snug line-clamp-2">
-                {course.title}
-              </h3>
-            </div>
+    <Card
+      className={`border ${accent.border} bg-white shadow-sm hover:shadow-md transition-all duration-200`}
+    >
+      <CardContent className="p-5 space-y-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+              {course.teacher.name}
+            </p>
+            <h3 className="text-sm font-semibold text-neutral-800 mt-1">
+              {course.title}
+            </h3>
+            <p className={`text-xs font-semibold mt-1 ${accent.text}`}>
+              {formatCurrency(payment.amount)}
+            </p>
           </div>
 
-          <Badge
-            className={`shrink-0 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border ${
-              isPaid
-                ? "bg-black text-white border-black"
-                : "bg-white text-black border-black"
+          <span
+            className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+              payment.status === "PAID"
+                ? `${accent.light} ${accent.text} ${accent.border}`
+                : "bg-neutral-100 text-neutral-400 border-neutral-200"
             }`}
           >
-            {isPaid ? (
-              <span className="flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Paid
-              </span>
-            ) : (
-              <span className="flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> Pending
-              </span>
-            )}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="px-5 pb-5 space-y-4">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">
-              Progress
-            </span>
-            <span className="text-[11px] font-semibold text-gray-700">
-              {total === 0 ? "No lectures yet" : `${done} / ${total} completed`}
-            </span>
-          </div>
-          <div className="h-1.5 rounded-full bg-black/10 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-black transition-all duration-700"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-          {total > 0 && (
-            <p className="text-right text-[10px] text-gray-500 mt-1">{pct}%</p>
-          )}
+            {payment.status}
+          </span>
         </div>
 
-        <div className="flex items-center justify-between pt-1 border-t border-black/10">
-          <div className="flex items-center gap-1.5 text-gray-600">
-            <CalendarCheck2 className="w-3.5 h-3.5" />
-            <span className="text-xs">{formatDate(createdAt)}</span>
+        {total > 0 && (
+          <div>
+            <div className="flex justify-between text-[11px] mb-1 text-neutral-500">
+              <span>Progress</span>
+              <span>
+                {done} / {total}
+              </span>
+            </div>
+            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${accent.bg}`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-1 text-black">
-            <IndianRupee className="w-3.5 h-3.5 text-gray-600" />
-            <span className="text-sm font-semibold">
-              {payment.amount.toLocaleString("en-IN")}
-            </span>
-          </div>
+        )}
+
+        <div className="flex justify-between text-xs text-neutral-500 pt-2 border-t">
+          <span>Enrolled {formatDate(createdAt)}</span>
         </div>
       </CardContent>
     </Card>
   );
 }
 
-/* ─── Loading Skeleton ────────────────────────────────────────────────────── */
-function DashboardSkeleton() {
+/* ─── Lecture Card ────────────────────────────────────────────────────────── */
+function LectureCard({ lecture }: { lecture: Lecture }) {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-2xl bg-black/5" />
-        ))}
-      </div>
-      <div className="space-y-3">
-        {[...Array(2)].map((_, i) => (
-          <Skeleton key={i} className="h-48 rounded-2xl bg-black/5" />
-        ))}
-      </div>
-    </div>
+    <Card className="border border-violet-200 bg-white shadow-sm hover:shadow-md transition-all duration-200">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <div className="flex items-center gap-1 mb-1">
+              <CircleDot className="w-3 h-3 text-violet-500" />
+              <span className="text-[10px] font-semibold text-neutral-400 uppercase">
+                Upcoming
+              </span>
+            </div>
+            <h3 className="text-sm font-semibold text-neutral-800">
+              {lecture.title}
+            </h3>
+            <p className="text-xs text-neutral-500 mt-1">
+              {formatDateTime(lecture.startTime)}
+            </p>
+          </div>
+          <PlayCircle className="w-5 h-5 text-violet-500" />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 /* ─── Main Page ───────────────────────────────────────────────────────────── */
-const DashboardPage = () => {
+export default function DashboardPage() {
   const { data, error, isLoading } = useMyDashboardQuery();
   const dashboard = data as DashboardData | undefined;
 
@@ -209,113 +243,92 @@ const DashboardPage = () => {
     dashboard?.enrollments.reduce((s, e) => s + e.payment.amount, 0) ?? 0;
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-black/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-black/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 max-w-3xl mx-auto px-4 py-10">
-        <div className="mb-8">
+    <div className="min-h-screen bg-slate-50 text-neutral-800">
+      <div className="max-w-3xl mx-auto px-4 py-10 space-y-7">
+        {/* Header */}
+        <div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md bg-black/10 flex items-center justify-center">
-              <GraduationCap className="w-3.5 h-3.5 text-black" />
+            <div className="w-6 h-6 rounded bg-violet-500 flex items-center justify-center">
+              <GraduationCap className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-xs font-semibold text-gray-600 tracking-widest uppercase">
+            <span className="text-[10px] font-bold text-violet-500 tracking-widest uppercase">
               Student Portal
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
             My Dashboard
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Track your learning progress and enrollments
+          <p className="text-sm text-neutral-400 mt-1">
+            Track your learning journey & progress
           </p>
         </div>
 
-        {isLoading && <DashboardSkeleton />}
+        {isLoading && <Skeleton className="h-40 w-full" />}
 
         {error && (
-          <Card className="bg-white border border-black shadow-sm">
-            <CardContent className="flex items-center gap-3 p-4">
-              <AlertCircle className="w-5 h-5 text-black shrink-0" />
-              <p className="text-sm text-black">
-                Failed to load dashboard. Please refresh the page.
-              </p>
+          <Card className="border border-rose-200 bg-rose-50">
+            <CardContent className="p-4 flex items-center gap-2 text-rose-600">
+              <AlertCircle className="w-4 h-4" />
+              Failed to load dashboard
             </CardContent>
           </Card>
         )}
 
         {dashboard && (
-          <div className="space-y-6">
+          <>
+            {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <StatCard
                 icon={BookOpen}
                 label="Courses"
                 value={dashboard.summary.totalCourses}
                 sub="Active enrollments"
+                color={colors.violet}
               />
               <StatCard
                 icon={TrendingUp}
                 label="Attendance"
                 value={`${dashboard.summary.attendancePercent}%`}
                 sub="Overall completion"
+                color={colors.sky}
               />
               <StatCard
                 icon={IndianRupee}
                 label="Total Spent"
                 value={formatCurrency(totalSpent)}
                 sub="Across all courses"
+                color={colors.emerald}
               />
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-widest">
-                  Enrolled Courses
-                </h2>
-                <div className="flex-1 h-px bg-black/10" />
-                <span className="text-xs text-gray-500">
-                  {dashboard.enrollments.length} total
-                </span>
-              </div>
-              <div className="space-y-3">
-                {dashboard.enrollments.map((enrollment) => (
-                  <CourseCard key={enrollment.id} enrollment={enrollment} />
-                ))}
-              </div>
+            {/* Enrollments */}
+            <div className="space-y-3">
+              <h2 className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                Enrolled Courses
+              </h2>
+              {dashboard.enrollments.map((enrollment, i) => (
+                <CourseCard
+                  key={enrollment.id}
+                  enrollment={enrollment}
+                  index={i}
+                />
+              ))}
             </div>
 
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-xs font-semibold text-gray-600 uppercase tracking-widest">
+            {/* Upcoming Lectures */}
+            {dashboard.upcomingLectures.length > 0 && (
+              <div className="space-y-2">
+                <h2 className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
                   Upcoming Lectures
                 </h2>
-                <div className="flex-1 h-px bg-black/10" />
+                {dashboard.upcomingLectures.map((lecture) => (
+                  <LectureCard key={lecture.id} lecture={lecture} />
+                ))}
               </div>
-              {dashboard.upcomingLectures.length === 0 && (
-                <Card className="bg-white border border-black/10 shadow-sm">
-                  <CardContent className="flex flex-col items-center justify-center py-10 gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-black/10 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-black" strokeWidth={1.5} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600">
-                        No upcoming lectures
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        Check back later for scheduled sessions
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>
   );
-};
-
-export default DashboardPage;
+}

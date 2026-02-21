@@ -44,9 +44,9 @@ type SortOption = {
 };
 
 const statusStyles: Record<string, string> = {
-  NOT_STARTED: "bg-neutral-100 text-neutral-500 border-neutral-200",
-  STARTED: "bg-black text-white border-black",
-  COMPLETED: "bg-neutral-900 text-neutral-300 border-neutral-700",
+  NOT_STARTED: "bg-slate-100 text-slate-700 border-slate-200",
+  STARTED: "bg-emerald-600 text-white border-emerald-600",
+  COMPLETED: "bg-indigo-600 text-white border-indigo-600",
 };
 
 const MyLecturesPage = () => {
@@ -185,7 +185,7 @@ const MyLecturesPage = () => {
           <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
             Teacher Portal
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-blue-500">
             My Lectures
           </h1>
           <p className="text-sm text-neutral-400 font-medium mt-1">

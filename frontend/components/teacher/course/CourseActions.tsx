@@ -57,9 +57,7 @@ const CourseActions = ({ courseId }: Props) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
                 <UserX className="w-3.5 h-3.5" strokeWidth={1.8} />
               </button>
             </TooltipTrigger>
@@ -87,7 +85,7 @@ const CourseActions = ({ courseId }: Props) => {
             <TooltipTrigger asChild>
               <button
                 onClick={() => openModal("ADD_LECTURE")}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black bg-black text-white hover:bg-black/80 active:bg-black/90 transition-all duration-150"
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black bg-blue-500 text-white hover:bg-black-700 active:bg-blue-800 transition-all duration-150"
               >
                 <Plus className="w-3.5 h-3.5" strokeWidth={2} />
               </button>

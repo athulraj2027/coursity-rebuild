@@ -86,7 +86,7 @@ const LectureActions = ({
               <button
                 onClick={() => openModal("START")}
                 disabled={!canStart}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed bg-black border-black text-white hover:bg-black/80 active:bg-black/90"
+                className="w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed bg-blue-500 border-black text-white hover:bg-blue-400 active:bg-blue-500"
               >
                 <Play className="w-3.5 h-3.5" strokeWidth={1.8} />
               </button>

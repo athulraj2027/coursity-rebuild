@@ -28,8 +28,8 @@ type SortOption = "date-asc" | "date-desc" | "status";
 const ITEMS_PER_PAGE = 6;
 
 const statusStyles: Record<string, string> = {
-  STARTED: "bg-black text-white border-black",
-  NOT_STARTED: "bg-neutral-100 text-neutral-500 border-neutral-200",
+  STARTED: "bg-red-500 text-white border-black",
+  NOT_STARTED: "bg-green-500 text-neutral-500 border-green-500",
   COMPLETED: "bg-neutral-900 text-neutral-300 border-neutral-700",
 };
 
@@ -60,7 +60,7 @@ const LectureCard = ({ lecture }: { lecture: any }) => {
 
         {/* Title + Badge row */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm font-semibold text-black leading-snug line-clamp-2 flex-1">
+          <h3 className="text-sm font-semibold text-green-400 leading-snug line-clamp-2 flex-1">
             {lecture.title}
           </h3>
           <span
@@ -203,7 +203,7 @@ export default function LecturesPage() {
           </p>
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-green-400">
                 My Lectures
               </h1>
               <p className="text-sm text-neutral-400 font-medium mt-1">

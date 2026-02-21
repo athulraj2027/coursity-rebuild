@@ -260,7 +260,6 @@ const MyCoursesPage = () => {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Subtle grid background */}
-     
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-10">
         {/* Header */}
@@ -268,7 +267,7 @@ const MyCoursesPage = () => {
           <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
             Teacher Portal
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-blue-500">
             My Courses
           </h1>
           <p className="text-sm text-neutral-400 font-medium mt-1">
@@ -294,7 +293,7 @@ const MyCoursesPage = () => {
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-3 mb-4">
               {/* Search */}
-              <div className="relative flex-1 min-w-[250px]">
+              <div className="relative flex-1 min-w-62.5">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
                 <Input
                   placeholder="Search courses..."
@@ -472,7 +471,7 @@ const MyCoursesPage = () => {
               {/* New Course */}
               <Button
                 onClick={() => setModal(true)}
-                className="bg-black text-white hover:bg-black/80 rounded-xl gap-2"
+                className="bg-blue-500 text-white hover:bg-blue-700 rounded-xl gap-2"
               >
                 New Course <Plus className="w-4 h-4" />
               </Button>

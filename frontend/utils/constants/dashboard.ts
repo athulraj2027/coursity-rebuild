@@ -1,11 +1,12 @@
 import {
+  ArrowRightLeft,
+  Banknote,
   BookSearch,
   Group,
-  IndianRupee,
   LayoutDashboard,
   Newspaper,
   Notebook,
-  Pen,
+  // Pen,
   User,
   // User2,
   User2Icon,
@@ -15,7 +16,7 @@ export const TEACHER_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "My Courses", url: "/my-courses", icon: Notebook },
   { name: "My Lectures", url: "/my-lectures", icon: Group },
-  { name: "Payouts", url: "/payouts", icon: IndianRupee },
+  { name: "Payouts", url: "/payouts", icon: Banknote },
   { name: "Profile", url: "/profile", icon: User },
 ];
 
@@ -24,8 +25,8 @@ export const STUDENT_LINKS = [
   { name: "Explore Courses", url: "/courses", icon: Notebook },
   { name: "Enrolled Courses", url: "/enrolled-courses", icon: BookSearch },
   { name: "Lectures", url: "/lectures", icon: Group },
-  { name: "Homeworks", url: "/homeworks", icon: Pen },
-  { name: "Purchase History", url: "/history", icon: Group },
+  // { name: "Homeworks", url: "/homeworks", icon: Pen },
+  { name: "Transactions", url: "/transactions", icon: ArrowRightLeft },
   { name: "Profile", url: "/profile", icon: User },
 ];
 export const ADMIN_LINKS = [

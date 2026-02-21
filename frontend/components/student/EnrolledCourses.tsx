@@ -155,7 +155,7 @@ const CourseCard = ({ course }: { course: Course }) => {
       <div className="px-4 pb-4">
         <Button
           onClick={() => router.push(`/student/course/${course.id}`)}
-          className="w-full bg-black text-white hover:bg-black/80 rounded-xl text-xs h-8"
+          className="w-full bg-green-500 text-white hover:bg-green-400 rounded-xl text-xs h-8"
         >
           Open Course
         </Button>
@@ -281,7 +281,7 @@ const EnrolledCourses = () => {
           </p>
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-black">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-green-400">
                 My Courses
               </h1>
               <p className="text-sm text-neutral-400 font-medium mt-1">
