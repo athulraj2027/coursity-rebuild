@@ -8,6 +8,7 @@ const WalletController = {
     try {
       const walletTransactionsWithBalance =
         await WalletServices.getWalletTransactionsWithBalance(user);
+      console.log("wallet transactions : ", walletTransactionsWithBalance);
       return res
         .status(200)
         .json({ success: true, walletTransactionsWithBalance });

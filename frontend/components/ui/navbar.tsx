@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -15,8 +14,9 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Menu, Zap, ArrowRight } from "lucide-react";
 
-// Types
+/* ─── Types ───────────────────────────────────────────────────────────────── */
 export interface NavbarNavLink {
   href: string;
   label: string;
@@ -35,7 +35,6 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
   onCtaClick?: () => void;
 }
 
-// Default navigation links
 const defaultNavigationLinks: NavbarNavLink[] = [
   { href: "#", label: "Home", active: true },
   { href: "#features", label: "Features" },
@@ -43,17 +42,17 @@ const defaultNavigationLinks: NavbarNavLink[] = [
   { href: "#about", label: "About" },
 ];
 
+/* ─── Navbar ──────────────────────────────────────────────────────────────── */
 export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
   (
     {
       className,
-      logo = null,
-      logoHref = "#",
+      logoHref = "/",
       navigationLinks = defaultNavigationLinks,
       signInText = "Sign In",
-      signInHref = "#signin",
+      signInHref = "/sign-in",
       ctaText = "Get Started",
-      ctaHref = "#get-started",
+      ctaHref = "/sign-up",
       onSignInClick,
       onCtaClick,
       ...props
@@ -61,82 +60,79 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
     ref,
   ) => {
     const [isMobile, setIsMobile] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
 
+    // Scroll shadow
     useEffect(() => {
-      const checkWidth = () => {
-        if (containerRef.current) {
-          const width = containerRef.current.offsetWidth;
-          setIsMobile(width < 768); // 768px is md breakpoint
-        }
-      };
-
-      checkWidth();
-
-      const resizeObserver = new ResizeObserver(checkWidth);
-      if (containerRef.current) {
-        resizeObserver.observe(containerRef.current);
-      }
-
-      return () => {
-        resizeObserver.disconnect();
-      };
+      const onScroll = () => setScrolled(window.scrollY > 16);
+      window.addEventListener("scroll", onScroll);
+      return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // Combine refs
+    // Responsive
+    useEffect(() => {
+      const check = () => {
+        if (containerRef.current)
+          setIsMobile(containerRef.current.offsetWidth < 768);
+      };
+      check();
+      const ro = new ResizeObserver(check);
+      if (containerRef.current) ro.observe(containerRef.current);
+      return () => ro.disconnect();
+    }, []);
+
     const combinedRef = React.useCallback(
       (node: HTMLElement | null) => {
         containerRef.current = node;
-        if (typeof ref === "function") {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
       },
       [ref],
     );
 
     return (
       <header
+        ref={combinedRef}
         className={cn(
-          "sticky top-0 z-50 w-full  bg-background/10 backdrop-blur-md supports-backdrop-filter:bg-background/20 px-4 md:px-6 **:no-underline",
+          "fixed top-0 z-50 w-full px-4 md:px-6 transition-all duration-300",
+          scrolled
+            ? "bg-slate-950/80 backdrop-blur-xl border-b border-white/8 shadow-xl shadow-black/30"
+            : "bg-transparent",
           className,
         )}
-        ref={combinedRef}
         {...(props as any)}
       >
-        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
-          {/* Left side */}
-          <div className="flex items-center gap-2">
-            {/* Mobile menu trigger */}
+        <div className="container mx-auto flex h-16 max-w-5xl items-center justify-between gap-4">
+          {/* ── Left ── */}
+          <div className="flex items-center gap-6">
+            {/* Mobile hamburger */}
             {isMobile && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-                    size="icon"
-                    variant="ghost"
-                  >
-                    {/* icon */}
-                  </Button>
+                  <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/8 transition-all duration-150">
+                    <Menu className="w-4 h-4" />
+                  </button>
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-48 p-2">
+                <PopoverContent
+                  align="start"
+                  className="w-44 p-1.5 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl"
+                >
                   <NavigationMenu className="max-w-none">
-                    <NavigationMenuList className="flex-col items-start gap-1">
-                      {navigationLinks.map((link, index) => (
-                        <NavigationMenuItem className="w-full" key={index}>
-                          <button
-                            type="button"
+                    <NavigationMenuList className="flex-col items-start gap-0.5">
+                      {navigationLinks.map((link, i) => (
+                        <NavigationMenuItem className="w-full" key={i}>
+                          <Link
+                            href={link.href}
                             className={cn(
-                              "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer no-underline",
+                              "flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium transition-colors",
                               link.active
-                                ? "bg-accent text-accent-foreground"
-                                : "text-foreground/80",
+                                ? "bg-indigo-500/15 text-indigo-300"
+                                : "text-slate-400 hover:text-white hover:bg-white/5",
                             )}
-                            onClick={(e) => e.preventDefault()}
                           >
                             {link.label}
-                          </button>
+                          </Link>
                         </NavigationMenuItem>
                       ))}
                     </NavigationMenuList>
@@ -144,71 +140,49 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
                 </PopoverContent>
               </Popover>
             )}
-            {/* Main nav */}
-            <div className="flex items-center gap-6">
-              <Link href={`/`}>
-                <button
-                  type="button"
-                  className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
-                >
-                  <div className="text-2xl">{logo}</div>
-                  <span className="hidden font-extrabold text-xl sm:inline-block">
-                    Coursity
-                  </span>
-                </button>
-              </Link>
-              {/* Navigation menu */}
-              {!isMobile && (
-                <NavigationMenu className="flex">
-                  <NavigationMenuList className="gap-1">
-                    {navigationLinks.map((link, index) => (
-                      <NavigationMenuItem key={index}>
-                        <button
-                          type="button"
-                          className={cn(
-                            "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer no-underline",
-                            link.active
-                              ? "bg-accent text-accent-foreground"
-                              : "text-foreground/80 hover:text-foreground",
-                          )}
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          {link.label}
-                        </button>
-                      </NavigationMenuItem>
-                    ))}
-                  </NavigationMenuList>
-                </NavigationMenu>
-              )}
-            </div>
+
+            {/* Logo */}
+            <Link href={logoHref} className="flex items-center gap-2 group">
+              <span className="font-extrabold text-base text-white tracking-tight">
+                Coursity
+              </span>
+            </Link>
+
+            {/* Desktop nav links */}
+            {!isMobile && (
+              <NavigationMenu>
+                <NavigationMenuList className="gap-0.5">
+                  {navigationLinks.map((link, i) => (
+                    <NavigationMenuItem key={i}>
+                      <Link
+                        href={link.href}
+                        className={cn(
+                          "inline-flex items-center px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150",
+                          link.active
+                            ? "text-white bg-white/8"
+                            : "text-slate-400 hover:text-white hover:bg-white/5",
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    </NavigationMenuItem>
+                  ))}
+                </NavigationMenuList>
+              </NavigationMenu>
+            )}
           </div>
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            <Button
-              className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onSignInClick) {
-                  onSignInClick();
-                }
-              }}
-              size="sm"
-              variant="ghost"
-            >
-              {signInText}
-            </Button>
-            <Button
-              className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onCtaClick) {
-                  onCtaClick();
-                }
-              }}
-              size="sm"
-            >
-              {ctaText}
-            </Button>
+
+          {/* ── Right ── */}
+          <div className="flex items-center gap-2">
+            <Link href={ctaHref}>
+              <button
+                onClick={onCtaClick}
+                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold transition-all duration-150 shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/40"
+              >
+                {ctaText}
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
+              </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -217,12 +191,3 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
 );
 
 Navbar.displayName = "Navbar";
-
-// Demo
-export function Demo() {
-  return (
-    <div className="fixed inset-0">
-      <Navbar />
-    </div>
-  );
-}

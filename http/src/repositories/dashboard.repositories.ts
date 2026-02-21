@@ -1,8 +1,8 @@
 import { prisma } from "../lib/prisma.js";
 
 const DashboardRepository = {
-  
   async getTeacherDashboard(userId: string) {
+    console.log("user id : ", userId);
     // 1️⃣ Courses taught
     const courses = await prisma.course.findMany({
       where: {
@@ -72,6 +72,7 @@ const DashboardRepository = {
       upcomingLectures,
     };
   },
+
   async getStudentDashboard(userId: string) {
     // 1️⃣ Enrollments
     const enrollments = await prisma.enrollment.findMany({

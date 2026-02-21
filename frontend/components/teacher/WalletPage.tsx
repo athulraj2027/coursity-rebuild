@@ -189,6 +189,43 @@ export default function WalletPage() {
   const wallet = (data as WalletData | undefined)
     ?.walletTransactionsWithBalance;
 
+  if (!wallet)
+    return (
+      <div className="min-h-screen bg-blue-50/40">
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center">
+                <Wallet className="w-3.5 h-3.5 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-[10px] font-bold text-blue-500 tracking-widest uppercase">
+                My Wallet
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-blue-500">
+              Wallet & Earnings
+            </h1>
+            <p className="text-sm text-neutral-400 font-medium mt-1">
+              Your balance and full transaction history
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-center py-14 gap-2">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+              <IndianRupee
+                className="w-5 h-5 text-blue-300"
+                strokeWidth={1.5}
+              />
+            </div>
+            <p className="text-sm font-medium text-neutral-400">
+              No transactions yet. Money will be credited to your wallet when
+              students pay for your courses.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+
   const tableData: TransactionRow[] = useMemo(() => {
     if (!wallet?.transactions) return [];
     return wallet.transactions.map((tx) => ({

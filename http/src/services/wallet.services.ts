@@ -10,8 +10,7 @@ const WalletServices = {
     const { id } = user;
     const walletTransactionsWithBalance =
       await WalletRepository.getWalletTransactionsWithBalance(id);
-    if (!walletTransactionsWithBalance)
-      throw new AppError("No transactions found", 400);
+    if (!walletTransactionsWithBalance) return null;
 
     return walletTransactionsWithBalance;
   },

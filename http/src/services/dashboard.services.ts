@@ -3,8 +3,8 @@ import DashboardRepository from "../repositories/dashboard.repositories.js";
 import { AppError } from "../utils/AppError.js";
 
 const DashboardServices = {
-  getDashboard: async (user: { userId: string; role: Role }) => {
-    const { userId, role } = user;
+  getDashboard: async (user: { id: string; role: Role }) => {
+    const { id, role } = user;
     let dashboard;
 
     switch (role) {
@@ -13,11 +13,11 @@ const DashboardServices = {
         break;
 
       case "STUDENT":
-        dashboard = await DashboardRepository.getStudentDashboard(userId);
+        dashboard = await DashboardRepository.getStudentDashboard(id);
         break;
 
       case "TEACHER":
-        dashboard = await DashboardRepository.getTeacherDashboard(userId);
+        dashboard = await DashboardRepository.getTeacherDashboard(id);
         break;
 
       default:

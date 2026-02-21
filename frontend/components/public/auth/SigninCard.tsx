@@ -1,31 +1,47 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
 import Link from "next/link";
 import SigninForm from "./SigninForm";
 
 const SigninCard = () => {
   return (
-    <Card className="w-full max-w-sm bg-white/10 backdrop-blur rounded-sm">
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">Sign in</CardTitle>
-        <CardDescription>Enter your credentials to sign in</CardDescription>
+    <div className="w-full">
+      {/* Logo */}
 
-        <CardAction>
-          <Link href={`/sign-up`}>
-            <Button variant="link">Sign up</Button>
+      {/* Card */}
+      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-md p-7 shadow-2xl shadow-black/40">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              Sign in
+            </h1>
+            <p className="text-sm text-slate-400 font-medium mt-1">
+              Enter your credentials to sign in
+            </p>
+          </div>
+          <Link
+            href="/sign-up"
+            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors duration-150 mt-1 shrink-0"
+          >
+            Sign up
           </Link>
-        </CardAction>
-      </CardHeader>
-      <SigninForm />
-    </Card>
+        </div>
+
+        {/* Form */}
+        <SigninForm />
+
+        {/* Footer */}
+        <p className="text-center text-xs text-slate-500 mt-5 font-medium">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/sign-up"
+            className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors duration-150"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 };
 
