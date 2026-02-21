@@ -27,6 +27,7 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
     isEnrollmentOpen,
     teacher,
     _count,
+    isEnrolled,
   } = data;
 
   return (
@@ -136,7 +137,10 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
 
           {/* Enroll Button */}
           <div className="pt-4">
-            <EnrollBtn courseId={courseId} />
+            <EnrollBtn
+              courseId={courseId}
+              disabled={isEnrolled || !isEnrollmentOpen}
+            />
           </div>
         </CardContent>
       </Card>

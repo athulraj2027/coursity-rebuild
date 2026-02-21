@@ -81,6 +81,7 @@ const CourseRepositories = {
       },
     });
   },
+
   // Full single course view
   async findByIdInternal(courseId: string) {
     return prisma.course.findUnique({
@@ -94,8 +95,8 @@ const CourseRepositories = {
   },
 
   // Public single course view
-  async findByIdPublic(courseId: string) {
-    return prisma.course.findUnique({
+  async findByIdPublic(courseId: string, studentId?: string) {
+    const course = await prisma.course.findUnique({
       where: {
         id: courseId,
         isDeleted: false,
@@ -126,9 +127,29 @@ const CourseRepositories = {
             },
           },
         },
+
+        enrollments: studentId
+          ? {
+              where: {
+                studentId: studentId,
+              },
+              select: {
+                id: true,
+              },
+            }
+          : false,
       },
     });
+
+    if (!course) return null;
+
+    return {
+      ...course,
+      isEnrolled: studentId ? course.enrollments.length > 0 : false,
+      enrollments: undefined, // hide internal data
+    };
   },
+  
   // Fetching teacher's courses
   async findByIdInternalOwnerView(courseId: string, teacherId: string) {
     return prisma.course.findFirst({

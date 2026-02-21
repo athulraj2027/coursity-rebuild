@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import PaymentServices from "../../services/payment.services.js";
-import EnrollmentServices from "../../services/enrollment.services.js";
 
 const StudentPaymentController = {
   createOrder: async (req: Request, res: Response) => {
@@ -40,26 +39,13 @@ const StudentPaymentController = {
     console.log("req body : ", req.body);
 
     try {
-      const verifiedOrder = await PaymentServices.verifyOrder(
-        req.body,
-        req.user,
-      );
-      if (!verifiedOrder.success || !verifiedOrder.paymentId)
-        return res
-          .status(400)
-          .json({ success: false, message: "Couldn't verify order" });
+      const completeEnrollment =
+        await PaymentServices.completeEnrollmentAfterPayment(
+          req.body,
+          req.user,
+        );
 
-      const enroll = await EnrollmentServices.enrollCourse({
-        paymentId: verifiedOrder.paymentId,
-        courseId: req.body.courseId,
-        user,
-      });
-
-      console.log(enroll);
-
-      // add wallet money for teacher
-
-      return res.status(200).json({ success: true, enroll });
+      return res.status(200).json(completeEnrollment);
     } catch (error: any) {
       console.log(`Failed to enroll student ${req.user.id} : `, error);
       if (error.statusCode) {

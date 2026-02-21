@@ -1,52 +1,83 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from "../ui/button";
 import { loadRazorpay } from "@/hooks/useRazorpay";
 import { createOrderApi, verifyPaymentApi } from "@/services/payment.services";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import Loading from "../common/Loading";
+import { Loader2, CreditCard, CheckCircle } from "lucide-react";
+import EnrollmentSuccess from "./EnrollmentSuccess";
 
-const EnrollBtn = ({ courseId }: { courseId: string }) => {
+const EnrollBtn = ({
+  courseId,
+  disabled,
+}: {
+  courseId: string;
+  disabled: boolean;
+}) => {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
+
+  // ✅ Show success component inline once payment is done
+  if (enrollmentId) {
+    return <EnrollmentSuccess enrollmentId={enrollmentId} />;
+  }
+
   const handleEnroll = async () => {
     try {
       const loaded = await loadRazorpay();
-      if (!loaded) return alert("Razorpay SDK failed");
+      if (!loaded) {
+        toast.error("Razorpay SDK failed to load");
+        return;
+      }
 
       setLoading(true);
       const { res } = await createOrderApi(courseId);
-      setLoading(false);
-      //   console.log("type of amount", typeof res.amount);
-      //return order_amount, currency, order_id
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
         amount: res.amount,
         currency: res.currency,
         order_id: res.orderId,
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         handler: async function (response: any) {
-          await verifyPaymentApi({
-            ...response,
-            courseId,
-          });
-
+          const data: any = await verifyPaymentApi({ ...response, courseId });
           toast.success("Enrolled successfully 🎉");
-          router.push(`/student/payment-success`);
+          setEnrollmentId(data.enrollment_id); // ← triggers inline success view
         },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || "Payment failed");
+    } finally {
+      setLoading(false);
     }
   };
-  //   if (loading) return null;
-  return <Button onClick={handleEnroll}>Enroll Now</Button>;
+
+  return (
+    <button
+      onClick={handleEnroll}
+      disabled={disabled || loading}
+      className="flex items-center justify-center gap-2 h-10 px-6 rounded-xl text-sm font-semibold border transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
+        bg-black text-white border-black hover:bg-black/80 active:bg-black/90"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Processing…
+        </>
+      ) : disabled ? (
+        <>
+          <CheckCircle className="w-4 h-4" strokeWidth={2} />
+          Already Enrolled
+        </>
+      ) : (
+        <>
+          <CreditCard className="w-4 h-4" strokeWidth={1.8} />
+          Enroll Now
+        </>
+      )}
+    </button>
+  );
 };
 
 export default EnrollBtn;

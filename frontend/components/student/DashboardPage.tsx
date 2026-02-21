@@ -6,12 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BookOpen,
-  CalendarCheck2,
   IndianRupee,
   TrendingUp,
   GraduationCap,
-  Clock,
-  CheckCircle2,
   AlertCircle,
   PlayCircle,
   CircleDot,

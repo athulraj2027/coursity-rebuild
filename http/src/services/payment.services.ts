@@ -4,6 +4,7 @@ import CourseRepositories from "../repositories/courses.repositories.js";
 import EnrollmentRepositories from "../repositories/enrollment.repositories.js";
 import PaymentRepositories from "../repositories/payments.repositories.js";
 import { AppError } from "../utils/AppError.js";
+import { prisma } from "../lib/prisma.js";
 
 export interface VerifyPaymentDto {
   razorpay_payment_id: string;
@@ -43,37 +44,128 @@ const PaymentServices = {
     return order;
   },
 
-  verifyOrder: async (
+  completeEnrollmentAfterPayment: async (
     data: VerifyPaymentDto,
     user: any,
-  ): Promise<{ success: boolean; paymentId?: string }> => {
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = data;
-
-    const payment =
-      await PaymentRepositories.findOrderByRazorpayOrderId(razorpay_order_id);
-
-    if (!payment) throw new AppError("Payment record not found", 400);
-    if (payment.status === "PAID") return { success: true };
-
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET!)
-      .update(body)
-      .digest("hex");
-
-    if (expectedSignature !== razorpay_signature) {
-      await PaymentRepositories.updatePaymentStatusToFailedById(payment.id);
-      throw new Error("Invalid payment signature");
-    }
-
-    await PaymentRepositories.updatePaymentSuccess(
+  ): Promise<{ success: boolean; enrollment_id?: string }> => {
+    const {
       razorpay_payment_id,
+      razorpay_order_id,
       razorpay_signature,
-      payment.id,
-    );
+      courseId,
+    } = data;
 
-    return { success: true, paymentId: payment.id };
+    return await prisma.$transaction(async (tx) => {
+      // 1️⃣ Find payment by Razorpay order ID
+      const payment = await tx.payment.findUnique({
+        where: { razorpayOrderId: razorpay_order_id },
+      });
+
+      if (!payment) {
+        throw new AppError("Payment record not found", 400);
+      }
+
+      // 2️⃣ If already paid, avoid double execution
+      if (payment.status === "PAID") {
+        return { success: true };
+      }
+
+      // 3️⃣ Verify Razorpay signature
+      const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+      const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_SECRET!)
+        .update(body)
+        .digest("hex");
+
+      if (expectedSignature !== razorpay_signature) {
+        await tx.payment.update({
+          where: { id: payment.id },
+          data: { status: "FAILED" },
+        });
+
+        throw new AppError("Invalid payment signature", 400);
+      }
+
+      // 4️⃣ Mark payment as PAID
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: "PAID",
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+        },
+      });
+
+      // 5️⃣ Prevent duplicate enrollment
+      const existingEnrollment = await tx.enrollment.findUnique({
+        where: {
+          studentId_courseId: {
+            studentId: user.id,
+            courseId,
+          },
+        },
+      });
+
+      if (existingEnrollment) {
+        return { success: true };
+      }
+
+      // 6️⃣ Create enrollment
+      const enrollment = await tx.enrollment.create({
+        data: {
+          studentId: user.id,
+          courseId,
+          paymentId: payment.id,
+        },
+      });
+
+      // 7️⃣ Get course + teacher
+      const course = await tx.course.findUnique({
+        where: { id: courseId },
+        select: {
+          teacherId: true,
+          price: true,
+        },
+      });
+
+      if (!course) {
+        throw new AppError("Course not found", 400);
+      }
+
+      // OPTIONAL: Platform fee logic
+      const teacherShare = course.price;
+
+      // 8️⃣ Upsert teacher wallet
+      const wallet = await tx.wallet.upsert({
+        where: { userId: course.teacherId },
+        update: {},
+        create: {
+          userId: course.teacherId,
+        },
+      });
+
+      // 9️⃣ Credit wallet balance
+      await tx.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          balance: { increment: teacherShare },
+        },
+      });
+
+      // 🔟 Create wallet transaction log
+      await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          amount: teacherShare,
+          type: "CREDIT",
+          description: "Revenue from course enrollment",
+          referenceId: payment.id,
+        },
+      });
+
+      return { success: true, enrollment_id: enrollment.id };
+    });
   },
 
   getHistory: async () => {},

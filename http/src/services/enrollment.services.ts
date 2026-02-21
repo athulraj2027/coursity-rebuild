@@ -15,9 +15,6 @@ const EnrollmentServices = {
     courseId: string,
   ) => {},
 
-  enrollCourse: async (data: any) =>
-    await EnrollmentRepositories.enrollToCourse(data),
-
   getEnrollmentDataById: async (id: string, userId: string) => {
     const enrollment = await EnrollmentRepositories.getEnrollmentById(
       id,

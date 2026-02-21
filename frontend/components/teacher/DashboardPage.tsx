@@ -182,7 +182,7 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
               <BookOpen className="w-4 h-4 text-white" strokeWidth={1.8} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-neutral-800 leading-snug line-clamp-2 break-words">
+              <h3 className="text-sm font-semibold text-neutral-800 leading-snug line-clamp-2 wrap-break-word">
                 {course.title}
               </h3>
               <p className={`text-xs font-semibold mt-0.5 ${accent.text}`}>

@@ -35,9 +35,46 @@ enum PaymentStatus {
   FAILED
 }
 
+enum WalletTransactionType {
+  CREDIT
+  DEBIT
+  REFUND
+  PURCHASE
+}
+
 //////////////////////
 // MODELS
 //////////////////////
+
+model Wallet {
+  id        String   @id @default(uuid())
+
+  userId    String   @unique
+  balance   Int      @default(0) // stored in paise
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  transactions WalletTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WalletTransaction {
+  id          String   @id @default(uuid())
+
+  walletId    String
+  amount      Int      // positive = credit, negative = debit
+  description String
+  referenceId String?  // link to payment / refund / etc
+  type        WalletTransactionType
+
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@index([walletId])
+}
 
 model User {
   id        String   @id @default(uuid())
@@ -45,6 +82,7 @@ model User {
   email     String   @unique
   password  String
   role      Role
+  wallet    Wallet?
 
   // Relations
   courses      Course[]      @relation("TeacherCourses")

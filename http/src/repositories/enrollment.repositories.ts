@@ -79,20 +79,6 @@ const EnrollmentRepositories = {
     });
   },
 
-  async enrollToCourse(params: {
-    paymentId: string;
-    courseId: string;
-    user: any;
-  }) {
-    return await prisma.enrollment.create({
-      data: {
-        studentId: params.user.id,
-        courseId: params.courseId,
-        paymentId: params.paymentId,
-      },
-    });
-  },
-
   async enrollmentDataById(id: string, userId: string) {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id, studentId: userId },
