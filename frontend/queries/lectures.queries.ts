@@ -1,4 +1,5 @@
 import {
+  getAllLectures,
   getLectureStatus,
   getMyLectureByIdForOwnerApi,
   getMyLecturesForOwnerApi,
@@ -23,3 +24,6 @@ export const useLectureStatusQuery = (lectureId: string) =>
     queryKey: ["lecture-status"],
     queryFn: () => getLectureStatus(lectureId),
   });
+
+export const useAllLecturesQuery = () =>
+  useQuery({ queryKey: ["lectures"], queryFn: getAllLectures });

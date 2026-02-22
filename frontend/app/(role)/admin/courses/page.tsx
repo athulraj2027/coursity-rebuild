@@ -1,3 +1,5 @@
+import AdminCourses from "@/components/admin/AdminCourses";
+
 export default function AdminCoursesPage() {
-  return;
+  return <AdminCourses />;
 }

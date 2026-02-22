@@ -29,3 +29,6 @@ export const joinLecture = async (lectureId: string) =>
 
 export const getLectureStatus = async (lectureId: string) =>
   apiRequest({ path: `/lectures/status/${lectureId}`, method: "GET" });
+
+export const getAllLectures = async () =>
+  apiRequest({ path: "/lectures", method: "GET" });

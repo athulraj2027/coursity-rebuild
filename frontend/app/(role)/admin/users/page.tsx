@@ -1,5 +1,5 @@
-import AdminTeachers from "@/components/admin/AdminTeachers";
+import AdminUsersPage from "@/components/admin/AdminUsers";
 
-export default function AdminTeachersPage() {
-  return <AdminTeachers />;
+export default function AdminUsers() {
+  return <AdminUsersPage />;
 }
