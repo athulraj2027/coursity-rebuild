@@ -12,7 +12,7 @@ import {
   ADMIN_LINKS,
   STUDENT_LINKS,
   TEACHER_LINKS,
-} from "@/utils/constants/dashboard";
+} from "@/constants/dashboard";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import React from "react";

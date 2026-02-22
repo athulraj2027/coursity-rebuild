@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PUBLIC_ROUTES } from "./utils/constants/routes";
+import { PUBLIC_ROUTES } from "./constants/routes";
 import { jwtDecode } from "jwt-decode";
 
 type JWTPayload = {

@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { areFieldsFilled } from "@/lib/handleFormChange";
-import { SIGNUP_FORM_REQUIRED_FIELDS } from "@/utils/constants/authForm";
+import { SIGNUP_FORM_REQUIRED_FIELDS } from "@/constants/authForm";
 import { Loader2, GraduationCap, BookOpen, ShieldCheck } from "lucide-react";
 
 /* ─── Dark input ──────────────────────────────────────────────────────────── */

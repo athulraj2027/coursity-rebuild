@@ -1,13 +1,12 @@
 import {
   ArrowRightLeft,
   Banknote,
-  BanknoteArrowUp,
   BookSearch,
   Group,
   LayoutDashboard,
-  Newspaper,
   Notebook,
   User,
+  Wallet,
 } from "lucide-react";
 
 export const TEACHER_LINKS = [
@@ -15,7 +14,7 @@ export const TEACHER_LINKS = [
   { name: "My Courses", url: "/my-courses", icon: Notebook },
   { name: "My Lectures", url: "/my-lectures", icon: Group },
   { name: "Wallet", url: "/wallet", icon: Banknote },
-  { name: "Profile", url: "/profile", icon: User },
+  // { name: "Profile", url: "/profile", icon: User },
 ];
 
 export const STUDENT_LINKS = [
@@ -25,13 +24,12 @@ export const STUDENT_LINKS = [
   { name: "Lectures", url: "/lectures", icon: Group },
   // { name: "Homeworks", url: "/homeworks", icon: Pen },
   { name: "Transactions", url: "/transactions", icon: ArrowRightLeft },
-  { name: "Profile", url: "/profile", icon: User },
+  // { name: "Profile", url: "/profile", icon: User },
 ];
 export const ADMIN_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
   { name: "Users", url: "/users", icon: User },
   { name: "Courses", url: "/courses", icon: Notebook },
   { name: "Lectures", url: "/lectures", icon: Group },
-  { name: "Enrollments", url: "/enrollments", icon: Newspaper },
-  { name: "Payouts", url: "/payouts", icon: BanknoteArrowUp },
+  { name: "Wallets", url: "/wallets", icon: Wallet },
 ];

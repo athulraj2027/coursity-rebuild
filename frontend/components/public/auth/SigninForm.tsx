@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { areFieldsFilled } from "@/lib/handleFormChange";
-import { SIGNIN_FORM_REQUIRED_FIELDS } from "@/utils/constants/authForm";
+import { SIGNIN_FORM_REQUIRED_FIELDS } from "@/constants/authForm";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { BookOpen, GraduationCap, Loader2, Sun } from "lucide-react";

@@ -7,13 +7,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <AppSidebar />
       <main className="w-full">
-        <SidebarTrigger />
-
-        <div className="">
-          {" "}
-          <MeLoader />
-          {children}
-        </div>
+        <MeLoader />
+        <SidebarTrigger className="absolute top-3 left-3 sm:left-35 z-50" />
+        {children}
       </main>
     </SidebarProvider>
   );
