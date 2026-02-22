@@ -2,7 +2,6 @@ import express from "express";
 import adminCourseRoutes from "./admin.course.routes.js";
 import teacherCourseRoutes from "./teacher.course.routes.js";
 import publicCourseRoutes from "./public.course.routes.js";
-import studentCourseRoutes from "./student.course.routes.js";
 import { roleMiddleware } from "../../../middlewares/role.middleware.js";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 
@@ -15,12 +14,7 @@ router.use(
   roleMiddleware("ADMIN"),
   adminCourseRoutes,
 );
-router.use(
-  "/student",
-  authMiddleware,
-  roleMiddleware("STUDENT"),
-  studentCourseRoutes,
-);
+
 router.use(
   "/teacher",
   authMiddleware,
