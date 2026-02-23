@@ -10,6 +10,7 @@ import {
   Wallet,
   IndianRupee,
   TrendingUp,
+  BanknoteArrowUpIcon,
 } from "lucide-react";
 
 import { DataTable } from "@/components/common/Table";
@@ -18,7 +19,7 @@ import Error from "@/components/common/Error";
 import { useMyWalletTransactionsQuery } from "@/queries/wallet.queries";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
-type TransactionType = "CREDIT" | "DEBIT" | "REFUND" | "PURCHASE";
+type TransactionType = "CREDIT" | "DEBIT" | "REFUND" | "PURCHASE" | "PAYOUT";
 
 interface Transaction {
   id: string;
@@ -93,6 +94,13 @@ const txConfig: Record<
     badge: "bg-blue-100 text-blue-700 border-blue-200",
     amount: "text-blue-600",
     label: "Purchase",
+    isPositive: false,
+  },
+  PAYOUT: {
+    icon: BanknoteArrowUpIcon,
+    badge: "bg-amber-100 text-amber-700 border-amber-200",
+    amount: "text-amber-600",
+    label: "Payout",
     isPositive: false,
   },
 };

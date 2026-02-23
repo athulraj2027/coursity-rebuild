@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Eye, Wallet, History } from "lucide-react";
 import {
   Tooltip,
@@ -6,8 +6,30 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PayoutCard from "../PayoutCard";
+import Modal from "@/components/common/Modal";
 
-const WalletActions = () => {
+type ModalType = "VIEW" | "PAY" | "ADD_LECTURE";
+
+const WalletActions = ({ userId }: { userId: string }) => {
+  const [modal, setModal] = useState(false);
+  const [modalType, setModalType] = useState<ModalType | null>(null);
+
+  const openModal = (type: ModalType) => {
+    setModalType(type);
+    setModal(true);
+  };
+
+  const renderModalCard = () => {
+    switch (modalType) {
+      case "PAY":
+        return (
+          <PayoutCard userId={userId} onClose={() => setModalType(null)} />
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <TooltipProvider>
       <div className="flex items-center justify-center gap-1">
@@ -29,7 +51,10 @@ const WalletActions = () => {
         {/* PAY NOW */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-emerald-200 bg-emerald-50 text-emerald-500 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white transition-all duration-150">
+            <button
+              onClick={() => openModal("PAY")}
+              className="w-8 h-8 rounded-lg flex items-center justify-center border border-emerald-200 bg-emerald-50 text-emerald-500 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white transition-all duration-150"
+            >
               <Wallet className="w-3.5 h-3.5" strokeWidth={1.8} />
             </button>
           </TooltipTrigger>
@@ -51,6 +76,7 @@ const WalletActions = () => {
           </TooltipContent>
         </Tooltip>
       </div>
+      {modal && modalType && renderModalCard()}
     </TooltipProvider>
   );
 };

@@ -214,7 +214,7 @@ const columns: ColumnDef<WalletTableRow>[] = [
   {
     accessorKey: "actions",
     header: "Actions",
-    cell: <WalletActions />,
+    cell: ({ row }) => <WalletActions userId={row.original.id} />,
   },
 ];
 

@@ -123,6 +123,55 @@ const WalletRepository = {
       },
     });
   },
+
+  getWalletByUserId: async (userId: string) =>
+    await prisma.wallet.findFirst({ where: { userId } }),
+
+  payUserWallet: async (
+    walletId: string,
+    amount: number,
+    adminUserId: string,
+    payoutProofUrl?: string,
+  ) => {
+    return await prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findUnique({
+        where: { id: walletId },
+      });
+
+      if (!wallet) {
+        throw new Error("Wallet not found");
+      }
+
+      if (wallet.balance < amount) {
+        throw new Error("Insufficient balance");
+      }
+
+      const newBalance = wallet.balance - amount;
+
+      // Create PAYOUT transaction
+      await tx.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          amount: -Math.abs(amount),
+          type: "PAYOUT",
+          description: "Teacher payout",
+          payoutProofUrl: payoutProofUrl || null,
+          processedById: adminUserId,
+          processedAt: new Date(),
+        },
+      });
+
+      // Update wallet balance
+      const updatedWallet = await tx.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          balance: newBalance,
+        },
+      });
+
+      return updatedWallet;
+    });
+  },
 };
 
 export default WalletRepository;

@@ -49,6 +49,34 @@ const WalletServices = {
       };
     });
   },
+
+  payUser: async (
+    adminUserId: string,
+    amount: number,
+    recipientUserId: string,
+    payoutProofUrl?: string,
+  ) => {
+    if (amount <= 0) {
+      throw new AppError("Invalid payout amount", 400);
+    }
+
+    const wallet = await WalletRepository.getWalletByUserId(recipientUserId);
+
+    if (!wallet) {
+      throw new AppError("No wallet found", 400);
+    }
+
+    if (wallet.balance < amount) {
+      throw new AppError("Insufficient wallet balance", 400);
+    }
+
+    return await WalletRepository.payUserWallet(
+      wallet.id,
+      amount,
+      adminUserId,
+      payoutProofUrl,
+    );
+  },
 };
 
 export default WalletServices;

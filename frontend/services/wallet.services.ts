@@ -5,3 +5,14 @@ export const getWalletDetails = async () =>
 
 export const getWalletsApiForAdmin = async () =>
   apiRequest({ path: `/wallet/all`, method: "GET" });
+
+export const verifyPayout = async (
+  imageUrl: string,
+  userId: string,
+  amount: number,
+) =>
+  apiRequest({
+    path: "/wallet/pay-user",
+    method: "POST",
+    body: { imageUrl, userId, amount },
+  });

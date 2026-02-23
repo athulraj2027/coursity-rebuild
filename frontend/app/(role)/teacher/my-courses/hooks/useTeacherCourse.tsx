@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback } from "react";
-
 import { createCourseApi } from "@/services/course.services";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 import { toast } from "sonner";
@@ -20,8 +19,6 @@ export const useCourse = () => {
       try {
         // uploadd image and get imageurl
         const imageUrl = await uploadToCloudinary(payload.image.file as File);
-        // console.log("image url : ", imageUrl);
-        // create course
         const res: any = await createCourseApi({
           title: payload.title,
           description: payload.description,

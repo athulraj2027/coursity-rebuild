@@ -44,6 +44,30 @@ const WalletController = {
       res.status(500).json({ success: false, message: error.message });
     }
   },
+
+  payUser: async (req: Request, res: Response) => {
+    try {
+      const { amount, userId, imageUrl } = req.body;
+
+      await WalletServices.payUser(
+        req.user.id, // admin ID
+        amount,
+        userId, // teacher ID
+        imageUrl,
+      );
+
+      return res.status(200).json({ success: true });
+    } catch (error: any) {
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 };
 
 export default WalletController;

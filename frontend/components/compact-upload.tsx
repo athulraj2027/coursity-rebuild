@@ -58,8 +58,6 @@ export default function FileUploadCompact({
     return type.startsWith("image/");
   };
 
-  
-
   return (
     <div className={cn("w-full max-w-lg", className)}>
       {/* Compact Upload Area */}
@@ -91,8 +89,9 @@ export default function FileUploadCompact({
         {/* File Previews */}
         <div className="flex flex-1 items-center gap-2">
           {files.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Drop files here or click to browse (max {maxFiles} files)
+            <p className="text-xs text-muted-foreground">
+              Drop files here
+              <br /> or click to browse (max {maxFiles} files)
             </p>
           ) : (
             files.map((fileItem) => (
