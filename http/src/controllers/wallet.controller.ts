@@ -25,6 +25,25 @@ const WalletController = {
       });
     }
   },
+
+  getAllWallets: async (req: Request, res: Response) => {
+    try {
+      const walletsData = await WalletServices.getAllWallets(req.user.id);
+      if (!walletsData)
+        return res
+          .status(400)
+          .json({ success: false, message: "Data not found" });
+      return res.status(200).json({ success: true, walletsData });
+    } catch (error: any) {
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      console.error(error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
 };
 
 export default WalletController;

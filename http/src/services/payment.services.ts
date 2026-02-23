@@ -133,8 +133,16 @@ const PaymentServices = {
         throw new AppError("Course not found", 400);
       }
 
-      // OPTIONAL: Platform fee logic
-      const teacherShare = course.price;
+      const teacherShare = Math.floor(course.price * 0.8);
+      const adminShare = course.price - teacherShare;
+
+      const adminUser = await tx.user.findFirst({
+        where: { role: "ADMIN" },
+      });
+
+      if (!adminUser) {
+        throw new AppError("Platform admin not configured", 500);
+      }
 
       // 8️⃣ Upsert teacher wallet
       const wallet = await tx.wallet.upsert({
@@ -153,6 +161,21 @@ const PaymentServices = {
         },
       });
 
+      const platformWallet = await tx.wallet.upsert({
+        where: { userId: adminUser.id },
+        update: {},
+        create: {
+          userId: adminUser.id,
+        },
+      });
+
+      await tx.wallet.update({
+        where: { id: platformWallet.id },
+        data: {
+          balance: { increment: adminShare },
+        },
+      });
+
       // 🔟 Create wallet transaction log
       await tx.walletTransaction.create({
         data: {
@@ -160,6 +183,16 @@ const PaymentServices = {
           amount: teacherShare,
           type: "CREDIT",
           description: "Revenue from course enrollment",
+          referenceId: payment.id,
+        },
+      });
+
+      await tx.walletTransaction.create({
+        data: {
+          walletId: platformWallet.id,
+          amount: adminShare,
+          type: "CREDIT",
+          description: "Platform commission from course sale",
           referenceId: payment.id,
         },
       });

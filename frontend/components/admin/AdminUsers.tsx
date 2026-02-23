@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useUsersQuery } from "@/queries/admin/users.queries";
 import React, { useMemo, useState } from "react";
@@ -144,7 +145,7 @@ const AdminUsersPage = () => {
           </p>
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-800">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-violet-600">
                 Users
               </h1>
               <p className="text-sm text-neutral-400 font-medium mt-1">

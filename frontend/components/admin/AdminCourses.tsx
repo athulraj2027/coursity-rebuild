@@ -365,8 +365,8 @@ const AdminCoursesPage = () => {
           <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
             Admin Portal
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-800">
-            All Courses
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-violet-600">
+            Courses
           </h1>
           <p className="text-sm text-neutral-400 font-medium mt-1">
             Browse and manage every course on the platform

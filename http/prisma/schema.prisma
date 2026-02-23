@@ -40,6 +40,7 @@ enum WalletTransactionType {
   DEBIT
   REFUND
   PURCHASE
+  PAYOUT
 }
 
 //////////////////////
@@ -68,6 +69,10 @@ model WalletTransaction {
   description String
   referenceId String?  // link to payment / refund / etc
   type        WalletTransactionType
+
+  payoutProofUrl String?   // screenshot proof
+  processedById  String?   // admin
+  processedAt    DateTime?
 
   wallet      Wallet   @relation(fields: [walletId], references: [id])
 

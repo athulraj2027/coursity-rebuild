@@ -3,7 +3,7 @@
 
 import React, { useMemo, useState } from "react";
 
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, Video, X } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import Loading from "../common/Loading";
@@ -52,9 +52,9 @@ type FilterOptions = {
 
 /* ─── Status config ───────────────────────────────────────────────────────── */
 const statusStyles: Record<LectureStatus, string> = {
-  NOT_STARTED: "bg-neutral-100 text-neutral-500 border-neutral-200",
+  NOT_STARTED: "bg-neutral-100 text-violet-600 border-neutral-200",
   STARTED: "bg-black text-white border-black",
-  COMPLETED: "bg-neutral-900 text-neutral-300 border-neutral-700",
+  COMPLETED: "bg-violet-600 text-white border-none",
 };
 
 const statusLabels: Record<LectureStatus, string> = {
@@ -284,8 +284,8 @@ const AdminLecturesPage = () => {
           <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
             Admin Portal
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-800">
-            All Lectures
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-violet-600">
+            Lectures
           </h1>
           <p className="text-sm text-neutral-400 font-medium mt-1">
             Monitor every lecture scheduled across the platform

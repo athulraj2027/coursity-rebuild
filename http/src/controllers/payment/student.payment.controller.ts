@@ -35,9 +35,6 @@ const StudentPaymentController = {
   },
 
   verifyOrder: async (req: Request, res: Response) => {
-    const user = req.user;
-    console.log("req body : ", req.body);
-
     try {
       const completeEnrollment =
         await PaymentServices.completeEnrollmentAfterPayment(

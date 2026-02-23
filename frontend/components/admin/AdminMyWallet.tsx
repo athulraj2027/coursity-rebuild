@@ -10,6 +10,8 @@ import {
   Wallet,
   IndianRupee,
   TrendingUp,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 
 import { DataTable } from "@/components/common/Table";
@@ -27,6 +29,9 @@ interface Transaction {
   description: string;
   referenceId: string | null;
   type: TransactionType;
+  payoutProofUrl: string | null;
+  processedById: string | null;
+  processedAt: string | null;
   createdAt: string;
 }
 
@@ -44,17 +49,35 @@ type TransactionRow = {
   type: TransactionType;
   amount: number;
   referenceId: string | null;
+  payoutProofUrl: string | null;
+  processedById: string | null;
+  processedAt: string | null;
   createdAt: string;
   rawCreatedAt: Date;
+  rawProcessedAt: Date | null;
 };
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
-const formatCurrency = (paise: number) =>
+const fmt = (n: number) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
-  }).format(paise);
+  }).format(n);
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+const fmtTime = (d: Date) =>
+  d.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 
 /* ─── Transaction config ──────────────────────────────────────────────────── */
 const txConfig: Record<
@@ -154,8 +177,59 @@ const columns: ColumnDef<TransactionRow>[] = [
       return (
         <span className={`text-sm font-bold ${config.amount}`}>
           {config.isPositive ? "+" : "−"}
-          {formatCurrency(Math.abs(row.original.amount))}
+          {fmt(Math.abs(row.original.amount))}
         </span>
+      );
+    },
+  },
+  {
+    id: "processedAt",
+    header: "Processed",
+    cell: ({ row }) => {
+      if (!row.original.rawProcessedAt) {
+        return (
+          <span className="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full border bg-amber-100 text-amber-600 border-amber-200 flex items-center gap-1 w-fit">
+            <Clock className="w-3 h-3" strokeWidth={2} />
+            Pending
+          </span>
+        );
+      }
+      return (
+        <div className="flex items-start gap-1.5">
+          <CheckCircle
+            className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5"
+            strokeWidth={2}
+          />
+          <div>
+            <p className="text-xs text-neutral-600 font-medium">
+              {fmtDate(row.original.rawProcessedAt)}
+            </p>
+            <p className="text-[11px] text-neutral-400">
+              {fmtTime(row.original.rawProcessedAt)}
+            </p>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    id: "payoutProofUrl",
+    header: "Proof",
+    cell: ({ row }) => {
+      if (!row.original.payoutProofUrl) {
+        return (
+          <span className="text-[10px] text-neutral-400 font-medium">—</span>
+        );
+      }
+      return (
+        <a
+          href={row.original.payoutProofUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] font-bold text-blue-600 underline underline-offset-2"
+        >
+          View Proof
+        </a>
       );
     },
   },
@@ -165,25 +239,17 @@ const columns: ColumnDef<TransactionRow>[] = [
     cell: ({ row }) => (
       <div>
         <p className="text-sm font-medium text-neutral-700">
-          {row.original.rawCreatedAt.toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          })}
+          {fmtDate(row.original.rawCreatedAt)}
         </p>
         <p className="text-[11px] text-neutral-400 mt-0.5">
-          {row.original.rawCreatedAt.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          })}
+          {fmtTime(row.original.rawCreatedAt)}
         </p>
       </div>
     ),
   },
 ];
 
-/* ─── Page Header (shared between states) ────────────────────────────────── */
+/* ─── Page Header ─────────────────────────────────────────────────────────── */
 function PageHeader() {
   return (
     <div className="mb-8">
@@ -192,27 +258,27 @@ function PageHeader() {
           <Wallet className="w-3.5 h-3.5 text-white" strokeWidth={2} />
         </div>
         <span className="text-[10px] font-bold text-blue-500 tracking-widest uppercase">
-          My Wallet
+          Admin Portal
         </span>
       </div>
       <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-blue-500">
-        Wallet & Earnings
+        Platform Wallet
       </h1>
       <p className="text-sm text-neutral-400 font-medium mt-1">
-        Your balance and full transaction history
+        Commission earnings and platform transaction history
       </p>
     </div>
   );
 }
 
 /* ─── Main Page ───────────────────────────────────────────────────────────── */
-export default function WalletPage() {
-  const { data, isLoading, error } = useMyWalletTransactionsQuery();
+const AdminMyWallet = () => {
+  const { data, error, isLoading } = useMyWalletTransactionsQuery();
 
   const wallet = (data as WalletData | undefined)
     ?.walletTransactionsWithBalance;
 
-  // ✅ ALL hooks before any early returns
+  /* ── All hooks first ── */
   const tableData: TransactionRow[] = useMemo(() => {
     if (!wallet?.transactions) return [];
     return wallet.transactions.map((tx) => ({
@@ -221,8 +287,12 @@ export default function WalletPage() {
       type: tx.type,
       amount: tx.amount,
       referenceId: tx.referenceId,
+      payoutProofUrl: tx.payoutProofUrl,
+      processedById: tx.processedById,
+      processedAt: tx.processedAt,
       createdAt: tx.createdAt,
       rawCreatedAt: new Date(tx.createdAt),
+      rawProcessedAt: tx.processedAt ? new Date(tx.processedAt) : null,
     }));
   }, [wallet]);
 
@@ -230,7 +300,7 @@ export default function WalletPage() {
     () =>
       wallet?.transactions
         .filter((tx) => tx.type === "CREDIT" || tx.type === "REFUND")
-        .reduce((sum, tx) => sum + tx.amount, 0) ?? 0,
+        .reduce((s, tx) => s + tx.amount, 0) ?? 0,
     [wallet],
   );
 
@@ -238,11 +308,16 @@ export default function WalletPage() {
     () =>
       wallet?.transactions
         .filter((tx) => tx.type === "DEBIT" || tx.type === "PURCHASE")
-        .reduce((sum, tx) => sum + Math.abs(tx.amount), 0) ?? 0,
+        .reduce((s, tx) => s + Math.abs(tx.amount), 0) ?? 0,
     [wallet],
   );
 
-  // ✅ Early returns only AFTER all hooks
+  const pendingCount = useMemo(
+    () => wallet?.transactions.filter((tx) => !tx.processedAt).length ?? 0,
+    [wallet],
+  );
+
+  /* ── Early returns after all hooks ── */
   if (isLoading) return <Loading />;
   if (error) return <Error />;
 
@@ -259,8 +334,8 @@ export default function WalletPage() {
               />
             </div>
             <p className="text-sm font-medium text-neutral-400 text-center max-w-sm">
-              No transactions yet. Money will be credited to your wallet when
-              students pay for your courses.
+              No transactions yet. Commission will be credited when students
+              enroll in courses.
             </p>
           </div>
         </div>
@@ -274,8 +349,9 @@ export default function WalletPage() {
         <PageHeader />
 
         {/* Balance + stat cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <div className="relative bg-blue-500 rounded-2xl p-5 overflow-hidden shadow-md shadow-blue-200">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {/* Balance */}
+          <div className="relative bg-blue-500 rounded-2xl p-5 overflow-hidden shadow-md shadow-blue-200 col-span-2 sm:col-span-1">
             <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10" />
             <div className="relative z-10">
               <div className="flex items-center gap-1.5 mb-1">
@@ -287,8 +363,8 @@ export default function WalletPage() {
                   Balance
                 </p>
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">
-                {formatCurrency(wallet.balance)}
+              <p className="text-2xl font-bold text-white tracking-tight">
+                {fmt(wallet.balance)}
               </p>
               <p className="text-xs text-blue-200 font-medium mt-1">
                 {wallet.transactions.length} transactions
@@ -296,7 +372,8 @@ export default function WalletPage() {
             </div>
           </div>
 
-          <div className="bg-white border border-emerald-200 rounded-2xl px-5 py-4 shadow-sm">
+          {/* Total In */}
+          <div className="bg-white border border-emerald-200 rounded-2xl px-4 py-4 shadow-sm">
             <div className="flex items-center gap-1.5 mb-2">
               <ArrowDownLeft
                 className="w-3.5 h-3.5 text-emerald-500"
@@ -306,12 +383,13 @@ export default function WalletPage() {
                 Total In
               </p>
             </div>
-            <p className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(totalCredit)}
+            <p className="text-xl font-bold text-emerald-600">
+              {fmt(totalCredit)}
             </p>
           </div>
 
-          <div className="bg-white border border-rose-200 rounded-2xl px-5 py-4 shadow-sm">
+          {/* Total Out */}
+          <div className="bg-white border border-rose-200 rounded-2xl px-4 py-4 shadow-sm">
             <div className="flex items-center gap-1.5 mb-2">
               <ArrowUpRight
                 className="w-3.5 h-3.5 text-rose-500"
@@ -321,8 +399,20 @@ export default function WalletPage() {
                 Total Out
               </p>
             </div>
-            <p className="text-2xl font-bold text-rose-600">
-              {formatCurrency(totalDebit)}
+            <p className="text-xl font-bold text-rose-600">{fmt(totalDebit)}</p>
+          </div>
+
+          {/* Pending */}
+          <div className="bg-white border border-amber-200 rounded-2xl px-4 py-4 shadow-sm">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Clock className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.8} />
+              <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                Pending
+              </p>
+            </div>
+            <p className="text-xl font-bold text-amber-600">{pendingCount}</p>
+            <p className="text-[10px] text-neutral-400 font-medium mt-0.5">
+              unprocessed
             </p>
           </div>
         </div>
@@ -358,4 +448,6 @@ export default function WalletPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminMyWallet;

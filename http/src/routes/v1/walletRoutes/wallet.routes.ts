@@ -5,7 +5,8 @@ const router = express.Router();
 
 router.get(
   "/",
-  roleMiddleware(["STUDENT", "TEACHER"]),
   walletController.getWalletTransactions,
 );
+
+router.get("/all", roleMiddleware("ADMIN"), walletController.getAllWallets);
 export default router;
