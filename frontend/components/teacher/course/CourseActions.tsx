@@ -9,7 +9,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Modal from "../../common/Modal";
-import CourseEditCard from "./CourseEditCard";
 import CreateLectureCard from "../lecture/CreateLectureCard";
 import Link from "next/link";
 
@@ -27,8 +26,6 @@ const CourseActions = ({ courseId }: Props) => {
 
   const renderModalCard = () => {
     switch (modalType) {
-      case "EDIT":
-        return <CourseEditCard courseId={courseId} />;
       case "ADD_LECTURE":
         return <CreateLectureCard courseId={courseId} setModal={setModal} />;
       default:
@@ -69,13 +66,11 @@ const CourseActions = ({ courseId }: Props) => {
           {/* EDIT */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => openModal("EDIT")}
-                disabled
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
-              </button>
+              <Link href={`/teacher/my-courses/${courseId}/edit`}>
+                <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
+                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
+                </button>
+              </Link>
             </TooltipTrigger>
             <TooltipContent className="text-xs">Edit course</TooltipContent>
           </Tooltip>

@@ -239,7 +239,13 @@ const MyCoursesPage = () => {
         header: "Price",
         cell: ({ getValue }) => {
           const price = getValue<number>();
-          return price === 0 ? "Free" : `₹${price.toLocaleString()}`;
+
+          if (price === 0) return "Free";
+
+          return `₹${(price / 100).toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`;
         },
       },
       { accessorKey: "students", header: "Students" },

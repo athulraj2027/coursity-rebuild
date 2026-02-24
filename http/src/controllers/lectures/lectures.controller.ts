@@ -96,12 +96,9 @@ const LectureController = {
           .json({ success: false, message: "Lecture not started" });
 
       // check whether already joined
-      const participant = await ParticipantService.upsertParticipant(
-        id as string,
-        user,
-      );
+      await ParticipantService.upsertParticipant(id as string, user);
 
-      return res.status(200).json(lecture);
+      return res.status(200).json({ success: true, lecture });
     } catch (error: any) {
       console.log("Failed to fetch lecture for student: ", error);
       if (error.statusCode) {

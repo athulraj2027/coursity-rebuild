@@ -97,7 +97,9 @@ const CourseCard = ({
               : "bg-white text-black border-black/15"
           }`}
         >
-          {course.price === 0 ? "Free" : `₹${course.price.toLocaleString()}`}
+          {course.price === 0
+            ? "Free"
+            : `₹${(course.price / 100).toLocaleString()}`}
         </span>
       </div>
 

@@ -38,7 +38,7 @@ export const useLectureSocket = (
       toast.warning("Lecture has ended");
 
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/lecture/completed";
       }, 1000);
     };
 

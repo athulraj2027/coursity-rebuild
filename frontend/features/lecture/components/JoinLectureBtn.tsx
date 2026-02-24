@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { joinLecture } from "@/services/lecture.services";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ const JoinLectureBtn = ({
     setIsLoading(true);
     try {
       const data: any = await joinLecture(lectureId);
+      console.log("data received : ", data);
 
       if (!data.success) {
         toast.error(data.message);

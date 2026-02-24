@@ -119,7 +119,7 @@ const CourseCard = ({ course }: { course: Course }) => {
         )}
 
         {/* Progress bar */}
-        <div className="mt-auto pt-2">
+        {/* <div className="mt-auto pt-2">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
               Progress
@@ -134,7 +134,7 @@ const CourseCard = ({ course }: { course: Course }) => {
               style={{ width: `${pct}%` }}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Meta footer */}
         <div className="flex items-center justify-between pt-2 border-t border-black/5">
@@ -144,9 +144,6 @@ const CourseCard = ({ course }: { course: Course }) => {
               month: "short",
               year: "numeric",
             })}
-          </span>
-          <span className="text-[11px] font-semibold text-black">
-            {course.price === 0 ? "Free" : `₹${course.price.toLocaleString()}`}
           </span>
         </div>
       </div>

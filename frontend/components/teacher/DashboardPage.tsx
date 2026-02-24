@@ -362,7 +362,7 @@ export default function DashboardPage() {
               <StatCard
                 icon={BarChart3}
                 label="Avg. Attendance"
-                value={`${dashboard.summary.avgAttendanceDuration}m`}
+                value={`${Math.round(dashboard.summary.avgAttendanceDuration / 60)}m`}
                 sub="Per lecture session"
                 color={colors.amber}
               />
