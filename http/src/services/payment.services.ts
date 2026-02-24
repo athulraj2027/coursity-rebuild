@@ -29,7 +29,7 @@ const PaymentServices = {
       throw new AppError("You have already enrolled to this course", 300);
 
     const order = await razorpay.orders.create({
-      amount: course.price * 100,
+      amount: course.price,
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     });
