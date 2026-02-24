@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { Menu, Zap, ArrowRight } from "lucide-react";
+import { Menu, ArrowRight } from "lucide-react";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 export interface NavbarNavLink {
@@ -177,7 +177,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             <Link href={ctaHref}>
               <button
                 onClick={onCtaClick}
-                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold transition-all duration-150 shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/40"
+                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-bold transition-all duration-150"
               >
                 {ctaText}
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />

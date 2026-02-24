@@ -29,10 +29,7 @@ const TeacherCourseController = {
   getMyCourseById: async (req: Request, res: Response) => {
     const id = req.params.id;
     try {
-      const course = await CourseServices.getCourseById(
-        id as string,
-        req.user,
-      );
+      const course = await CourseServices.getCourseById(id as string, req.user);
       if (!course)
         return res
           .status(400)
@@ -106,6 +103,36 @@ const TeacherCourseController = {
         });
       }
       return res.status(200).json(course);
+    } catch (error: any) {
+      console.log("Failed to update course : ", error);
+      if (error.statusCode) {
+        return res
+          .status(error.statusCode)
+          .json({ success: false, message: error.message });
+      }
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to update course" });
+    }
+  },
+
+  editCourse: async (req: Request, res: Response) => {
+    const user = req.user;
+    const { id } = req.params;
+    console.log("id : ", id);
+    console.log("req body : ", req.body);
+    try {
+      const updatedCourse = await CourseServices.editCourseById(
+        user.id,
+        id as string,
+        req.body,
+      );
+      if (!updatedCourse)
+        return res
+          .status(400)
+          .json({ success: false, message: "Updating course failed" });
+
+      return res.status(200).json({ success: true, updatedCourse });
     } catch (error: any) {
       console.log("Failed to update course : ", error);
       if (error.statusCode) {

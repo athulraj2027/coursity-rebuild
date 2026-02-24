@@ -37,7 +37,7 @@ const RoleOption = ({
     }`}
   >
     <RadioGroupItem value={value} id={id} className="sr-only" />
-    <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
+    {/* <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} /> */}
     <span className="text-xs font-semibold">{label}</span>
   </label>
 );
@@ -94,7 +94,7 @@ const SigninForm = () => {
           placeholder="m@example.com"
           name="email"
           required
-          className="bg-white/8 border-white/10 text-white placeholder:text-slate-600 rounded-xl focus-visible:ring-indigo-500/40 focus-visible:border-indigo-500/50"
+          className="bg-white/8 border-white/10 text-white placeholder:text-slate-600  focus-visible:ring-indigo-500/40 focus-visible:border-indigo-500/50"
         />
       </div>
 
@@ -144,7 +144,7 @@ const SigninForm = () => {
           type="password"
           name="password"
           required
-          className="bg-white/8 border-white/10 text-white placeholder:text-slate-600 rounded-xl focus-visible:ring-indigo-500/40 focus-visible:border-indigo-500/50"
+          className="bg-white/8 border-white/10 text-white placeholder:text-slate-600  focus-visible:ring-indigo-500/40 focus-visible:border-indigo-500/50"
         />
       </div>
 
@@ -167,7 +167,7 @@ const SigninForm = () => {
 
         <button
           type="button"
-          className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
+          className="w-full h-10 flex items-center justify-center gap-2 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path

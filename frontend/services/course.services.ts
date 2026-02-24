@@ -1,5 +1,13 @@
 import { apiRequest } from "@/lib/apiClient";
 
+interface EditCoursePayload {
+  title?: string;
+  description?: string;
+  price?: number; // already converted to paise
+  startDate?: Date;
+  imageUrl?: string;
+}
+
 export const createCourseApi = ({
   title,
   description,
@@ -19,6 +27,13 @@ export const createCourseApi = ({
     body: { title, description, imageUrl, price, startDate },
   });
 };
+
+export const editCourseApi = (id: string, payload: EditCoursePayload) =>
+  apiRequest({
+    path: `/courses/teacher/edit/${id}`,
+    method: "PUT",
+    body: payload,
+  });
 
 export const fetchAllCoursesForOwner = () =>
   apiRequest({ path: "/courses/teacher/my", method: "GET" });

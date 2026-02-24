@@ -1,4 +1,5 @@
 import CourseRepositories from "../repositories/courses.repositories.js";
+import { AppError } from "../utils/AppError.js";
 
 const CourseServices = {
   getCourses: async (user: any) => {
@@ -48,6 +49,27 @@ const CourseServices = {
       case "TEACHER":
         return CourseRepositories.patchCourseByOwner(courseId, user.id, data);
     }
+  },
+
+  editCourseById: async (
+    userId: string,
+    courseId: string,
+    requestBody: any,
+  ) => {
+    const course = await CourseRepositories.findByIdInternalOwnerView(
+      courseId,
+      userId,
+    );
+
+    if (!course)
+      throw new AppError("You are not authorized to edit this course", 403);
+    const updateCourse = await CourseRepositories.editCourse(
+      courseId,
+      requestBody,
+    );
+
+    if (!updateCourse) throw new AppError("Updation failed", 400);
+    return updateCourse;
   },
 };
 

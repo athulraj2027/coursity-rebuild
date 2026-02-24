@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback } from "react";
-import { createCourseApi } from "@/services/course.services";
+import { createCourseApi, editCourseApi } from "@/services/course.services";
 import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 import { toast } from "sonner";
 import { FileWithPreview } from "@/hooks/use-file-upload";
@@ -46,5 +46,49 @@ export const useCourse = () => {
     [queryClient],
   );
 
-  return { createCourse };
+  const editCourse = useCallback(
+    async (
+      courseId: string,
+      payload: {
+        title?: string;
+        description?: string;
+        price?: string;
+        startDate?: Date;
+        image?: FileWithPreview;
+      },
+    ) => {
+      try {
+        let imageUrl: string | undefined;
+
+        if (payload.image) {
+          imageUrl = await uploadToCloudinary(payload.image.file as File);
+        }
+
+        const updateData: any = {};
+
+        if (payload.title !== undefined) updateData.title = payload.title;
+        if (payload.description !== undefined)
+          updateData.description = payload.description;
+        if (payload.price !== undefined)
+          updateData.price = Math.round(Number(payload.price) * 100);
+        if (payload.startDate !== undefined)
+          updateData.startDate = payload.startDate;
+        if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+
+        const res = await editCourseApi(courseId, updateData);
+        queryClient.invalidateQueries({ queryKey: ["my-courses"] });
+        queryClient.invalidateQueries({ queryKey: ["course", courseId] });
+
+        toast.success("Course updated successfully");
+
+        return { success: true, data: res };
+      } catch (err: any) {
+        toast.error(err?.message || "Something went wrong");
+        return { success: false };
+      }
+    },
+    [queryClient],
+  );
+
+  return { createCourse, editCourse };
 };

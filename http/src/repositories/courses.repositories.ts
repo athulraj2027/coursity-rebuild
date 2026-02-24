@@ -14,7 +14,7 @@ const CourseRepositories = {
         title,
         description,
         imageUrl,
-        price: Number(priceString),
+        price: Number(priceString) * 100,
         startDate,
         teacherId: userId,
       },
@@ -149,28 +149,119 @@ const CourseRepositories = {
       enrollments: undefined, // hide internal data
     };
   },
-  
+
   // Fetching teacher's courses
   async findByIdInternalOwnerView(courseId: string, teacherId: string) {
-    return prisma.course.findFirst({
-      where: {
-        id: courseId,
-        teacherId: teacherId,
-      },
-      include: {
-        teacher: {
-          select: { id: true, name: true, email: true },
+    const [course, revenueAgg, paymentStatusAgg] = await Promise.all([
+      prisma.course.findFirst({
+        where: {
+          id: courseId,
+          teacherId: teacherId,
         },
-        lectures: true,
-        enrollments: {
-          include: {
-            student: {
-              select: { id: true, name: true, email: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          imageUrl: true,
+          price: true,
+          startDate: true,
+          isEnrollmentOpen: true,
+          isDisabled: true,
+          isDeleted: true,
+          createdAt: true,
+          updatedAt: true,
+
+          lectures: {
+            where: { isDeleted: false },
+            select: {
+              id: true,
+              title: true,
+              startTime: true,
+              status: true,
+              _count: {
+                select: {
+                  attendance: true,
+                  participants: true,
+                },
+              },
+            },
+          },
+
+          enrollments: {
+            take: 5, // preview only
+            orderBy: { createdAt: "desc" },
+            select: {
+              student: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+
+          _count: {
+            select: {
+              lectures: true,
+              enrollments: true,
+              payments: true,
             },
           },
         },
+      }),
+
+      // Revenue aggregation
+      prisma.payment.aggregate({
+        where: {
+          courseId,
+          status: "PAID",
+        },
+        _sum: {
+          amount: true,
+        },
+        _count: true,
+      }),
+
+      // Payment status breakdown
+      prisma.payment.groupBy({
+        by: ["status"],
+        where: { courseId },
+        _count: true,
+      }),
+    ]);
+
+    if (!course) return null;
+
+    return {
+      course: {
+        ...course,
+        formattedPrice: `₹${(course.price / 100).toFixed(2)}`,
       },
-    });
+
+      stats: {
+        totalLectures: course._count.lectures,
+        totalStudents: course._count.enrollments,
+        totalPayments: course._count.payments,
+        revenue: revenueAgg._sum.amount ?? 0,
+        formattedRevenue: `₹${((revenueAgg._sum.amount ?? 0) / 100).toFixed(2)}`,
+        paymentBreakdown: paymentStatusAgg,
+      },
+
+      lectureSummary: course.lectures.map((l) => ({
+        id: l.id,
+        title: l.title,
+        startTime: l.startTime,
+        status: l.status,
+        attendanceCount: l._count.attendance,
+        liveParticipantsCount: l._count.participants,
+      })),
+
+      enrollmentPreview: {
+        totalStudents: course._count.enrollments,
+        recentStudents: course.enrollments.map((e) => e.student),
+      },
+    };
   },
 
   // Fetching teacher's course with id
@@ -206,6 +297,28 @@ const CourseRepositories = {
     return prisma.course.update({
       where: { id: courseId, teacherId },
       data: safeUpdates,
+    });
+  },
+
+  async editCourse(courseId: string, requestBody: any) {
+    const updateData: any = {};
+
+    if (requestBody.title !== undefined) updateData.title = requestBody.title;
+
+    if (requestBody.description !== undefined)
+      updateData.description = requestBody.description;
+
+    if (requestBody.price !== undefined) updateData.price = requestBody.price; // already number (paise)
+
+    if (requestBody.imageUrl !== undefined)
+      updateData.imageUrl = requestBody.imageUrl;
+
+    if (requestBody.startDate !== undefined)
+      updateData.startDate = new Date(requestBody.startDate);
+
+    return prisma.course.update({
+      where: { id: courseId },
+      data: updateData,
     });
   },
 };

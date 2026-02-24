@@ -9,9 +9,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Modal from "../../common/Modal";
-import CourseViewCard from "./CourseViewCard";
 import CourseEditCard from "./CourseEditCard";
 import CreateLectureCard from "../lecture/CreateLectureCard";
+import Link from "next/link";
 
 type Props = { courseId: string };
 type ModalType = "VIEW" | "EDIT" | "ADD_LECTURE";
@@ -27,8 +27,6 @@ const CourseActions = ({ courseId }: Props) => {
 
   const renderModalCard = () => {
     switch (modalType) {
-      case "VIEW":
-        return <CourseViewCard courseId={courseId} />;
       case "EDIT":
         return <CourseEditCard courseId={courseId} />;
       case "ADD_LECTURE":
@@ -45,19 +43,21 @@ const CourseActions = ({ courseId }: Props) => {
           {/* VIEW */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => openModal("VIEW")}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150"
-              >
-                <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
-              </button>
+              <Link href={`/teacher/my-courses/${courseId}`}>
+                <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150">
+                  <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
+                </button>
+              </Link>
             </TooltipTrigger>
             <TooltipContent className="text-xs">View course</TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
+              <button
+                disabled
+                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
                 <UserX className="w-3.5 h-3.5" strokeWidth={1.8} />
               </button>
             </TooltipTrigger>

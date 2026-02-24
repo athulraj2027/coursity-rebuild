@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { areFieldsFilled } from "@/lib/handleFormChange";
 import { SIGNUP_FORM_REQUIRED_FIELDS } from "@/constants/authForm";
-import { Loader2, GraduationCap, BookOpen, ShieldCheck } from "lucide-react";
+import { Loader2, GraduationCap, BookOpen } from "lucide-react";
 
 /* ─── Dark input ──────────────────────────────────────────────────────────── */
 const DarkInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
@@ -132,7 +132,6 @@ const SignupForm = () => {
             icon={BookOpen}
             checked={selectedRole === "TEACHER"}
           />
-         
         </RadioGroup>
       </div>
 

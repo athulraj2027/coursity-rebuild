@@ -6,5 +6,6 @@ router.post("/", TeacherCourseController.createCourse);
 router.get("/my", TeacherCourseController.getMyCourses);
 router.get("/my/:id", TeacherCourseController.getMyCourseById);
 router.patch("/:id", TeacherCourseController.patchCourse);
+router.put("/edit/:id", TeacherCourseController.editCourse);
 
 export default router;
