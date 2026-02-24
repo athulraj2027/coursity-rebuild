@@ -53,8 +53,8 @@ const SigninForm = () => {
     setIsSubmitting(true);
     try {
       const data = await signinUser(new FormData(e.currentTarget));
-      if (data.success && data.res) {
-        router.replace(`/${data.res.role.toLowerCase()}`);
+      if (data.success) {
+        router.replace(`/${data.role.toLowerCase()}`);
       }
     } catch (error) {
       console.log("error : ", error);

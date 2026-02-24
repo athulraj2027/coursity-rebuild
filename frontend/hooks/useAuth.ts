@@ -6,6 +6,7 @@ import {
   signinApi,
   SigninResponse,
   signupApi,
+  SignupResponse,
 } from "@/services/auth.services";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -15,9 +16,7 @@ export const useAuth = () => {
   const signupUser = useCallback(
     async (
       formData: FormData,
-    ): Promise<
-      { success: true; res: SigninResponse["res"] } | { success: false }
-    > => {
+    ): Promise<SignupResponse | { success: false }> => {
       const rawData = {
         name: formData.get("name"),
         email: formData.get("email"),
@@ -50,7 +49,7 @@ export const useAuth = () => {
         await queryClient.invalidateQueries({ queryKey: ["me"] });
         console.log("res : ", res);
         toast.success("Account created successfully ");
-        return { success: true, res: res.res };
+        return res;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err.message);
@@ -64,9 +63,7 @@ export const useAuth = () => {
   const signinUser = useCallback(
     async (
       formData: FormData,
-    ): Promise<
-      { success: true; res: SigninResponse["res"] } | { success: false }
-    > => {
+    ): Promise<SigninResponse | { success: false }> => {
       const rawData = {
         email: formData.get("email"),
         role: formData.get("role"),
@@ -98,7 +95,7 @@ export const useAuth = () => {
 
         console.log("res : ", res);
         toast.success("Logged in successfully ");
-        return { success: true, res: res.res };
+        return res;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err.message);

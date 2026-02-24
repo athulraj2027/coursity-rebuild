@@ -5,9 +5,18 @@ type Role = "STUDENT" | "TEACHER" | "ADMIN";
 
 export interface SigninResponse {
   success: boolean;
-  res: {
-    role: Role;
-  };
+  id: string;
+  name: string;
+  role: Role;
+  email: string;
+}
+
+export interface SignupResponse {
+  success: boolean;
+  id: string;
+  name: string;
+  role: Role;
+  email: string;
 }
 
 export const signupApi = (data: {
@@ -16,7 +25,7 @@ export const signupApi = (data: {
   role: Role;
   password: string;
 }) =>
-  apiRequest<SigninResponse, typeof data>({
+  apiRequest<SignupResponse, typeof data>({
     path: "/auth/signup",
     method: "POST",
     body: data,
