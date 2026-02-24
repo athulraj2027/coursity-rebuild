@@ -299,21 +299,21 @@ npm start
          │  Express API     │    │  Socket.IO Server  │
          │  (Port 5000)     │    │   (Port 3001)      │
          │  - Auth          │    │  - Live Lectures   │
-         │  - Courses       │    │  - Real-time Data  │
+         │  - Courses       │<───│  - Real-time Data  │
          │  - Payments      │    │  - MediaSoup       │
          │  - Wallet        │    │  - Attendance      │
-         └────────┬─────────┘    └────────┬───────────┘
-                  │                       │
-                  └───────────┬───────────┘
-                              │
-                     ┌────────▼────────┐
-                     │  PostgreSQL DB  │
-                     │  - Users        │
-                     │  - Courses      │
-                     │  - Lectures     │
-                     │  - Payments     │
-                     │  - Wallets      │
-                     └─────────────────┘
+         └────────┬─────────┘    └────────────────────┘
+                  │                       
+                  └───┬
+                      │
+           ┌────────▼────────┐
+           │  PostgreSQL DB  │
+           │  - Users        │
+           │  - Courses      │
+           │  - Lectures     │
+           │  - Payments     │
+           │  - Wallets      │
+           └─────────────────┘
 ```
 
 ### Authentication Flow
