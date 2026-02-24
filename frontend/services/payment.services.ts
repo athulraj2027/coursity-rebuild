@@ -1,14 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiRequest } from "@/lib/apiClient";
 
-export const createOrderApi = async (courseId: string) =>
+export interface OrderData {
+  orderId: string;
+  amount: number;
+  currency: string;
+}
+
+export interface CreateOrderResponse {
+  success: boolean;
+  res: OrderData;
+}
+
+export interface VerifyPaymentResponse {
+  success: boolean;
+  enrollment_id: string;
+}
+
+export const createOrderApi = async (
+  courseId: string,
+): Promise<CreateOrderResponse> =>
   apiRequest({
     path: "/payment/student/create-order",
     method: "POST",
     body: { courseId },
   });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const verifyPaymentApi = async (body: any) =>
+
+export const verifyPaymentApi = async (
+  body: any,
+): Promise<VerifyPaymentResponse> =>
   apiRequest({
     path: "/payment/student/verify-payment",
     method: "POST",

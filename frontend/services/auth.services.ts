@@ -1,6 +1,14 @@
 import { apiRequest } from "@/lib/apiClient";
+import { UseMeResponse } from "@/queries/auth.queries";
 
 type Role = "STUDENT" | "TEACHER" | "ADMIN";
+
+export interface SigninResponse {
+  success: boolean;
+  res: {
+    role: Role;
+  };
+}
 
 export const signupApi = (data: {
   name: string;
@@ -8,7 +16,7 @@ export const signupApi = (data: {
   role: Role;
   password: string;
 }) =>
-  apiRequest({
+  apiRequest<SigninResponse, typeof data>({
     path: "/auth/signup",
     method: "POST",
     body: data,
@@ -19,7 +27,7 @@ export const signinApi = (data: {
   role: Role;
   password: string;
 }) =>
-  apiRequest({
+  apiRequest<SigninResponse, typeof data>({
     path: "/auth/signin",
     method: "POST",
     body: data,
@@ -31,8 +39,8 @@ export const logoutApi = () =>
     method: "POST",
   });
 
-export const meApi = () =>
-  apiRequest({
+export const meApi = (): Promise<UseMeResponse> =>
+  apiRequest<UseMeResponse>({
     path: "/auth/me",
   });
 

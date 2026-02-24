@@ -19,11 +19,13 @@ import React from "react";
 
 const Body = () => {
   const { data, isLoading } = useMe();
+
   const pathname = usePathname();
 
-  if (isLoading) return null;
+  if (isLoading || !data) return null;
+  const user = data.user;
 
-  const userRole: string = data.user.role;
+  const userRole = user.role;
   let links: { name: string; url: string; icon: any }[] = [];
 
   if (userRole === "STUDENT") links = STUDENT_LINKS;

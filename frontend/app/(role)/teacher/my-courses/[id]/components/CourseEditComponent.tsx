@@ -1,7 +1,7 @@
 "use client";
 import Error from "@/components/common/Error";
 import Loading from "@/components/common/Loading";
-import { useCourseByIdQueryPublic } from "@/queries/courses.queries";
+import { useMyCourseQueryById } from "@/queries/courses.queries";
 import React, { useEffect, useState } from "react";
 import { useCourse } from "../../hooks/useTeacherCourse";
 import {
@@ -60,7 +60,7 @@ const Field = ({
 /* ─── Main Component ──────────────────────────────────────────────────────── */
 const CourseEditComponent = ({ id }: { id: string }) => {
   const router = useRouter();
-  const { data, error, isLoading } = useCourseByIdQueryPublic(id);
+  const { data, error, isLoading } = useMyCourseQueryById(id);
   const { editCourse } = useCourse();
 
   const [title, setTitle] = useState("");

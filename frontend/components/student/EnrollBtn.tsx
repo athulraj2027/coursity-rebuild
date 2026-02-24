@@ -1,7 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { loadRazorpay } from "@/hooks/useRazorpay";
-import { createOrderApi, verifyPaymentApi } from "@/services/payment.services";
+import {
+  createOrderApi,
+  verifyPaymentApi,
+  VerifyPaymentResponse,
+} from "@/services/payment.services";
 import { toast } from "sonner";
 import { Loader2, CreditCard, CheckCircle } from "lucide-react";
 import EnrollmentSuccess from "./EnrollmentSuccess";
@@ -38,7 +42,10 @@ const EnrollBtn = ({
         currency: res.currency,
         order_id: res.orderId,
         handler: async function (response: any) {
-          const data: any = await verifyPaymentApi({ ...response, courseId });
+          const data: VerifyPaymentResponse = await verifyPaymentApi({
+            ...response,
+            courseId,
+          });
           toast.success("Enrolled successfully 🎉");
           setEnrollmentId(data.enrollment_id); // ← triggers inline success view
         },

@@ -19,7 +19,6 @@ const RoleOption = ({
   id,
   value,
   label,
-  icon: Icon,
   checked,
 }: {
   id: string;
@@ -41,11 +40,6 @@ const RoleOption = ({
     <span className="text-xs font-semibold">{label}</span>
   </label>
 );
-const roles = [
-  { value: "STUDENT", id: "student", label: "Student" },
-  { value: "TEACHER", id: "teacher", label: "Teacher" },
-  { value: "ADMIN", id: "admin", label: "Admin" },
-];
 
 const SigninForm = () => {
   const router = useRouter();
@@ -59,8 +53,8 @@ const SigninForm = () => {
     setIsSubmitting(true);
     try {
       const data = await signinUser(new FormData(e.currentTarget));
-      if (data?.success) {
-        router.replace(`/${data.res?.role.toLocaleLowerCase()}`);
+      if (data.success && data.res) {
+        router.replace(`/${data.res.role.toLowerCase()}`);
       }
     } catch (error) {
       console.log("error : ", error);

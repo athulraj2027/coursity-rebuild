@@ -34,6 +34,12 @@ type Course = {
   lectures?: Lecture[];
 };
 
+interface EnrolledCoursesData {
+  courses: {
+    course: Course; // matches your Course type
+  }[];
+}
+
 type SortOption =
   | "newest"
   | "oldest"
@@ -173,7 +179,8 @@ const EnrolledCourses = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const allCourses: Course[] = useMemo(
-    () => data?.courses.map((e: any) => e.course) ?? [],
+    () =>
+      (data as EnrolledCoursesData)?.courses.map((e: any) => e.course) ?? [],
     [data],
   );
 

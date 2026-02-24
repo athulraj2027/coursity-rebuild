@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllCoursesQueryPublic } from "@/queries/courses.queries";
+import { Course, useAllCoursesQueryPublic } from "@/queries/courses.queries";
 import React, { useMemo, useState } from "react";
 import Loading from "../common/Loading";
 import Error from "../common/Error";
@@ -26,18 +26,6 @@ import {
 } from "lucide-react";
 import Modal from "../common/Modal";
 import CourseDetailCard from "./CourseDetailCard";
-
-type Course = {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  price: number;
-  startDate: string;
-  teacher: { id: string; name: string };
-  _count: { enrollments: number };
-  createdAt: string;
-};
 
 type SortOption =
   | "newest"

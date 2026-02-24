@@ -8,8 +8,7 @@ import Error from "../common/Error";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
-import { Calendar, IndianRupee, GraduationCap, BookOpen } from "lucide-react";
-import { Button } from "../ui/button";
+import { BookOpen } from "lucide-react";
 import EnrollBtn from "./EnrollBtn";
 
 const CourseDetailCard = ({ courseId }: { courseId: string }) => {
@@ -40,7 +39,7 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
         {/* Hero Section */}
         <div className="relative h-72 w-full overflow-hidden">
           {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
+          <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-background to-primary/5" />
 
           {imageUrl ? (
             <img
@@ -88,7 +87,7 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
           {/* Price */}
           <div className="flex items-end gap-3">
             <div className="text-4xl font-bold text-primary">
-              {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
+              {price === 0 ? "Free" : `₹${(price / 100).toLocaleString()}`}
             </div>
             {price > 0 && (
               <span className="text-sm text-muted-foreground mb-1">
@@ -130,7 +129,7 @@ const CourseDetailCard = ({ courseId }: { courseId: string }) => {
                 Price
               </div>
               <div className="text-2xl font-bold text-primary mt-2">
-                {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
+                {price === 0 ? "Free" : `₹${(price / 100).toLocaleString()}`}
               </div>
             </div>
           </div>

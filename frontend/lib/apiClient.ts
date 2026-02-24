@@ -31,5 +31,5 @@ export async function apiRequest<TResponse, TBody = undefined>({
     throw new Error(message);
   }
 
-  return res.json();
+  return res.json() as Promise<TResponse>;
 }

@@ -1,14 +1,23 @@
 import { useCallback } from "react";
 import { loginSchema, registerSchema } from "@/validations/auth.schema";
 import { toast } from "sonner";
-import { logoutApi, signinApi, signupApi } from "@/services/auth.services";
+import {
+  logoutApi,
+  signinApi,
+  SigninResponse,
+  signupApi,
+} from "@/services/auth.services";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
   const signupUser = useCallback(
-    async (formData: FormData) => {
+    async (
+      formData: FormData,
+    ): Promise<
+      { success: true; res: SigninResponse["res"] } | { success: false }
+    > => {
       const rawData = {
         name: formData.get("name"),
         email: formData.get("email"),
@@ -23,13 +32,13 @@ export const useAuth = () => {
         if (firstError) {
           console.log(firstError);
           toast.error(firstError);
-          return;
+          return { success: false };
         }
       }
 
       const data = result.data;
       console.log("data : ", data);
-      if (!data) return;
+      if (!data) return { success: false };
 
       try {
         const res = await signupApi({
@@ -41,7 +50,7 @@ export const useAuth = () => {
         await queryClient.invalidateQueries({ queryKey: ["me"] });
         console.log("res : ", res);
         toast.success("Account created successfully ");
-        return { success: true, res };
+        return { success: true, res: res.res };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err.message);
@@ -53,7 +62,11 @@ export const useAuth = () => {
   );
 
   const signinUser = useCallback(
-    async (formData: FormData) => {
+    async (
+      formData: FormData,
+    ): Promise<
+      { success: true; res: SigninResponse["res"] } | { success: false }
+    > => {
       const rawData = {
         email: formData.get("email"),
         role: formData.get("role"),
@@ -67,12 +80,12 @@ export const useAuth = () => {
         if (firstError) {
           console.log(firstError);
           toast.error(firstError);
-          return;
+          return { success: false };
         }
       }
       const data = result.data;
       console.log("data : ", data);
-      if (!data) return;
+      if (!data) return { success: false };
 
       try {
         const res = await signinApi({
@@ -85,7 +98,7 @@ export const useAuth = () => {
 
         console.log("res : ", res);
         toast.success("Logged in successfully ");
-        return { success: true, res };
+        return { success: true, res: res.res };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err.message);

@@ -4,18 +4,21 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, Video, BookOpen, Users } from "lucide-react";
+import { Calendar, Clock, BookOpen, Users } from "lucide-react";
 import { useMyLectureQueryById } from "@/queries/lectures.queries";
 import Loading from "@/components/common/Loading";
 import Error from "@/components/common/Error";
 
 const statusColorMap: Record<
-  "NOT_STARTED" | "STARTED" | "COMPLETED",
-  "secondary" | "default" | "outline"
+  "NOT_STARTED" | "STARTED" | "COMPLETED" | "SCHEDULED" | "LIVE" | "CANCELLED",
+  "secondary" | "default" | "outline" | "ghost" | "destructive" | "secondary"
 > = {
   NOT_STARTED: "secondary",
   STARTED: "default",
   COMPLETED: "outline",
+  SCHEDULED: "ghost",
+  LIVE: "destructive",
+  CANCELLED: "secondary",
 };
 
 const LectureViewCard = ({ lectureId }: { lectureId: string }) => {
@@ -24,8 +27,7 @@ const LectureViewCard = ({ lectureId }: { lectureId: string }) => {
   if (isLoading) return <Loading />;
   if (error || !data) return <Error />;
 
-  const { title, startTime, status, meetingId, createdAt, course, attendance } =
-    data;
+  const { title, startTime, status, createdAt, course, attendance } = data;
 
   const formatDateTime = (date: string) =>
     new Date(date).toLocaleString("en-US", {

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { CheckCircle, Video, ArrowLeft, BookOpen, Star } from "lucide-react";
+import { CheckCircle, ArrowLeft, Star } from "lucide-react";
 import Link from "next/link";
 
 export default function LectureCompletedPage() {
