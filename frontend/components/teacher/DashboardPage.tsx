@@ -186,7 +186,7 @@ function CourseCard({ course, index }: { course: Course; index: number }) {
                 {course.title}
               </h3>
               <p className={`text-xs font-semibold mt-0.5 ${accent.text}`}>
-                {formatCurrency(course.price)}
+                {formatCurrency(course.price / 100)}
               </p>
             </div>
           </div>

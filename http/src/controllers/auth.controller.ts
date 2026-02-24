@@ -15,6 +15,7 @@ const AuthController = {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
       return res.status(201).json({
+        success: true,
         id: user.id,
         name: user.name,
         email: user.email,
@@ -43,6 +44,7 @@ const AuthController = {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
       return res.status(201).json({
+        success: true,
         id: user.id,
         name: user.name,
         email: user.email,
