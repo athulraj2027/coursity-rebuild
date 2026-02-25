@@ -207,11 +207,6 @@ const columns: ColumnDef<WalletTableRow>[] = [
     cell: ({ row }) => <DateCell d={row.original.rawLastTransaction} />,
   },
   {
-    id: "lastPayoutAt",
-    header: "Last Payout",
-    cell: ({ row }) => <DateCell d={row.original.rawLastPayout} />,
-  },
-  {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => <WalletActions userId={row.original.id} />,

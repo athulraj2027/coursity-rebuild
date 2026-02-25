@@ -355,7 +355,7 @@ export default function DashboardPage() {
               <StatCard
                 icon={IndianRupee}
                 label="Total Revenue"
-                value={formatCurrency(dashboard.summary.totalRevenue)}
+                value={formatCurrency(dashboard.summary.totalRevenue / 100)}
                 sub="All time earnings"
                 color={colors.emerald}
               />
