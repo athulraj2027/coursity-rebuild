@@ -75,7 +75,8 @@ const DashboardRepository = {
 
   async getStudentDashboard(userId: string) {
     // 1️⃣ Enrollments
-    const enrollments = await prisma.enrollment.findMany({
+    let enrollments = [];
+    enrollments = await prisma.enrollment.findMany({
       where: { studentId: userId },
       include: {
         course: {
@@ -145,6 +146,7 @@ const DashboardRepository = {
       upcomingLectures,
     };
   },
+
   async getAdminDashboard() {
     // 1️⃣ User counts
     const userCounts = await prisma.user.groupBy({
