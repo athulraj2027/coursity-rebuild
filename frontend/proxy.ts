@@ -10,7 +10,7 @@ type JWTPayload = {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("auth_token")?.value as string;
+  const token = request.cookies.get("auth_token")?.value ;
   console.log("token received : ", token);
 
   if (pathname.startsWith("/lecture")) {
