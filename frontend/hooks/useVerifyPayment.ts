@@ -13,7 +13,7 @@ export const useVerifyPayment = () => {
       try {
         const imageUrl = await uploadToCloudinary(image.file as File);
 
-        const res: any = await verifyPayout(imageUrl, userId, amount);
+        const res: any = await verifyPayout(imageUrl, userId, amount * 100);
         if (!res.success) {
           console.log(res.message);
           toast.error(res.message);

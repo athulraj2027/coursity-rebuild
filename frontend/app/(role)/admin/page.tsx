@@ -230,7 +230,7 @@ export default function AdminDashboardPage() {
                 <StatCard
                   icon={IndianRupee}
                   label="Revenue Received"
-                  value={formatCurrency(stats.totalRevenueReceived)}
+                  value={formatCurrency(stats.totalRevenueReceived / 100)}
                   sub="Total earnings collected"
                   iconBg="bg-amber-500"
                   topBar="bg-amber-500"

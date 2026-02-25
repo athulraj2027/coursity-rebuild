@@ -162,7 +162,7 @@ const columns: ColumnDef<TransactionRow>[] = [
       return (
         <span className={`text-sm font-bold ${config.amount}`}>
           {config.isPositive ? "+" : "−"}
-          {formatCurrency(Math.abs(row.original.amount))}
+          {formatCurrency(Math.abs(row.original.amount / 100))}
         </span>
       );
     },
@@ -296,7 +296,7 @@ export default function WalletPage() {
                 </p>
               </div>
               <p className="text-3xl font-bold text-white tracking-tight">
-                {formatCurrency(wallet.balance)}
+                {formatCurrency(wallet.balance / 100)}
               </p>
               <p className="text-xs text-blue-200 font-medium mt-1">
                 {wallet.transactions.length} transactions
@@ -315,7 +315,7 @@ export default function WalletPage() {
               </p>
             </div>
             <p className="text-2xl font-bold text-emerald-600">
-              {formatCurrency(totalCredit)}
+              {formatCurrency(totalCredit / 100)}
             </p>
           </div>
 
@@ -330,7 +330,7 @@ export default function WalletPage() {
               </p>
             </div>
             <p className="text-2xl font-bold text-rose-600">
-              {formatCurrency(totalDebit)}
+              {formatCurrency(totalDebit / 100)}
             </p>
           </div>
         </div>

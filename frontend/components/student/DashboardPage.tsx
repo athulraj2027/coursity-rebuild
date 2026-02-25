@@ -164,7 +164,7 @@ function CourseCard({
               {course.title}
             </h3>
             <p className={`text-xs font-semibold mt-1 ${accent.text}`}>
-              {formatCurrency(payment.amount)}
+              {formatCurrency(payment.amount / 100)}
             </p>
           </div>
 
@@ -292,7 +292,7 @@ export default function DashboardPage() {
               <StatCard
                 icon={IndianRupee}
                 label="Total Spent"
-                value={formatCurrency(totalSpent)}
+                value={formatCurrency(totalSpent/100)}
                 sub="Across all courses"
                 color={colors.emerald}
               />

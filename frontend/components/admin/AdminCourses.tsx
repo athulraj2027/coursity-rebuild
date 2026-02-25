@@ -107,7 +107,7 @@ const columns: ColumnDef<CourseTableRow>[] = [
       const price = getValue<number>();
       return (
         <span className="text-sm font-semibold text-black">
-          {price === 0 ? "Free" : `₹${price.toLocaleString("en-IN")}`}
+          {price === 0 ? "Free" : `₹${(price / 100).toLocaleString("en-IN")}`}
         </span>
       );
     },

@@ -160,7 +160,7 @@ const columns: ColumnDef<WalletTableRow>[] = [
     header: "Balance",
     cell: ({ getValue }) => (
       <span className="text-sm font-bold text-violet-600">
-        {fmt(getValue<number>())}
+        {fmt(getValue<number>() / 100)}
       </span>
     ),
   },
@@ -169,7 +169,7 @@ const columns: ColumnDef<WalletTableRow>[] = [
     header: "Credits",
     cell: ({ getValue }) => (
       <span className="text-sm font-bold text-emerald-600">
-        {fmt(getValue<number>())}
+        {fmt(getValue<number>() / 100)}
       </span>
     ),
   },
@@ -177,7 +177,7 @@ const columns: ColumnDef<WalletTableRow>[] = [
     accessorKey: "totalDebits",
     header: "Debits",
     cell: ({ getValue }) => {
-      const val = getValue<number>();
+      const val = getValue<number>() / 100;
       return (
         <span
           className={`text-sm font-bold ${val > 0 ? "text-rose-600" : "text-neutral-400"}`}
@@ -191,7 +191,7 @@ const columns: ColumnDef<WalletTableRow>[] = [
     accessorKey: "totalRefunds",
     header: "Refunds",
     cell: ({ getValue }) => {
-      const val = getValue<number>();
+      const val = getValue<number>() / 100;
       return (
         <span
           className={`text-sm font-bold ${val > 0 ? "text-amber-600" : "text-neutral-400"}`}
@@ -421,7 +421,7 @@ const AdminWalletsPage = () => {
                 </p>
               </div>
               <p className="text-2xl font-bold text-white tracking-tight">
-                {fmt(totalBalance)}
+                {fmt(totalBalance / 100)}
               </p>
               <p className="text-xs text-violet-200 font-medium mt-1">
                 {wallets.length} wallets
@@ -440,7 +440,7 @@ const AdminWalletsPage = () => {
               </p>
             </div>
             <p className="text-xl font-bold text-emerald-600">
-              {fmt(totalCredits)}
+              {fmt(totalCredits / 100)}
             </p>
           </div>
 
@@ -455,7 +455,7 @@ const AdminWalletsPage = () => {
               </p>
             </div>
             <p className="text-xl font-bold text-rose-600">
-              {fmt(totalDebits)}
+              {fmt(totalDebits / 100)}
             </p>
           </div>
 
