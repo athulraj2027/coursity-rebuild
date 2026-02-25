@@ -54,7 +54,8 @@ const SigninForm = () => {
     try {
       const data = await signinUser(new FormData(e.currentTarget));
       if (data.success) {
-        router.replace(`/${data.role.toLowerCase()}`);
+        router.push(`/${data.role.toLowerCase()}`);
+        router.refresh();
       }
     } catch (error) {
       console.log("error : ", error);

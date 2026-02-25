@@ -65,7 +65,8 @@ const SignupForm = () => {
       const data = await signupUser(new FormData(e.currentTarget));
       if (data?.success) {
         console.log("data : ", data);
-        router.replace(`/${data.role.toLocaleLowerCase()}`);
+        router.push(`/${data.role.toLocaleLowerCase()}`);
+        router.refresh();
         return;
       }
     } catch (error) {

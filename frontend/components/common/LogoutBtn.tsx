@@ -18,7 +18,8 @@ const LogoutBtn = () => {
       const res = await logoutUser();
 
       if (res?.success) {
-        router.replace("/");
+        router.push("/");
+        router.refresh();
       }
     } catch (error) {
       console.error("Logout failed:", error);
