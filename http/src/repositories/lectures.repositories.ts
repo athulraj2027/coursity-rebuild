@@ -38,6 +38,7 @@ const LectureRepositories = {
   async findAllOwner(teacherId: string) {
     return prisma.lecture.findMany({
       where: {
+        isDeleted: false,
         course: {
           teacherId,
         },
@@ -124,6 +125,8 @@ const LectureRepositories = {
         isDeleted: false,
         course: {
           teacherId,
+          isDeleted: false,
+          isDisabled: false,
         },
       },
       include: {
@@ -131,8 +134,18 @@ const LectureRepositories = {
           select: {
             id: true,
             title: true,
+            price: true,
+            startDate: true,
+            _count: {
+              select: {
+                enrollments: true,
+                lectures: true,
+              },
+            },
           },
         },
+
+        // Academic truth
         attendance: {
           include: {
             student: {
@@ -140,6 +153,7 @@ const LectureRepositories = {
                 id: true,
                 name: true,
                 email: true,
+                createdAt: true,
               },
             },
           },
@@ -147,19 +161,41 @@ const LectureRepositories = {
             durationSec: "desc",
           },
         },
+
+        // Realtime truth
         participants: {
           select: {
             id: true,
+            userId: true,
+            role: true,
+            joinTime: true,
+            leaveTime: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+
+        _count: {
+          select: {
+            attendance: true,
+            participants: true,
           },
         },
       },
     });
   },
+
   //  Student – single lecture (enrollment enforced)
   async findByIdStudent(studentId: string, lectureId: string) {
     return prisma.lecture.findFirst({
       where: {
         id: lectureId,
+        isDeleted: false,
         course: {
           enrollments: {
             some: {

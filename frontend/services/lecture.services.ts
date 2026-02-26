@@ -1,5 +1,6 @@
 import { apiRequest } from "@/lib/apiClient";
 import {
+  LectureData,
   LectureForTeacher,
   ScheduledLecturesResponse,
 } from "@/queries/lectures.queries";
@@ -16,7 +17,7 @@ export const getMyLecturesForOwnerApi = async (): Promise<
 
 export const getMyLectureByIdForOwnerApi = async (
   lectureId: string,
-): Promise<LectureForTeacher> =>
+): Promise<LectureData> =>
   apiRequest({ path: `/lectures/teacher/${lectureId}`, method: "GET" });
 
 export const getScheduledLectures =
@@ -40,3 +41,10 @@ export const getLectureStatus = async (lectureId: string) =>
 
 export const getAllLectures = async () =>
   apiRequest({ path: "/lectures", method: "GET" });
+
+export const cancelLecture = async (lectureId: string) =>
+  apiRequest({
+    path: `/lectures/teacher/${lectureId}`,
+    method: "PATCH",
+    body: { isDeleted: true },
+  });

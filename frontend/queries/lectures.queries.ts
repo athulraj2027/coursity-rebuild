@@ -42,6 +42,27 @@ export interface Student {
   email: string;
 }
 
+export interface LectureData {
+  id: string;
+  title: string;
+  startTime: string;
+  status: LectureStatus;
+  meetingId: string | null;
+  isDeleted: boolean;
+  courseId: string;
+  createdAt: string;
+  course: {
+    id: string;
+    title: string;
+    price: number;
+    startDate: string;
+    _count: { enrollments: number; lectures: number };
+  };
+  attendance: AttendanceRecord[];
+  participants: Participant[];
+  _count: { attendance: number; participants: number };
+}
+
 export interface AttendanceRecord {
   id: string;
   studentId: string;
@@ -81,7 +102,7 @@ export const useMyLecturesQuery = () =>
   });
 
 export const useMyLectureQueryById = (lectureId: string) =>
-  useQuery<LectureForTeacher>({
+  useQuery<LectureData>({
     queryKey: ["my-lecture", lectureId],
     queryFn: () => getMyLectureByIdForOwnerApi(lectureId),
   });

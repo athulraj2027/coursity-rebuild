@@ -14,8 +14,10 @@ const CreateLectureCard = ({
   courseId: string;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const [formData, setFormData] = useState({ title: "", meetingId: "" });
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(today);
   const [time, setTime] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -143,7 +145,7 @@ const CreateLectureCard = ({
               }}
               className="w-full"
               captionLayout="dropdown"
-              disabled={(d) => d < new Date()}
+              disabled={(d) => d < today}
             />
           </div>
         </div>

@@ -9,11 +9,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Modal from "../../common/Modal";
-import LectureViewCard from "./LectureViewCard";
-import LectureEditCard from "./LectureEditCard";
 import CancelLectureCard from "./CancelLectureCard";
+import Link from "next/link";
 
-type ModalType = "VIEW" | "EDIT" | "CANCEL" | "START";
+type ModalType = "CANCEL" | "START";
 
 const LectureActions = ({
   lectureId,
@@ -49,10 +48,6 @@ const LectureActions = ({
 
   const renderModalCard = () => {
     switch (modalType) {
-      case "VIEW":
-        return <LectureViewCard lectureId={lectureId} />;
-      case "EDIT":
-        return <LectureEditCard lectureId={lectureId} />;
       case "CANCEL":
         return <CancelLectureCard lectureId={lectureId} />;
       default:
@@ -70,12 +65,11 @@ const LectureActions = ({
           {/* VIEW */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => openModal("VIEW")}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150"
-              >
-                <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
-              </button>
+              <Link href={`/teacher/my-lectures/${lectureId}`}>
+                <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150">
+                  <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
+                </button>
+              </Link>
             </TooltipTrigger>
             <TooltipContent className="text-xs">View lecture</TooltipContent>
           </Tooltip>
@@ -103,13 +97,14 @@ const LectureActions = ({
           {/* EDIT */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={() => openModal("EDIT")}
-                disabled
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
-              </button>
+              <Link href={`/teacher/my-lectures/${lectureId}/edit`}>
+                <button
+                  disabled
+                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
+                </button>
+              </Link>
             </TooltipTrigger>
             <TooltipContent className="text-xs">Edit lecture</TooltipContent>
           </Tooltip>
@@ -131,7 +126,10 @@ const LectureActions = ({
       </TooltipProvider>
 
       {modal && modalType && (
-        <Modal Card={renderModalCard()} setModal={setModal} />
+        <CancelLectureCard
+          lectureId={lectureId}
+          onClose={() => setModalType(null)}
+        />
       )}
     </>
   );
