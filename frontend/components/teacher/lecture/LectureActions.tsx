@@ -8,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Modal from "../../common/Modal";
 import CancelLectureCard from "./CancelLectureCard";
 import Link from "next/link";
 
@@ -44,15 +43,6 @@ const LectureActions = ({
     return (
       now.getTime() >= tenMinutesBefore && now.getTime() <= twentyMinutesAfter
     );
-  };
-
-  const renderModalCard = () => {
-    switch (modalType) {
-      case "CANCEL":
-        return <CancelLectureCard lectureId={lectureId} />;
-      default:
-        return null;
-    }
   };
 
   const canStart = status === "NOT_STARTED" && canStartLecture();

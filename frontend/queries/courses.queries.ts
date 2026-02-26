@@ -2,6 +2,7 @@ import {
   fetchAllCourses,
   fetchAllCoursesForOwner,
   fetchAllCoursesForPublic,
+  fetchCourseByIdAdmin,
   fetchCourseByIdForOwner,
   fetchCourseByIdForPublic,
   fetchEnrolledCourses,
@@ -91,3 +92,9 @@ export const useEnrolledCoursesQuery = () =>
 
 export const useAllCoursesAdminQuery = () =>
   useQuery({ queryKey: ["courses"], queryFn: fetchAllCourses });
+
+export const useCourseByIdQueryAdmin = (courseId: string) =>
+  useQuery({
+    queryKey: ["course", courseId],
+    queryFn: () => fetchCourseByIdAdmin(courseId),
+  });

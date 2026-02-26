@@ -70,3 +70,6 @@ export const fetchEnrolledCourses = () =>
 
 export const fetchAllCourses = () =>
   apiRequest({ path: "/courses", method: "GET" });
+
+export const fetchCourseByIdAdmin = (id: string) =>
+  apiRequest({ path: `/courses/admin/${id}`, method: "GET" });

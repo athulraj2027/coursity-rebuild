@@ -84,14 +84,84 @@ const CourseRepositories = {
 
   // Full single course view
   async findByIdInternal(courseId: string) {
-    return prisma.course.findUnique({
+    const course = await prisma.course.findUnique({
       where: { id: courseId },
-      include: {
-        teacher: true,
-        lectures: true,
-        enrollments: true,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        imageUrl: true,
+        price: true,
+        startDate: true,
+        isEnrollmentOpen: true,
+        isDeleted: true,
+        isDisabled: true,
+        createdAt: true,
+        updatedAt: true,
+
+        teacher: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            wallet: {
+              select: {
+                balance: true,
+              },
+            },
+          },
+        },
+
+        lectures: {
+          select: {
+            id: true,
+            title: true,
+            startTime: true,
+            status: true,
+            meetingId: true,
+            _count: {
+              select: {
+                participants: true,
+                attendance: true,
+              },
+            },
+          },
+          orderBy: {
+            startTime: "asc",
+          },
+        },
+
+        _count: {
+          select: {
+            enrollments: true,
+            payments: true,
+          },
+        },
       },
     });
+
+    if (!course) return null;
+
+    // Revenue aggregation (only PAID)
+    const revenue = await prisma.payment.aggregate({
+      where: {
+        courseId,
+        status: "PAID",
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    return {
+      ...course,
+      stats: {
+        totalEnrollments: course._count.enrollments,
+        totalPayments: course._count.payments,
+        totalRevenue: revenue._sum.amount ?? 0,
+      },
+    };
   },
 
   // Public single course view

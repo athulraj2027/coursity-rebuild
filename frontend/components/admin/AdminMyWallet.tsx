@@ -177,7 +177,7 @@ const columns: ColumnDef<TransactionRow>[] = [
       return (
         <span className={`text-sm font-bold ${config.amount}`}>
           {config.isPositive ? "+" : "−"}
-          {fmt(Math.abs(row.original.amount))}
+          {fmt(Math.abs(row.original.amount / 100))}
         </span>
       );
     },
@@ -364,7 +364,7 @@ const AdminMyWallet = () => {
                 </p>
               </div>
               <p className="text-2xl font-bold text-white tracking-tight">
-                {fmt(wallet.balance)}
+                {fmt(wallet.balance / 100)}
               </p>
               <p className="text-xs text-blue-200 font-medium mt-1">
                 {wallet.transactions.length} transactions
@@ -384,7 +384,7 @@ const AdminMyWallet = () => {
               </p>
             </div>
             <p className="text-xl font-bold text-emerald-600">
-              {fmt(totalCredit)}
+              {fmt(totalCredit/100)}
             </p>
           </div>
 
@@ -399,7 +399,9 @@ const AdminMyWallet = () => {
                 Total Out
               </p>
             </div>
-            <p className="text-xl font-bold text-rose-600">{fmt(totalDebit)}</p>
+            <p className="text-xl font-bold text-rose-600">
+              {fmt(totalDebit / 100)}
+            </p>
           </div>
 
           {/* Pending */}

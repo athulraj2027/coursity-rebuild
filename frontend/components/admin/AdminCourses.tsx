@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { DataTable } from "../common/Table";
+import CourseActions from "./actions/CourseActions";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 type CourseTableRow = {
@@ -163,6 +164,15 @@ const columns: ColumnDef<CourseTableRow>[] = [
     cell: ({ row }) => (
       <span className="text-xs text-neutral-400 font-medium">
         {row.original.createdAt}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "actions",
+    header: "Actions",
+    cell: ({ row }) => (
+      <span className="text-xs text-neutral-400 font-medium">
+        <CourseActions id={row.original.id} />
       </span>
     ),
   },
