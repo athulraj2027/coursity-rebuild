@@ -18,7 +18,8 @@ export const useLectureAccess = (lectureId: string) => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data: any = await getLectureAccess(lectureId);
-        console.log(data);
+        console.log("data after access check : ", data);
+        if (!data.isAllowed) throw new Error(data.message);
         setRole(data.role);
         setLectureStatus(data.status);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

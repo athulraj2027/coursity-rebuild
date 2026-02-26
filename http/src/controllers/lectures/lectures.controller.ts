@@ -63,7 +63,7 @@ const LectureController = {
       if (user.role !== "TEACHER" && lecture.status === "NOT_STARTED")
         return res
           .status(200)
-          .json({ isAllowed: false, message: "Lecture has not started " });
+          .json({ isAllowed: false, message: "Lecture is not live" });
       return res
         .status(200)
         .json({ isAllowed: true, role: user.role, status: lecture.status });
@@ -72,11 +72,11 @@ const LectureController = {
       if (error.statusCode) {
         return res
           .status(error.statusCode)
-          .json({ success: false, message: error.message });
+          .json({ isAllowed: false, message: error.message });
       }
       return res
         .status(500)
-        .json({ success: false, message: "Failed to fetch lecture" });
+        .json({ isAllowed: false, message: "Failed to fetch lecture" });
     }
   },
 
