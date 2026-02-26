@@ -10,13 +10,7 @@ import { toast } from "sonner";
 import { Loader2, CreditCard, CheckCircle } from "lucide-react";
 import EnrollmentSuccess from "./EnrollmentSuccess";
 
-const EnrollBtn = ({
-  courseId,
-  disabled,
-}: {
-  courseId: string;
-  disabled: boolean;
-}) => {
+const EnrollBtn = ({ courseId }: { courseId: string }) => {
   const [loading, setLoading] = useState(false);
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
 
@@ -63,7 +57,7 @@ const EnrollBtn = ({
   return (
     <button
       onClick={handleEnroll}
-      disabled={disabled || loading}
+      disabled={loading}
       className="flex items-center justify-center gap-2 h-10 px-6 rounded-xl text-sm font-semibold border transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed
         bg-black text-white border-black hover:bg-black/80 active:bg-black/90"
     >
@@ -71,11 +65,6 @@ const EnrollBtn = ({
         <>
           <Loader2 className="w-4 h-4 animate-spin" />
           Processing…
-        </>
-      ) : disabled ? (
-        <>
-          <CheckCircle className="w-4 h-4" strokeWidth={2} />
-          Already Enrolled
         </>
       ) : (
         <>

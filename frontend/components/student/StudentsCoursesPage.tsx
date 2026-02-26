@@ -24,8 +24,7 @@ import {
   ChevronRight,
   BookOpen,
 } from "lucide-react";
-import Modal from "../common/Modal";
-import CourseDetailCard from "./CourseDetailCard";
+import { useRouter } from "next/navigation";
 
 type SortOption =
   | "newest"
@@ -144,9 +143,9 @@ const CourseCard = ({
 
 /* ─── Main Page ───────────────────────────────────────────────────────────── */
 const StudentsCoursesPage = () => {
+  const router = useRouter();
   const { isLoading, error, data } = useAllCoursesQueryPublic();
 
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<SortOption>("newest");
   const [filters, setFilters] = useState<FilterOptions>({
@@ -230,6 +229,10 @@ const StudentsCoursesPage = () => {
           return 0;
       }
     });
+
+  const routeToDetailPage = async (id: string) => {
+    router.push(`/student/courses/${id}`);
+  };
 
   const processedData = useMemo(() => {
     if (!data) return [];
@@ -439,7 +442,7 @@ const StudentsCoursesPage = () => {
                 <CourseCard
                   key={course.id}
                   course={course}
-                  onView={() => setSelectedCourseId(course.id)}
+                  onView={() => routeToDetailPage(course.id)}
                 />
               ))}
             </div>
@@ -511,13 +514,6 @@ const StudentsCoursesPage = () => {
           </>
         )}
       </div>
-
-      {selectedCourseId && (
-        <Modal
-          Card={<CourseDetailCard courseId={selectedCourseId} />}
-          setModal={() => setSelectedCourseId(null)}
-        />
-      )}
     </div>
   );
 };

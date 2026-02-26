@@ -264,7 +264,7 @@ const EnrolledCourses = () => {
               You haven&apos;t enrolled in any courses yet
             </p>
             <Button
-              onClick={() => router.push("/courses")}
+              onClick={() => router.push("/student/courses")}
               className="bg-black text-white hover:bg-black/80 rounded-xl text-xs h-8 px-4"
             >
               Explore Courses

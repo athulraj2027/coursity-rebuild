@@ -139,7 +139,7 @@ const LectureRepositories = {
             _count: {
               select: {
                 enrollments: true,
-                lectures: true,
+                lectures: { where: { isDeleted: false } },
               },
             },
           },

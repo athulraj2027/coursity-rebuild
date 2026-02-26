@@ -42,6 +42,7 @@ const StudentPaymentController = {
           req.user,
         );
 
+      // send email
       return res.status(200).json(completeEnrollment);
     } catch (error: any) {
       console.log(`Failed to enroll student ${req.user.id} : `, error);
