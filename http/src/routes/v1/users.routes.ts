@@ -1,10 +1,11 @@
 import express from "express";
 import UserController from "../../controllers/user.controller.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 const router = express.Router();
 
-router.get("/", UserController.getUsers);
-router.patch("/block-user", UserController.blockUser);
-router.get("/:id", UserController.getUserById);
+router.get("/", asyncHandler(UserController.getUsers));
+router.patch("/block-user", asyncHandler(UserController.blockUser));
+router.get("/:id", asyncHandler(UserController.getUserById));
 // router.get("/enrollments");
 // router.get("/lectures")
 // router.get("/courses");

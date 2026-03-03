@@ -6,6 +6,7 @@ import studentLectureRoutes from "./student.lecture.routes.js";
 import adminLectureRoutes from "./admin.lecture.routes.js";
 import LectureController from "../../../controllers/lectures/lectures.controller.js";
 import { internalAuth } from "../../../middlewares/internal.middleware.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
 const router = express.Router();
 
 router.use(
@@ -22,16 +23,28 @@ router.use(
   studentLectureRoutes,
 );
 
-router.get("/", authMiddleware, LectureController.getLectures);
-router.get("/:id", authMiddleware, LectureController.getLectureById);
-router.get("/access/:id", authMiddleware, LectureController.getLectureAccess);
+router.get("/", authMiddleware, asyncHandler(LectureController.getLectures));
+router.get(
+  "/:id",
+  authMiddleware,
+  asyncHandler(LectureController.getLectureById),
+);
+router.get(
+  "/access/:id",
+  authMiddleware,
+  asyncHandler(LectureController.getLectureAccess),
+);
 router.post(
   "/:id/join",
   authMiddleware,
   roleMiddleware(["ADMIN", "STUDENT"]),
-  LectureController.joinLecture,
+  asyncHandler(LectureController.joinLecture),
 );
 
-router.patch("/:id/leave", internalAuth, LectureController.leaveLecture);
+router.patch(
+  "/:id/leave",
+  internalAuth,
+  asyncHandler(LectureController.leaveLecture),
+);
 
 export default router;

@@ -8,18 +8,8 @@ const TeacherAttendanceController = {
   finalizeAttendanceForLecture: async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = req.user;
-    try {
-      await AttendanceService.finalizeAttendance(user.id, id as string);
-      return res.status(200).json({ success: true });
-    } catch (error: any) {
-      console.log("ERror in finalizing attendance : ", error);
-      if (error.statusCode) {
-        return res
-          .status(error.statusCode)
-          .json({ success: false, message: error.message });
-      }
-      return res.status(500).json({ success: false, message: error.message });
-    }
+    await AttendanceService.finalizeAttendance(user.id, id as string);
+    return res.status(200).json({ success: true });
   },
 };
 export default TeacherAttendanceController;

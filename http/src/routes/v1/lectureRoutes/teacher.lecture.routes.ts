@@ -3,38 +3,43 @@ import TeacherLectureController from "../../../controllers/lectures/teacher.lect
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../../../middlewares/role.middleware.js";
 import { internalAuth } from "../../../middlewares/internal.middleware.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
 const router = express.Router();
 
 router.get(
   "/",
   authMiddleware,
   roleMiddleware("TEACHER"),
-  TeacherLectureController.getAllLectures,
+  asyncHandler(TeacherLectureController.getAllLectures),
 );
 router.post(
   "/",
   authMiddleware,
   roleMiddleware("TEACHER"),
-  TeacherLectureController.createLecture,
+  asyncHandler(TeacherLectureController.createLecture),
 );
 router.get(
   "/:id",
   authMiddleware,
   roleMiddleware("TEACHER"),
-  TeacherLectureController.getLectureById,
+  asyncHandler(TeacherLectureController.getLectureById),
 );
 router.patch(
   "/:id",
   authMiddleware,
   roleMiddleware("TEACHER"),
-  TeacherLectureController.editLecture,
+  asyncHandler(TeacherLectureController.editLecture),
 );
 router.post(
   "/:id/start",
   authMiddleware,
   roleMiddleware("TEACHER"),
-  TeacherLectureController.startLecture,
+  asyncHandler(TeacherLectureController.startLecture),
 );
-router.post("/:id/end", internalAuth, TeacherLectureController.endLecture);
+router.post(
+  "/:id/end",
+  internalAuth,
+  asyncHandler(TeacherLectureController.endLecture),
+);
 
 export default router;

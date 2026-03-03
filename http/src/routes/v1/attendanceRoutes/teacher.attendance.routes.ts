@@ -3,18 +3,19 @@ import TeacherAttendanceController from "../../../controllers/attendance/teacher
 import { internalAuth } from "../../../middlewares/internal.middleware.js";
 import { authMiddleware } from "../../../middlewares/auth.middleware.js";
 import { roleMiddleware } from "../../../middlewares/role.middleware.js";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
 const router = express.Router();
 
 router.get(
   "/:id",
   authMiddleware,
   roleMiddleware,
-  TeacherAttendanceController.getAttendance,
+  asyncHandler(TeacherAttendanceController.getAttendance),
 );
 router.post(
   "/:id/finalize-attendance",
   internalAuth,
-  TeacherAttendanceController.finalizeAttendanceForLecture,
+  asyncHandler(TeacherAttendanceController.finalizeAttendanceForLecture),
 );
 
 export default router;
