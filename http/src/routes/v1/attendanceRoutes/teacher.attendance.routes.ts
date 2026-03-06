@@ -9,9 +9,10 @@ const router = express.Router();
 router.get(
   "/:id",
   authMiddleware,
-  roleMiddleware,
+  roleMiddleware("TEACHER"),
   asyncHandler(TeacherAttendanceController.getAttendance),
 );
+
 router.post(
   "/:id/finalize-attendance",
   internalAuth,

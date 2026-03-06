@@ -18,17 +18,12 @@ export const authMiddleware = (
       token as string,
       process.env.JWT_SECRET || "myjwtsecret",
     ) as AuthPayload;
-
-    // attach user to reques
     req.user = {
       id: decoded.userId as string,
       role: decoded.role,
       username: decoded.username,
     };
-
-    console.log("req user ", req.user);
-
-    // console.log(req.user);
+    // console.log("req user ", req.user);
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });

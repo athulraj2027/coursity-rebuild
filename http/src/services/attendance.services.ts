@@ -1,4 +1,6 @@
 import AttendanceRepositories from "../repositories/attendance.repositories.js";
+import CourseRepositories from "../repositories/courses.repositories.js";
+import EnrollmentRepositories from "../repositories/enrollment.repositories.js";
 import LectureRepositories from "../repositories/lectures.repositories.js";
 import ParticipantRepository from "../repositories/participants.repositories.js";
 import { AppError } from "../utils/AppError.js";
@@ -76,6 +78,66 @@ const AttendanceService = {
       lectureEndTime,
     );
     return { message: "Attendance finalized successfully" };
+  },
+
+  getAttendanceDataForTeacher: async (teacherId: string, courseId: string) => {
+    const course = await CourseRepositories.findByIdInternalOwnerView(
+      courseId,
+      teacherId,
+    );
+
+    if (!course) throw new AppError("Course not found", 400);
+
+    const lectures =
+      await LectureRepositories.getAllLecturesForACourse(courseId);
+
+    if (!lectures)
+      throw new AppError("Lectures not found for this course ", 400);
+
+    const enrollments =
+      await EnrollmentRepositories.getAllEnrollmentsForACourse(courseId);
+
+    if (!enrollments)
+      throw new AppError("No enrollments found for the course", 400);
+
+    const attendance =
+      await AttendanceRepositories.getAttendanceForCourse(courseId);
+
+    const attendanceMap = new Map();
+
+    for (const a of attendance) {
+      attendanceMap.set(`${a.studentId}-${a.lectureId}`, a);
+    }
+
+    // 6️⃣ Build table data
+    const table = enrollments.map((enrollment) => {
+      const student = enrollment.student;
+
+      const lecturesData = lectures.map((lecture) => {
+        const record = attendanceMap.get(`${student.id}-${lecture.id}`);
+
+        return {
+          lectureId: lecture.id,
+          lectureTitle: lecture.title,
+          startTime: lecture.startTime,
+          durationSec: record?.durationSec || 0,
+          status: record?.status || "ABSENT",
+        };
+      });
+
+      return {
+        studentId: student.id,
+        name: student.name,
+        email: student.email,
+        lectures: lecturesData,
+      };
+    });
+
+    return {
+      course: course.course.title,
+      lectures,
+      students: table,
+    };
   },
 };
 

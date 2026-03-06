@@ -111,6 +111,22 @@ const AttendanceRepository = {
       },
     });
   },
+
+  getAttendanceForCourse: async (courseId: string) => {
+    return await prisma.attendance.findMany({
+      where: {
+        lecture: {
+          courseId: courseId,
+        },
+      },
+      select: {
+        lectureId: true,
+        studentId: true,
+        durationSec: true,
+        status: true,
+      },
+    });
+  },
 };
 
 export default AttendanceRepository;

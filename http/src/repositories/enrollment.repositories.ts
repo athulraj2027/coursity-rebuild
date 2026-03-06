@@ -137,6 +137,23 @@ const EnrollmentRepositories = {
       where: { id, studentId: userId },
     });
   },
+
+  async getAllEnrollmentsForACourse(courseId: string) {
+    return await prisma.enrollment.findMany({
+      where: {
+        courseId,
+      },
+      select: {
+        student: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  },
 };
 
 export default EnrollmentRepositories;

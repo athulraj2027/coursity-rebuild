@@ -266,6 +266,20 @@ const LectureRepositories = {
       },
     });
   },
+
+  async getAllLecturesForACourse(courseId: string) {
+    return prisma.lecture.findMany({
+      where: { courseId, isDeleted: false },
+      select: {
+        id: true,
+        title: true,
+        startTime: true,
+      },
+      orderBy: {
+        startTime: "asc",
+      },
+    });
+  },
 };
 
 export default LectureRepositories;
