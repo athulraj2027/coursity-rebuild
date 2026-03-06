@@ -1,6 +1,4 @@
 "use client";
-
-import { Eye, Pencil, Plus, UserX } from "lucide-react";
 import { useState } from "react";
 import {
   Tooltip,
@@ -11,11 +9,17 @@ import {
 import Modal from "../../common/Modal";
 import CreateLectureCard from "../lecture/CreateLectureCard";
 import Link from "next/link";
+import { actions } from "@/constants/teacher";
 
-type Props = { courseId: string };
+type Props = {
+  courseId: string;
+  isEnrollmentOpen: boolean | null;
+  isDisabled: boolean | null;
+};
+
 type ModalType = "VIEW" | "EDIT" | "ADD_LECTURE";
 
-const CourseActions = ({ courseId }: Props) => {
+const CourseActions = ({ courseId, isEnrollmentOpen, isDisabled }: Props) => {
   const [modal, setModal] = useState(false);
   const [modalType, setModalType] = useState<ModalType | null>(null);
 
@@ -33,62 +37,51 @@ const CourseActions = ({ courseId }: Props) => {
     }
   };
 
+  const courseActions = actions(
+    courseId,
+    openModal,
+    isEnrollmentOpen,
+    isDisabled,
+  );
+
   return (
     <>
       <TooltipProvider>
         <div className="flex items-center justify-center gap-1">
-          {/* VIEW */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/teacher/my-courses/${courseId}`}>
-                <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-500 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150">
-                  <Eye className="w-3.5 h-3.5" strokeWidth={1.8} />
-                </button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent className="text-xs">View course</TooltipContent>
-          </Tooltip>
+          {courseActions.map((action) => {
+            const Icon = action.icon;
 
-          <Tooltip>
-            <TooltipTrigger asChild>
+            const button = (
               <button
-                disabled
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
+                onClick={action.onClick}
+                disabled={action.disabled || undefined}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-150
+                ${
+                  action.color === "primary"
+                    ? "border-black bg-blue-500 text-white hover:bg-blue-600"
+                    : "border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50"
+                }
+                disabled:opacity-30 disabled:cursor-not-allowed`}
               >
-                <UserX className="w-3.5 h-3.5" strokeWidth={1.8} />
+                <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />
               </button>
-            </TooltipTrigger>
-            <TooltipContent className="text-xs">
-              Enrollment disabled
-            </TooltipContent>
-          </Tooltip>
+            );
 
-          {/* EDIT */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/teacher/my-courses/${courseId}/edit`}>
-                <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-black/10 bg-white text-neutral-400 hover:text-black hover:border-black/25 hover:bg-neutral-50 transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed">
-                  <Pencil className="w-3.5 h-3.5" strokeWidth={1.8} />
-                </button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent className="text-xs">Edit course</TooltipContent>
-          </Tooltip>
-
-          {/* ADD LECTURE */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => openModal("ADD_LECTURE")}
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-black bg-blue-500 text-white hover:bg-black-700 active:bg-blue-800 transition-all duration-150"
-              >
-                <Plus className="w-3.5 h-3.5" strokeWidth={2} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="text-xs">
-              Schedule new lecture
-            </TooltipContent>
-          </Tooltip>
+            return (
+              <Tooltip key={action.key}>
+                <TooltipTrigger asChild>
+                  {action.href ? (
+                    <Link href={action.href}>{button}</Link>
+                  ) : (
+                    button
+                  )}
+                </TooltipTrigger>
+                <TooltipContent className="text-xs">
+                  {action.tooltip}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </div>
       </TooltipProvider>
 

@@ -43,6 +43,8 @@ const Meeting = ({
     removeProducerById,
     pauseVideoUI,
     resumeVideoUI,
+    raiseHand,
+    lowerHand,
   } = useJoinRoom();
 
   const { message, setMessage, messages, sendMessage } = useMessage(lectureId);
@@ -211,6 +213,8 @@ const Meeting = ({
         startScreenShare={startScreenShare}
         stopScreenShare={stopScreenShare}
         leaveRoom={leaveRoom}
+        raiseHand={raiseHand}
+        lowerHand={lowerHand}
       />
     </div>
   );

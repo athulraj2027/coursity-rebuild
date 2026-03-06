@@ -32,5 +32,5 @@ export const ADMIN_LINKS = [
   { name: "Courses", url: "/courses", icon: Notebook },
   { name: "Lectures", url: "/lectures", icon: Group },
   { name: "User Wallets", url: "/wallets", icon: Wallet },
-   { name: "My Wallet", url: "/my-wallet", icon: Wallet },
+  { name: "My Wallet", url: "/my-wallet", icon: Wallet },
 ];

@@ -6,6 +6,8 @@ import {
   VideoOff,
   MonitorUp,
   MonitorOff,
+  Hand,
+  HandIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -17,6 +19,8 @@ type ControlBarProps = {
   startScreenShare: (lectureId: string) => Promise<void>;
   stopScreenShare: () => Promise<void>;
   leaveRoom: (lectureId: string) => void;
+  raiseHand: () => void;
+  lowerHand: () => void;
   lectureId: string;
 };
 
@@ -65,10 +69,13 @@ const ControlBar = ({
   stopScreenShare,
   lectureId,
   leaveRoom,
+  lowerHand,
+  raiseHand,
 }: ControlBarProps) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [isHandRaised, setIsHandRaised] = useState(false);
 
   const handleVideoToggle = async () => {
     if (isVideoOn) {
@@ -105,6 +112,16 @@ const ControlBar = ({
     window.location.href = "/";
   };
 
+  const handleHandToggle = async () => {
+    if (isHandRaised) {
+      await lowerHand();
+      setIsHandRaised(false);
+    } else {
+      await raiseHand();
+      setIsHandRaised(true);
+    }
+  };
+
   return (
     <div className="shrink-0 flex items-center justify-center gap-3 sm:gap-5 px-4 py-3 border-t border-white/8 bg-neutral-900">
       <ControlBtn
@@ -128,6 +145,18 @@ const ControlBar = ({
           <Video className="w-4.5 h-4.5" strokeWidth={1.8} />
         ) : (
           <VideoOff className="w-4.5 h-4.5" strokeWidth={1.8} />
+        )}
+      </ControlBtn>
+
+      <ControlBtn
+        onClick={handleHandToggle}
+        active={isHandRaised}
+        label={isHandRaised ? "Lower Hand" : "Raise Hand"}
+      >
+        {isHandRaised ? (
+          <Hand className="w-4.5 h-4.5" strokeWidth={1.8} />
+        ) : (
+          <HandIcon className="w-4.5 h-4.5" strokeWidth={1.8} />
         )}
       </ControlBtn>
 

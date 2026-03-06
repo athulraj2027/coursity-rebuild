@@ -254,7 +254,13 @@ const MyCoursesPage = () => {
       {
         id: "actions",
         header: "Actions",
-        cell: ({ row }) => <CourseActions courseId={row.original.id} />,
+        cell: ({ row }) => (
+          <CourseActions
+            courseId={row.original.id}
+            isEnrollmentOpen={null}
+            isDisabled={null}
+          />
+        ),
       },
     ],
     [],

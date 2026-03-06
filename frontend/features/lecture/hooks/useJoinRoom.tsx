@@ -487,6 +487,9 @@ export const useJoinRoom = () => {
     socket.emit("leave-room", { lectureId });
   };
 
+  const raiseHand = async () => {};
+  const lowerHand = async () => {};
+
   return {
     createMeetingEssentials,
     stopScreenShare,
@@ -505,5 +508,7 @@ export const useJoinRoom = () => {
     removeProducerById,
     pauseVideoUI,
     resumeVideoUI,
+    raiseHand,
+    lowerHand,
   };
 };
