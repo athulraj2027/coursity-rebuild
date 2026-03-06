@@ -9,7 +9,7 @@ const SignupCard = () => {
     <div className="w-full">
      
       {/* Card */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-md p-7 shadow-2xl shadow-black/40">
+      <div className=" backdrop-blur-xl border border-white/10 rounded-sm p-7 shadow-2xl shadow-black/40">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
@@ -20,12 +20,7 @@ const SignupCard = () => {
               Enter your details to get started
             </p>
           </div>
-          <Link
-            href="/sign-in"
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors duration-150 mt-1 shrink-0"
-          >
-            Sign in
-          </Link>
+       
         </div>
 
         {/* Form */}

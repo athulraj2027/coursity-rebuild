@@ -11,7 +11,7 @@ import { Loader2, GraduationCap, BookOpen } from "lucide-react";
 const DarkInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
-    className="w-full h-10 px-3.5 rounded-xl bg-white/8 border border-white/10 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-150"
+    className="w-full h-10 px-3.5 rounded-sm bg-white/8 border border-white/10 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/60 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-150"
   />
 );
 
@@ -38,7 +38,7 @@ const RoleOption = ({
 }) => (
   <label
     htmlFor={id}
-    className={`flex flex-1 items-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all duration-150 ${
+    className={`flex flex-1 items-center gap-2 px-3 py-2.5 rounded-sm border cursor-pointer transition-all duration-150 ${
       checked
         ? "bg-indigo-500/15 border-indigo-500/50 text-indigo-300"
         : "bg-white/5 border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-300"
@@ -94,6 +94,7 @@ const SignupForm = () => {
           id="name"
           type="text"
           name="name"
+          className="rounded-sm"
           placeholder="John Doe"
           required
         />
@@ -161,7 +162,7 @@ const SignupForm = () => {
       <button
         type="submit"
         disabled={!isValid || isSubmitting}
-        className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold tracking-wide transition-all duration-150 shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full h-10 flex items-center justify-center gap-2 rounded-xs bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold tracking-wide transition-all duration-150 shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {isSubmitting ? (
           <>
@@ -176,7 +177,7 @@ const SignupForm = () => {
       {/* Google */}
       <button
         type="button"
-        className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-white/8 hover:bg-white/12 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
+        className="w-full h-10 flex items-center justify-center gap-2 rounded-xs bg-white/8 hover:bg-white/12 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24">
           <path

@@ -29,7 +29,7 @@ const RoleOption = ({
 }) => (
   <label
     htmlFor={id}
-    className={`flex flex-1 items-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all duration-150 ${
+    className={`flex flex-1 items-center gap-2 px-3 py-2.5 rounded-sm border cursor-pointer transition-all duration-150 ${
       checked
         ? "bg-indigo-500/15 border-indigo-500/50 text-indigo-300"
         : "bg-white/5 border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-300"
@@ -148,7 +148,7 @@ const SigninForm = () => {
         <button
           type="submit"
           disabled={!isValid || isSubmitting}
-          className="w-full h-10 flex items-center justify-center gap-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold border border-indigo-500 transition-all duration-150 shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full h-10 flex items-center justify-center gap-2 rounded-sm bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-bold border border-indigo-500 transition-all duration-150 shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
@@ -162,7 +162,7 @@ const SigninForm = () => {
 
         <button
           type="button"
-          className="w-full h-10 flex items-center justify-center gap-2 rounded-md bg-white/5 hover:bg-white/10 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
+          className="w-full h-10 flex items-center justify-center gap-2 rounded-sm bg-white/5 hover:bg-white/10 text-white text-sm font-semibold border border-white/10 hover:border-white/20 transition-all duration-150"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
