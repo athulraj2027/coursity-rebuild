@@ -167,6 +167,7 @@ const SigninForm = () => {
 
         <div className="w-full">
           <GoogleLogin
+          width={324}
             onSuccess={(credentialResponse) => {
               setLoading(true);
               googleAuthApi(credentialResponse.credential)
