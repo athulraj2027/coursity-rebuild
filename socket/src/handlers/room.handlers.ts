@@ -111,7 +111,7 @@ export async function DisconnectHandler(socket: Socket) {
         if (stillDisconnected) {
           // await endLectureService(user.lectureId);
           await callInternalApi(
-            `/lectures/${user.lectureId}/end`,
+            `/lectures/teacher/${user.lectureId}/end`,
             "POST",
             {},
             { userId, role },
@@ -152,9 +152,7 @@ export async function LeaveRoomHandler(socket: Socket, lectureId: string) {
 
   room.peers.delete(user.userId);
 
-  socket
-    .to(user.lectureId)
-    .emit("peer-left", { username, socketId: socket.id });
+  socket.to(user.lectureId).emit("peer-left", { username });
 
   if (user.userId === room.teacherId) {
     console.log("emitting the lecture ended");
