@@ -1,6 +1,6 @@
 "use client";
 import { useCourseByIdQueryPublic } from "@/queries/courses.queries";
-import React from "react";
+import React, { useState } from "react";
 import {
   BookOpen,
   Users,
@@ -79,8 +79,9 @@ const FeaturePill = ({
 /* ─── Main Component ──────────────────────────────────────────────────────── */
 const CourseDetailPage = ({ id }: { id: string }) => {
   const { data, error, isLoading } = useCourseByIdQueryPublic(id);
+  const [loading, setLoading] = useState(false);
 
-  if (isLoading) return <Loading />;
+  if (isLoading || loading) return <Loading />;
   if (error || !data) return <Error />;
 
   const course = data as CoursePublic;
@@ -272,7 +273,7 @@ const CourseDetailPage = ({ id }: { id: string }) => {
                       Enrollment Closed
                     </div>
                   ) : (
-                    <EnrollBtn courseId={course.id} />
+                    <EnrollBtn courseId={course.id} setLoadingProp={setLoading} />
                   )}
 
                   {/* Guarantee note */}

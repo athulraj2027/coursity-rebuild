@@ -5,6 +5,7 @@ import {
   fetchCourseByIdAdmin,
   fetchCourseByIdForOwner,
   fetchCourseByIdForPublic,
+  fetchEnrolledCourseById,
   fetchEnrolledCourses,
   PublicCourse,
 } from "@/services/course.services";
@@ -89,6 +90,12 @@ export const useCourseByIdQueryPublic = (courseId: string) =>
 
 export const useEnrolledCoursesQuery = () =>
   useQuery({ queryKey: ["enrolled-courses"], queryFn: fetchEnrolledCourses });
+
+export const useEnrolledCourseQuery = (courseId: string) =>
+  useQuery({
+    queryKey: ["enrolled-course", courseId],
+    queryFn: () => fetchEnrolledCourseById(courseId),
+  });
 
 export const useAllCoursesAdminQuery = () =>
   useQuery({ queryKey: ["courses"], queryFn: fetchAllCourses });

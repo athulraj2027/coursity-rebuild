@@ -166,7 +166,7 @@ const CourseRepositories = {
 
   // Public single course view
   async findByIdPublic(courseId: string, studentId?: string) {
-    const course = await prisma.course.findUnique({
+    const course = await prisma.course.findFirst({
       where: {
         id: courseId,
         isDeleted: false,
@@ -201,7 +201,7 @@ const CourseRepositories = {
         enrollments: studentId
           ? {
               where: {
-                studentId: studentId,
+                studentId,
               },
               select: {
                 id: true,
@@ -212,6 +212,7 @@ const CourseRepositories = {
     });
 
     if (!course) return null;
+    
 
     return {
       ...course,

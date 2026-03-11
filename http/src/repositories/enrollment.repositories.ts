@@ -57,20 +57,57 @@ const EnrollmentRepositories = {
         courseId,
       },
       select: {
+        id: true,
+
         course: {
           select: {
             id: true,
             title: true,
             description: true,
+            imageUrl: true,
+            startDate: true,
+
             teacher: {
-              select: { id: true, name: true },
+              select: {
+                id: true,
+                name: true,
+              },
             },
+
+            _count: {
+              select: {
+                lectures: {
+                  where: {
+                    isDeleted: false,
+                  },
+                },
+              },
+            },
+
             lectures: {
+              where: {
+                isDeleted: false,
+              },
+
+              orderBy: {
+                startTime: "asc",
+              },
+
               select: {
                 id: true,
                 title: true,
                 startTime: true,
                 status: true,
+
+                attendance: {
+                  where: {
+                    studentId,
+                  },
+                  select: {
+                    status: true,
+                    durationSec: true,
+                  },
+                },
               },
             },
           },
@@ -78,7 +115,7 @@ const EnrollmentRepositories = {
       },
     });
   },
-
+  
   async enrollmentDataById(id: string, userId: string) {
     const enrollment = await prisma.enrollment.findUnique({
       where: { id, studentId: userId },

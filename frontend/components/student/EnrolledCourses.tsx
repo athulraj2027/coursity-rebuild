@@ -157,7 +157,7 @@ const CourseCard = ({ course }: { course: Course }) => {
       {/* CTA */}
       <div className="px-4 pb-4">
         <Button
-          onClick={() => router.push(`/student/course/${course.id}`)}
+          onClick={() => router.push(`/student/enrolled-courses/${course.id}`)}
           className="w-full bg-green-500 text-white hover:bg-green-400 rounded-xl text-xs h-8"
         >
           Open Course

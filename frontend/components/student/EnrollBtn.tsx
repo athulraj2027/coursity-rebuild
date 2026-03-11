@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import { loadRazorpay } from "@/hooks/useRazorpay";
@@ -7,10 +8,16 @@ import {
   VerifyPaymentResponse,
 } from "@/services/payment.services";
 import { toast } from "sonner";
-import { Loader2, CreditCard, CheckCircle } from "lucide-react";
+import { Loader2, CreditCard } from "lucide-react";
 import EnrollmentSuccess from "./EnrollmentSuccess";
 
-const EnrollBtn = ({ courseId }: { courseId: string }) => {
+const EnrollBtn = ({
+  courseId,
+  setLoadingProp,
+}: {
+  courseId: string;
+  setLoadingProp: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [loading, setLoading] = useState(false);
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
 
@@ -36,10 +43,12 @@ const EnrollBtn = ({ courseId }: { courseId: string }) => {
         currency: res.currency,
         order_id: res.orderId,
         handler: async function (response: any) {
+          setLoadingProp(true);
           const data: VerifyPaymentResponse = await verifyPaymentApi({
             ...response,
             courseId,
           });
+          setLoadingProp(false);
           toast.success("Enrolled successfully 🎉");
           setEnrollmentId(data.enrollment_id); // ← triggers inline success view
         },

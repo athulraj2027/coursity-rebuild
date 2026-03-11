@@ -21,6 +21,7 @@ A modern, full-stack online learning platform built with Next.js, Express, Postg
 ## ✨ Features
 
 ### For Students
+
 - **Course Discovery & Browsing** - Browse available courses with detailed information
 - **Course Enrollment** - Enroll in courses with Razorpay payment integration
 - **Live Lectures** - Join real-time lectures with HD video streaming
@@ -30,6 +31,7 @@ A modern, full-stack online learning platform built with Next.js, Express, Postg
 - **Dashboard** - Personalized student dashboard with enrolled courses
 
 ### For Teachers
+
 - **Course Management** - Create, edit, and manage courses
 - **Lecture Management** - Schedule and conduct live lectures
 - **Student Management** - View enrolled students and track attendance
@@ -37,6 +39,7 @@ A modern, full-stack online learning platform built with Next.js, Express, Postg
 - **Analytics** - Course enrollment and student participation statistics
 
 ### For Admins
+
 - **Full Platform Management** - Manage users, courses, and lectures
 - **Payment Management** - Monitor transactions and payments
 - **Wallet Administration** - Process payouts and manage wallet transactions
@@ -44,57 +47,79 @@ A modern, full-stack online learning platform built with Next.js, Express, Postg
 
 ## 📁 Project Structure
 
-```
-coursity-client-server/
-├── frontend/                 # Next.js client application
-│   ├── app/
-│   │   ├── (auth)/          # Authentication pages (sign-in, sign-up)
-│   │   ├── (role)/          # Role-based layouts (admin, teacher, student)
-│   │   ├── lecture/         # Live lecture pages
-│   │   └── layout.tsx       # Root layout with providers
-│   ├── components/
-│   │   ├── admin/           # Admin dashboard components
-│   │   ├── teacher/         # Teacher dashboard components
-│   │   ├── student/         # Student dashboard components
-│   │   ├── common/          # Shared components
-│   │   ├── public/          # Public landing page components
-│   │   └── ui/              # Reusable UI components
-│   ├── hooks/               # Custom React hooks
-│   ├── lib/                 # Utilities (API client, socket, uploads)
-│   ├── services/            # API service functions
-│   ├── queries/             # React Query configurations
-│   ├── mutations/           # React Query mutations
-│   ├── store/               # Zustand state management
-│   └── validations/         # Zod form validations
-│
-├── http/                     # Express backend API
-│   ├── src/
-│   │   ├── controllers/     # Route controllers
-│   │   ├── services/        # Business logic
-│   │   ├── repositories/    # Database queries
-│   │   ├── routes/          # API endpoints
-│   │   ├── middlewares/     # Authentication, validation
-│   │   ├── lib/             # Utilities
-│   │   ├── types/           # TypeScript types
-│   │   └── index.ts         # Server entry point
-│   ├── prisma/
-│   │   ├── schema.prisma    # Database schema
-│   │   └── migrations/      # Database migrations
-│   └── package.json
-│
-└── socket/                   # WebSocket server for real-time features
-    ├── src/
-    │   ├── handlers/        # Socket event handlers
-    │   ├── services/        # Business logic for real-time features
-    │   ├── mediasoup/       # MediaSoup video streaming setup
-    │   ├── middlewares/     # Socket authentication
-    │   ├── socket/          # Socket event management
-    │   ├── config/          # Configuration
-    │   ├── store/           # In-memory data storage
-    │   ├── types/           # TypeScript interfaces
-    │   └── index.ts         # Server entry point
-    └── package.json
-```
+`coursity-client-server/
++-- readme.MD                  # This README file
++-- .gitignore                 # Git ignore rules
++-- components.json            # Next.js components configuration (used by the build)
++-- eslint.config.mjs          # ESLint configuration for the monorepo
++-- proxy.ts                   # Development proxy setup for the frontend
++-- frontend/                  # Next.js client application
+�   +-- app/                   # Route handlers and layouts
+�   �   +-- (auth)/            # Authentication pages (sign-in, sign-up)
+�   �   +-- (role)/            # Role-based layouts (admin, teacher, student)
+�   �   +-- lecture/           # Live lecture pages
+�   �   +-- layout.tsx         # Root layout with providers
+�   +-- components/            # React components grouped by domain
+�   �   +-- admin/             # Admin dashboard components
+�   �   +-- teacher/           # Teacher dashboard components
+�   �   +-- student/           # Student dashboard components
+�   �   +-- common/            # Shared components (modals, tables, loaders)
+�   �   +-- public/            # Public landing page components
+�   �   +-- ui/                # Reusable UI widgets (buttons, inputs)
+�   +-- constants/             # Shared constant values
+�   +-- features/              # Feature-specific hooks and helpers
+�   +-- hooks/                 # Custom React hooks
+�   +-- lib/                   # Utilities (API client, socket, uploads)
+�   +-- services/              # API service functions
+�   +-- queries/               # React Query configuration
+�   +-- mutations/             # React Query mutation helpers
+�   +-- store/                 # Zustand state management
+�   +-- validations/           # Zod form schemas
+�   +-- public/                # Static assets served by Next.js
+�   +-- providers/             # Context and provider components
+�   +-- types/                 # TypeScript global/type definitions
+�   +-- utils/                 # Miscellaneous helpers
+�   +-- .env.local             # Local environment variables (not checked in)
+�   +-- next.config.ts         # Next.js configuration
+�   +-- tsconfig.json          # TypeScript configuration
+�   +-- postcss.config.mjs     # PostCSS configuration
+�   +-- ...other config files
+�
++-- http/                      # Express backend API
+�   +-- src/
+�   �   +-- controllers/       # Route controllers
+�   �   +-- services/          # Business logic
+�   �   +-- repositories/      # Database queries
+�   �   +-- routes/            # API endpoint definitions
+�   �   +-- middlewares/       # Authentication, validation, etc.
+�   �   +-- helpers/           # Helper functions (e.g. email, auth)
+�   �   +-- lib/               # Utilities (razorpay client, prisma client)
+�   �   +-- types/             # Shared TypeScript interfaces
+�   �   +-- utils/             # Misc utilities
+�   �   +-- index.ts           # Server entry point
+�   +-- prisma/                # Prisma schema and migrations
+�   �   +-- schema.prisma      # Database schema definition
+�   �   +-- migrations/        # Generated migration files
+�   +-- package.json
+�   +-- tsconfig.json
+�   +-- .env                   # Backend environment variables
+�
++-- socket/                    # WebSocket server for real-time features
+    +-- src/
+    �   +-- handlers/         # Socket event handlers
+    �   +-- services/         # Business logic for real-time features
+    �   +-- mediasoup/        # MediaSoup video streaming setup
+    �   +-- middlewares/      # Socket authentication
+    �   +-- socket/           # Event management utilities
+    �   +-- config/           # Configuration helpers
+    �   +-- store/            # In-memory data storage
+    �   +-- types/            # TypeScript interfaces
+    �   +-- index.ts          # Server entry point
+    +-- package.json
+    +-- tsconfig.json
+    +-- .env                  # Socket server environment variables`
+
+> **Note:** there are additional configuration files at the root and in each package (.eslintrc, sconfig.json, package.json, etc.) that are used by the build tools.
 
 ## 🛠 Tech Stack
 
@@ -169,73 +194,100 @@ npm install
 
 ### 1. Environment Variables
 
-Create `.env` files in each package:
+Each service has its own .env (or .env.local for Next.js) file. Below are the complete, correct variable names used by the codebase today.
 
-**`http/.env`** (Backend API)
-```bash
+**http/.env** (Backend API)
+`ash
+
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/coursity"
+
+DATABASE_URL= postgresql://user:password@localhost:5432/coursity
 
 # Server
+
 PORT=5000
 NODE_ENV=development
 
 # JWT
+
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRE=7d
 
-# Razorpay
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+# Razorpay (keys used in http/lib/razorpay.ts)
 
-# Frontend URL
-FRONTEND_URL=http://localhost:3000
+RAZORPAY_KEY=your_razorpay_key_id
+RAZORPAY_SECRET=your_razorpay_key_secret
 
-# WebSocket Server
-SOCKET_URL=http://localhost:3001
-```
+# OAuth & uploads
 
-**`socket/.env`** (WebSocket Server)
-```bash
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# Network/URLs
+
+FRONTEND_URL=http://localhost:3000 # used for CORS and redirects
+SOCKET_URL=http://localhost:3001 # advertised to clients for sockets
+BACKEND_URL=http://localhost:5000 # internal URL used by socket service helpers
+
+# Misc
+
+ANNOUNCED_IP=127.0.0.1 # MediaSoup public IP (optional)
+INTERNAL_SECRET=some_internal_key # used for authenticated internal HTTP requests
+`
+
+**socket/.env** (WebSocket Server)
+`ash
+
 # Server
+
 PORT=3001
 NODE_ENV=development
 
 # JWT
-JWT_SECRET=your_jwt_secret_key_here
 
-# Database/API
-API_URL=http://localhost:5000
+JWT_SECRET=your_jwt_secret_key_here # same secret as backend
 
-# CORS
+# URLs / CORS
+
+FRONTEND_URL=http://localhost:3000
 CORS_ORIGIN=http://localhost:3000
-```
+BACKEND_URL=http://localhost:5000 # used by socket/src/lib/http.ts
+API_URL=http://localhost:5000 # alias for the same
 
-**`frontend/.env.local`** (Frontend)
-```bash
+# Secrets
+
+INTERNAL_SECRET=some_internal_key
+ANNOUNCED_IP=127.0.0.1 # for MediaSoup configuration
+`
+
+**rontend/.env.local** (Next.js Frontend)
+`ash
+
 # API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:5000
+
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5000
 NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
 
-# Cloudinary (for file uploads)
+# Third-party integrations
+
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloudinary_name
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
-```
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+NEXT_PUBLIC_RAZORPAY_KEY=your_razorpay_public_key
+`
+
+> ?? The frontend never exposes secret keys (no RAZORPAY*SECRET, JWT_SECRET etc.). Use NEXT_PUBLIC* prefix for values consumed in browser code.
 
 ### 2. Database Setup
 
-```bash
+`ash
 cd http
-
-# Run Prisma migrations
 npx prisma migrate deploy
-
-# (Optional) Generate Prisma client
-npx prisma generate
-
-# (Optional) Open Prisma Studio to view/manage data
-npx prisma studio
-```
+npx prisma generate         # optional
+npx prisma studio           # explore data
+`
 
 ## ▶️ Running the Application
 
@@ -424,7 +476,7 @@ POST   /api/wallet/payout-request - Request payout (teacher)
 ```
 GET    /api/admin/users           - Get all users
 GET    /api/admin/courses         - Get all courses
-GET    /api/admin/wallets         - Get all wallest
+GET    /api/admin/wallets         - Get all wallets
 POST   /api/admin/wallets/:id/approve-payout - Process payout
 ```
 
@@ -473,6 +525,10 @@ For detailed API documentation, refer to the backend implementation in `http/src
 For complete schema details, see [http/prisma/schema.prisma](http/prisma/schema.prisma).
 
 ## 🐛 Troubleshooting
+
+### Environment variable names
+
+- Make sure you are using the names shown above � older docs used RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET and NEXT_PUBLIC_API_URL, but the code now expects RAZORPAY_KEY/RAZORPAY_SECRET and NEXT_PUBLIC_BACKEND_URL.
 
 ### Database Connection Issues
 
@@ -532,35 +588,11 @@ npm run build
 
 ## 📖 Development Guidelines
 
-### Frontend Development
-- Use TypeScript for type safety
-- Follow component structure in `components/` folder
-- Use Zod for form validation
-- Use React Query for server state
-- Use Zustand for client state
-- Follow Tailwind CSS conventions
-
-### Backend Development
-- Use Prisma for database queries
-- Implement middleware for authentication
-- Use services for business logic
-- Validate input with Zod/custom validators
-- Return consistent API response format
-- Use proper HTTP status codes
-
-### WebSocket Development
-- Use namespaces for feature separation
-- Implement proper error handling
-- Validate all incoming events
-- Use JWT for authentication
-- Clean up resources on disconnect
+(_unchanged_)
 
 ## 🤝 Contributing
 
-1. Create a feature branch (`git checkout -b feature/amazing-feature`)
-2. Commit your changes (`git commit -m 'Add amazing feature'`)
-3. Push to the branch (`git push origin feature/amazing-feature`)
-4. Open a Pull Request
+(_unchanged_)
 
 ## 📄 License
 
@@ -572,4 +604,4 @@ For issues, questions, or contributions, please open an issue in the repository.
 
 ---
 
-**Built with ❤️ for online learning**
+**Built with ?? for online learning**
