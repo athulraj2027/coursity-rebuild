@@ -45,3 +45,9 @@ export const actions = (
     },
   ];
 };
+
+export const LECTURES_PAGE_POINTS = [
+  " Lecture starting option will be enabled 10 minutes prior to the scheduled time",
+  " For creating new lecture, please go to your courses page.",
+  " In case you disconnect from your lecture, the lecture will be marked completed after 2 mins.",
+];

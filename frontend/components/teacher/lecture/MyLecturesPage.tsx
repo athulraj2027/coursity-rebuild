@@ -26,6 +26,7 @@ import {
 
 import { useMyLecturesQuery } from "@/queries/lectures.queries";
 import LectureActions from "./LectureActions";
+import { LECTURES_PAGE_POINTS } from "@/constants/teacher";
 
 type LectureTableRow = {
   id: string;
@@ -315,20 +316,13 @@ const MyLecturesPage = () => {
           lectures
         </p>
 
-        <div className="flex items-start gap-1">
-          <span className="text-red-600 text-sm">*</span>
-          <p className="text-xs text-neutral-400 font-medium">
-            Lecture starting option will be enabled 10 minutes prior to the
-            scheduled time.
-          </p>
-        </div>
+        {LECTURES_PAGE_POINTS.map((point, i) => (
+          <div key={i} className="flex items-start gap-1">
+            <span className="text-red-600 text-sm">*</span>
+            <p className="text-xs text-neutral-400 font-medium">{point}</p>
+          </div>
+        ))}
 
-        <div className="flex items-start gap-1 mb-4">
-          <span className="text-red-600 text-sm">*</span>
-          <p className="text-xs text-neutral-400 font-medium">
-            For creating new lecture, please go to your courses page.
-          </p>
-        </div>
         {/* Table */}
 
         <div className="bg-white border border-black/8 rounded-2xl overflow-hidden shadow-sm">

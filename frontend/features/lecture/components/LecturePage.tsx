@@ -56,9 +56,17 @@ const LecturePageComponent = ({ lectureId }: { lectureId: string }) => {
           {/* CTA Button */}
           <div className="w-full">
             {isTeacher ? (
-              <StartLectureBtn onStart={handleEnter} lectureId={lectureId} />
+              <StartLectureBtn
+                onStart={handleEnter}
+                lectureId={lectureId}
+                isConnected={isConnected}
+              />
             ) : (
-              <JoinLectureBtn onStart={handleEnter} lectureId={lectureId} />
+              <JoinLectureBtn
+                onStart={handleEnter}
+                lectureId={lectureId}
+                isConnected={isConnected}
+              />
             )}
           </div>
 

@@ -20,15 +20,8 @@ export const useLectureSocket = (
       setExistingUsers((prev) => [...prev, params]);
     };
 
-    const handlePeerLeft = ({
-      username,
-      socketId,
-    }: {
-      username: string;
-      socketId: string;
-    }) => {
+    const handlePeerLeft = ({ username }: { username: string }) => {
       toast.warning(`${username} left the lecture`);
-
       setExistingUsers((prev) =>
         prev.filter((user: any) => user.username !== username),
       );

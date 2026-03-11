@@ -7,9 +7,11 @@ import { Loader2, Video } from "lucide-react";
 const JoinLectureBtn = ({
   onStart,
   lectureId,
+  isConnected,
 }: {
   onStart: () => void;
   lectureId: string;
+  isConnected: boolean;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +37,7 @@ const JoinLectureBtn = ({
   return (
     <button
       onClick={handleJoin}
-      disabled={isLoading}
+      disabled={isLoading || !isConnected}
       className="w-full flex items-center justify-center gap-2 h-10 px-6 rounded-xl bg-black text-white text-sm font-semibold border border-black hover:bg-black/80 active:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
     >
       {isLoading ? (
