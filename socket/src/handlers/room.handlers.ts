@@ -110,6 +110,12 @@ export async function DisconnectHandler(socket: Socket) {
 
         if (stillDisconnected) {
           // await endLectureService(user.lectureId);
+          await callInternalApi(
+            `/lectures/${user.lectureId}/end`,
+            "POST",
+            {},
+            { userId, role },
+          );
           socket.to(user.lectureId).emit("lecture-ended");
           roomStore.removeRoom(user.lectureId);
         }
