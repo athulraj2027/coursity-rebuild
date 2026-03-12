@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
 
-const TeacherEnrollmentController = {
-  getMyEnrollments: async (req: Request, res: Response) => {},
-  getMyEnrollmentsByCourseId: async (req: Request, res: Response) => {},
-};
+const getMyEnrollments = async (req: Request, res: Response) => {};
+const getMyEnrollmentsByCourseId = async (req: Request, res: Response) => {};
 
-export default TeacherEnrollmentController;
+export default { getMyEnrollments, getMyEnrollmentsByCourseId };

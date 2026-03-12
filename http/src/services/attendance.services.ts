@@ -7,138 +7,134 @@ import { AppError } from "../utils/AppError.js";
 const LATE_THRESHOLD_MIN = 10;
 const PRESENT_THRESHOLD_PERCENT = 70;
 
-const AttendanceService = {
-  finalizeAttendance: async (teacherId: string, lectureId: string) => {
-    const lecture =
-      await AttendanceRepositories.findLectureWithCourse(lectureId);
+const finalizeAttendance = async (teacherId: string, lectureId: string) => {
+  const lecture = await AttendanceRepositories.findLectureWithCourse(lectureId);
 
-    if (!lecture) throw new AppError("Lecture not found", 400);
+  if (!lecture) throw new AppError("Lecture not found", 400);
 
-    if (lecture.course.teacherId !== teacherId)
-      throw new AppError("Unauthorized", 403);
+  if (lecture.course.teacherId !== teacherId)
+    throw new AppError("Unauthorized", 403);
 
-    if (lecture.status !== "STARTED")
-      throw new AppError("Lecture is not live", 403);
+  if (lecture.status !== "STARTED")
+    throw new AppError("Lecture is not live", 403);
 
-    const lectureEndTime = new Date();
+  const lectureEndTime = new Date();
 
-    const lectureDurationSec = Math.floor(
-      (lectureEndTime.getTime() - lecture.startTime.getTime()) / 1000,
+  const lectureDurationSec = Math.floor(
+    (lectureEndTime.getTime() - lecture.startTime.getTime()) / 1000,
+  );
+
+  const enrollments = await AttendanceRepositories.getEnrollmentsByCourseId(
+    lecture.courseId,
+  );
+
+  const participants =
+    await ParticipantRepository.getParticipantsByLectureId(lectureId);
+
+  const durationMap = new Map<string, number>();
+
+  for (const p of participants) {
+    if (p.role !== "STUDENT") continue;
+
+    const leaveTime = p.leaveTime ?? lectureEndTime;
+
+    const sessionDuration = Math.floor(
+      (leaveTime.getTime() - p.joinTime.getTime()) / 1000,
     );
 
-    const enrollments = await AttendanceRepositories.getEnrollmentsByCourseId(
-      lecture.courseId,
-    );
+    const existing = durationMap.get(p.userId) || 0;
+    durationMap.set(p.userId, existing + sessionDuration);
+  }
 
-    const participants =
-      await ParticipantRepository.getParticipantsByLectureId(lectureId);
+  for (const enrollment of enrollments) {
+    const totalDuration = durationMap.get(enrollment.studentId) || 0;
 
-    const durationMap = new Map<string, number>();
+    const attendedPercent =
+      lectureDurationSec === 0 ? 0 : (totalDuration / lectureDurationSec) * 100;
 
-    for (const p of participants) {
-      if (p.role !== "STUDENT") continue;
+    const status =
+      attendedPercent >= PRESENT_THRESHOLD_PERCENT
+        ? "PRESENT"
+        : totalDuration > 0
+          ? "LATE"
+          : "ABSENT";
 
-      const leaveTime = p.leaveTime ?? lectureEndTime;
-
-      const sessionDuration = Math.floor(
-        (leaveTime.getTime() - p.joinTime.getTime()) / 1000,
-      );
-
-      const existing = durationMap.get(p.userId) || 0;
-      durationMap.set(p.userId, existing + sessionDuration);
-    }
-
-    for (const enrollment of enrollments) {
-      const totalDuration = durationMap.get(enrollment.studentId) || 0;
-
-      const attendedPercent =
-        lectureDurationSec === 0
-          ? 0
-          : (totalDuration / lectureDurationSec) * 100;
-
-      const status =
-        attendedPercent >= PRESENT_THRESHOLD_PERCENT
-          ? "PRESENT"
-          : totalDuration > 0
-            ? "LATE"
-            : "ABSENT";
-
-      await AttendanceRepositories.upsertAttendance({
-        lectureId,
-        studentId: enrollment.studentId,
-        durationSec: totalDuration,
-        status,
-      });
-    }
-
-    await LectureRepositories.endLectureOwner(lectureId);
-
-    await ParticipantRepository.closeAllActiveParticipants(
+    await AttendanceRepositories.upsertAttendance({
       lectureId,
-      lectureEndTime,
-    );
-    return { message: "Attendance finalized successfully" };
-  },
+      studentId: enrollment.studentId,
+      durationSec: totalDuration,
+      status,
+    });
+  }
 
-  getAttendanceDataForTeacher: async (teacherId: string, courseId: string) => {
-    const course = await CourseRepositories.findByIdInternalOwnerView(
-      courseId,
-      teacherId,
-    );
+  await LectureRepositories.endLectureOwner(lectureId);
 
-    if (!course) throw new AppError("Course not found", 400);
+  await ParticipantRepository.closeAllActiveParticipants(
+    lectureId,
+    lectureEndTime,
+  );
+  return { message: "Attendance finalized successfully" };
+};
 
-    const lectures =
-      await LectureRepositories.getAllLecturesForACourse(courseId);
+const getAttendanceDataForTeacher = async (
+  teacherId: string,
+  courseId: string,
+) => {
+  const course = await CourseRepositories.findByIdInternalOwnerView(
+    courseId,
+    teacherId,
+  );
 
-    if (!lectures)
-      throw new AppError("Lectures not found for this course ", 400);
+  if (!course) throw new AppError("Course not found", 400);
 
-    const enrollments =
-      await EnrollmentRepositories.getAllEnrollmentsForACourse(courseId);
+  const lectures = await LectureRepositories.getAllLecturesForACourse(courseId);
 
-    if (!enrollments)
-      throw new AppError("No enrollments found for the course", 400);
+  if (!lectures) throw new AppError("Lectures not found for this course ", 400);
 
-    const attendance =
-      await AttendanceRepositories.getAttendanceForCourse(courseId);
+  const enrollments =
+    await EnrollmentRepositories.getAllEnrollmentsForACourse(courseId);
 
-    const attendanceMap = new Map();
+  if (!enrollments)
+    throw new AppError("No enrollments found for the course", 400);
 
-    for (const a of attendance) {
-      attendanceMap.set(`${a.studentId}-${a.lectureId}`, a);
-    }
+  const attendance =
+    await AttendanceRepositories.getAttendanceForCourse(courseId);
 
-    // 6️⃣ Build table data
-    const table = enrollments.map((enrollment) => {
-      const student = enrollment.student;
+  const attendanceMap = new Map();
 
-      const lecturesData = lectures.map((lecture) => {
-        const record = attendanceMap.get(`${student.id}-${lecture.id}`);
+  for (const a of attendance) {
+    attendanceMap.set(`${a.studentId}-${a.lectureId}`, a);
+  }
 
-        return {
-          lectureId: lecture.id,
-          lectureTitle: lecture.title,
-          startTime: lecture.startTime,
-          durationSec: record?.durationSec || 0,
-          status: record?.status || "ABSENT",
-        };
-      });
+  // 6️⃣ Build table data
+  const table = enrollments.map((enrollment) => {
+    const student = enrollment.student;
+
+    const lecturesData = lectures.map((lecture) => {
+      const record = attendanceMap.get(`${student.id}-${lecture.id}`);
 
       return {
-        studentId: student.id,
-        name: student.name,
-        email: student.email,
-        lectures: lecturesData,
+        lectureId: lecture.id,
+        lectureTitle: lecture.title,
+        startTime: lecture.startTime,
+        durationSec: record?.durationSec || 0,
+        status: record?.status || "ABSENT",
       };
     });
 
     return {
-      course: course.course.title,
-      lectures,
-      students: table,
+      studentId: student.id,
+      name: student.name,
+      email: student.email,
+      lectures: lecturesData,
     };
-  },
+  });
+
+  return {
+    course: course.course.title,
+    lectures,
+    students: table,
+  };
 };
 
-export default AttendanceService;
+export default { finalizeAttendance, getAttendanceDataForTeacher };

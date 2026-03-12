@@ -1,34 +1,32 @@
 import type { Request, Response } from "express";
 import PaymentServices from "../../services/payment.services.js";
 
-const StudentPaymentController = {
-  createOrder: async (req: Request, res: Response) => {
-    const { courseId } = req.body;
-    const user = req.user;
+const createOrder = async (req: Request, res: Response) => {
+  const { courseId } = req.body;
+  const user = req.user;
 
-    const order = await PaymentServices.createOrder(courseId, user);
-    if (!order)
-      return res
-        .status(400)
-        .json({ success: false, message: "Couldn't create order" });
+  const order = await PaymentServices.createOrder(courseId, user);
+  if (!order)
+    return res
+      .status(400)
+      .json({ success: false, message: "Couldn't create order" });
 
-    return res.status(200).json({
-      success: true,
-      res: {
-        orderId: order.id,
-        amount: order.amount,
-        currency: order.currency,
-      },
-    });
-  },
-
-  verifyOrder: async (req: Request, res: Response) => {
-    const completeEnrollment =
-      await PaymentServices.completeEnrollmentAfterPayment(req.body, req.user);
-
-    // send email
-    return res.status(200).json(completeEnrollment);
-  },
+  return res.status(200).json({
+    success: true,
+    res: {
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+    },
+  });
 };
 
-export default StudentPaymentController;
+const verifyOrder = async (req: Request, res: Response) => {
+  const completeEnrollment =
+    await PaymentServices.completeEnrollmentAfterPayment(req.body, req.user);
+
+  // send email
+  return res.status(200).json(completeEnrollment);
+};
+
+export default { createOrder, verifyOrder };
