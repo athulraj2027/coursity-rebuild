@@ -5,6 +5,7 @@ import {
   Compass,
   LayoutDashboard,
   Presentation,
+  User2,
   Users,
   Video,
   Wallet,
@@ -15,6 +16,7 @@ export const TEACHER_LINKS = [
   { name: "Courses", url: "/my-courses", icon: BookOpen },
   { name: "Lectures", url: "/my-lectures", icon: Presentation },
   { name: "Wallet", url: "/wallet", icon: Wallet },
+  { name: "Profile", url: "/profile", icon: User2 },
 ];
 export const STUDENT_LINKS = [
   { name: "Dashboard", url: "", icon: LayoutDashboard },
@@ -22,6 +24,7 @@ export const STUDENT_LINKS = [
   { name: "Enrolled Courses", url: "/enrolled-courses", icon: BookMarked },
   { name: "Lectures", url: "/lectures", icon: Video },
   { name: "Transactions", url: "/transactions", icon: ArrowLeftRight },
+  { name: "Profile", url: "/profile", icon: User2 },
 ];
 
 export const ADMIN_LINKS = [

@@ -148,7 +148,7 @@ const ControlBar = ({
         )}
       </ControlBtn>
 
-      <ControlBtn
+      {/* <ControlBtn
         onClick={handleHandToggle}
         active={isHandRaised}
         label={isHandRaised ? "Lower Hand" : "Raise Hand"}
@@ -158,7 +158,7 @@ const ControlBar = ({
         ) : (
           <HandIcon className="w-4.5 h-4.5" strokeWidth={1.8} />
         )}
-      </ControlBtn>
+      </ControlBtn> */}
 
       <ControlBtn
         onClick={handleScreenToggle}
