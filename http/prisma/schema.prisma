@@ -93,6 +93,7 @@ model User {
   role      Role
   wallet    Wallet?
   isVerified   Boolean   @default(false)
+  profile   Profile?
 
   // Relations
   courses      Course[]      @relation("TeacherCourses")
@@ -100,6 +101,27 @@ model User {
   attendance   Attendance[]
   participants Participant[]
   payments     Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id        String  @id @default(uuid())
+
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+
+  avatarUrl String?
+  bio       String?
+  headline  String? // "Full Stack Developer", "DSA Mentor", etc
+
+  website   String?
+  github    String?
+  linkedin  String?
+  twitter   String?
+
+  location  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,10 +197,6 @@ model Lecture {
   createdAt DateTime @default(now())
 }
 
-//
-// Realtime presence (socket-driven)
-// NOT academic truth
-//
 model Participant {
   id        String   @id @default(uuid())
 
@@ -195,10 +213,6 @@ model Participant {
   @@index([lectureId])
 }
 
-//
-// Derived academic truth
-// Calculated from join/leave time
-//
 model Attendance {
   id          String   @id @default(uuid())
 
@@ -214,10 +228,6 @@ model Attendance {
   @@unique([studentId, lectureId])
 }
 
-//
-// Payments are financial truth
-// Enrollment is derived from PAID payment
-//
 model Payment {
   id                  String   @id @default(uuid())
 
