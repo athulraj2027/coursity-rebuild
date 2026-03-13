@@ -9,10 +9,15 @@ const getUserProfile = async (req: Request, res: Response) => {
 };
 
 const patchProfile = async (req: Request, res: Response) => {
-  console.log("req body : ", req.body);
   const user = req.user;
   await profileServices.putUserProfile(user.id, req.body);
   return res.status(200).json({ success: true });
 };
 
-export default { getUserProfile, patchProfile };
+const getTeacherProfile = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const teacherProfile = await profileServices.getTeacherProfile(id as string);
+  return res.status(200).json({ success: true, teacherProfile });
+};
+
+export default { getUserProfile, patchProfile, getTeacherProfile };

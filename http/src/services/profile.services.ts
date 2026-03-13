@@ -9,4 +9,10 @@ const putUserProfile = async (userId: string, data: any) => {
   return await profileRepositories.putUserProfile(userId, data);
 };
 
-export default { getUserProfile, putUserProfile };
+const getTeacherProfile = async (id: string) => {
+  const profile = await profileRepositories.getTeacherProfileForStudents(id);
+  if (!profile) throw new AppError("Profile not found", 400);
+  return profile;
+};
+
+export default { getUserProfile, putUserProfile, getTeacherProfile };

@@ -24,7 +24,6 @@ export const STUDENT_LINKS = [
   { name: "Enrolled Courses", url: "/enrolled-courses", icon: BookMarked },
   { name: "Lectures", url: "/lectures", icon: Video },
   { name: "Transactions", url: "/transactions", icon: ArrowLeftRight },
-  { name: "Profile", url: "/profile", icon: User2 },
 ];
 
 export const ADMIN_LINKS = [

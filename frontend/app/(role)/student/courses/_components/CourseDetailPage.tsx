@@ -11,10 +11,12 @@ import {
   Video,
   IndianRupee,
   Clock,
+  MoveLeftIcon,
 } from "lucide-react";
 import Loading from "@/components/common/Loading";
 import Error from "@/components/common/Error";
 import EnrollBtn from "@/components/student/EnrollBtn";
+import Link from "next/link";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 interface CoursePublic {
@@ -90,6 +92,24 @@ const CourseDetailPage = ({ id }: { id: string }) => {
     <div className="min-h-screen bg-neutral-50">
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
         {/* ── Header ── */}
+        <button
+          onClick={() => window.history.back()}
+          className="
+            inline-flex items-center gap-2
+            px-4 py-2
+            rounded-xl
+            text-sm font-semibold
+            text-red-600
+            bg-red-50
+            hover:bg-red-100
+            active:scale-95
+            transition-all duration-200 mb-6
+            focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2
+          "
+        >
+          <MoveLeftIcon size={18} />
+          Go Back
+        </button>
         <div>
           <p className="text-[10px] font-bold text-neutral-400 tracking-widest uppercase mb-2">
             Course
@@ -104,9 +124,11 @@ const CourseDetailPage = ({ id }: { id: string }) => {
             />
             <p className="text-sm text-neutral-500 font-medium">
               by{" "}
-              <span className="text-violet-600 font-semibold">
-                {course.teacher.name}
-              </span>
+              <Link href={`/student/teacher/profile/${course.teacher.id}`}>
+                <span className="text-violet-600 font-semibold">
+                  {course.teacher.name}
+                </span>
+              </Link>
             </p>
           </div>
         </div>
@@ -273,7 +295,10 @@ const CourseDetailPage = ({ id }: { id: string }) => {
                       Enrollment Closed
                     </div>
                   ) : (
-                    <EnrollBtn courseId={course.id} setLoadingProp={setLoading} />
+                    <EnrollBtn
+                      courseId={course.id}
+                      setLoadingProp={setLoading}
+                    />
                   )}
 
                   {/* Guarantee note */}

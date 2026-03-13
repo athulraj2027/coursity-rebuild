@@ -6,3 +6,6 @@ export const getProfileApi = async () =>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const patchProfileApi = async (data: any) =>
   apiRequest({ path: "/profile", method: "PUT", body: data });
+
+export const getTeacherProfileApi = async (id: string) =>
+  apiRequest({ path: `/profile/${id}`, method: "GET" });
